@@ -67,7 +67,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
             if len(self.vols) > 0:
                 for vol in self.vols:
                     sampling, volFileName, x, y, z = self._getXYZFromVol(vol)
-                    f.write("open %s\n" % volFileName)
+                    f.write("open %s\n" % os.path.abspath(volFileName))
                     f.write("volume #1 style surface voxelSize %f\n"
                             "volume #1 origin %0.2f,%0.2f,%0.2f\n"
                             % (sampling, x, y, z))
