@@ -189,7 +189,7 @@ hierarchy = RingerDict(ringer_results, 0)
 chains = sorted(hierarchy.get_chains())
 dataDict['_chains'] = chains
 
-# Aminoacids that contain gamma-carbon (at least one Chi angle; included in
+# Aminoacids that contain non-H gamma atom (at least one Chi angle; included in
 # ringer_results)
 dictResidue = {}
 formatResidue = []

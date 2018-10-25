@@ -136,7 +136,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
                       choices=self.residueList,
                       default=0,
                       label="Residue",
-                      help="Choose one of the gamma-carbon-containing "
+                      help="Choose one of the non-H gamma atom-containing "
                            "residues (at least with one Chi angle) "
                            "located in one of the chains in the "
                            "position indicated. ")
