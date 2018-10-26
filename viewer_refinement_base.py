@@ -604,6 +604,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         f = open(fnCmd, 'w')
         # reference axis model = 0
         f.write("open %s\n" % bildFileName)
+        f.write("cofr 0,0,0\n")  # set center of coordinates
 
         # input 3D map
         counter += 1  # 1

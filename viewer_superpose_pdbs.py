@@ -64,6 +64,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
 
         with open(fnCmd, 'w') as f:
             f.write("open %s\n" % bildFileName)
+            f.write("cofr 0,0,0\n")  # set center of coordinates
             if len(self.vols) > 0:
                 for vol in self.vols:
                     sampling, volFileName, x, y, z = self._getXYZFromVol(vol)
