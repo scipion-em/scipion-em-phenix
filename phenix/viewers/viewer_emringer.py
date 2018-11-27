@@ -28,14 +28,14 @@
 import json
 import os
 from tkMessageBox import showerror
-from protocol_emringer import PhenixProtRunEMRinger
+from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from pyworkflow.protocol.params import LabelParam, EnumParam
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
 from pyworkflow.em.viewer import TableView
 import collections
 import glob
 from PIL import Image
-from convert import runPhenixProgram
+from phenix.convert import runPhenixProgram
 from pyworkflow.em.viewers.chimera_utils import \
     createCoordinateAxisFile, runChimeraProgram
 

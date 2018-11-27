@@ -28,7 +28,7 @@ import glob
 import json
 import os
 
-from convert import runPhenixProgram, getProgram, EMRINGER
+from phenix.convert import runPhenixProgram, getProgram, EMRINGER
 from pyworkflow.em.headers import adaptFileToCCP4, START
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String

@@ -27,7 +27,7 @@
 
 import os
 
-from protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
+from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from pyworkflow.em.viewers.chimera_utils import \
     createCoordinateAxisFile, runChimeraProgram, getProgram
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer

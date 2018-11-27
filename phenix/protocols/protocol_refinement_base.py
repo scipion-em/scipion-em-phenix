@@ -4,7 +4,7 @@ from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam, FloatParam
 from pyworkflow.em.headers import adaptFileToCCP4, START
-from convert import runPhenixProgram, getProgram, MOLPROBITY
+from phenix.convert import runPhenixProgram, getProgram, MOLPROBITY
 from pyworkflow.utils import magentaStr
 
 class PhenixProtRunRefinementBase(EMProtocol):

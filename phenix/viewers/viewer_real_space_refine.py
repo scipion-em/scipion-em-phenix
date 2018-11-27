@@ -1,7 +1,8 @@
-# **************************************************************************
 # *
-# * Authors:     Roberto Marabini (roberto@cnb.csic.es)
+# * Authors:     Roberto Marabini
+# *              Marta Martinez
 # *
+# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -23,18 +24,25 @@
 # *
 # **************************************************************************
 
-from pyworkflow.em.packages.ccp4.convert import getEnviron
-from bibtex import _bibtex  # Load bibtex dict with references
+from phenix.protocols.protocol_real_space_refine import PhenixProtRunRSRefine
+from viewer_refinement_base import PhenixProtRefinementBaseViewer
 
-_logo = "phenix.png"
+class PhenixProtRunRSRefineViewer(PhenixProtRefinementBaseViewer):
+    """ Viewer for Phenix program real space refine
+    """
+    _label = 'Real Space Refine viewer'
+    _targets = [PhenixProtRunRSRefine]
 
-from protocol_emringer import PhenixProtRunEMRinger
-from protocol_molprobity import PhenixProtRunMolprobity
-from viewer_emringer import PhenixProtRunEMRingerViewer
-from viewer_molprobity import PhenixProtRunMolprobityViewer
-from protocol_real_space_refine import PhenixProtRunRSRefine
-from protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
-from viewer_superpose_pdbs import PhenixProtRunSuperposePDBsViewer
-from viewer_real_space_refine import PhenixProtRunRSRefineViewer
-_references = ['Adams_2010']
-_environ = getEnviron()
+    def __init__(self,  **kwargs):
+         PhenixProtRefinementBaseViewer.__init__(self, **kwargs)
+         REALSPACEFILE = self.protocol._getExtraPath(
+             self.protocol.REALSPACEFILE)
+         self.protocol._parseFile(REALSPACEFILE)
+
+    def _defineParams(self, form):
+        PhenixProtRefinementBaseViewer._defineParams(self,form)
+
+
+
+
+

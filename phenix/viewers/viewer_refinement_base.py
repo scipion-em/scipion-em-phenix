@@ -36,7 +36,7 @@ import collections
 import json
 import os
 import glob
-from convert import runPhenixProgram
+from phenix.convert import runPhenixProgram
 import matplotlib.pyplot as plt
 
 

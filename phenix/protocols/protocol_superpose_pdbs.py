@@ -30,7 +30,7 @@ from pyworkflow.object import String, Float, Integer
 
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam
-from convert import runPhenixProgram, getProgram, SUPERPOSE
+from phenix.convert import runPhenixProgram, getProgram, SUPERPOSE
 from pyworkflow.em import PdbFile
 import collections
 

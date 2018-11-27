@@ -26,7 +26,7 @@
 
 import os
 from pyworkflow.object import Float, Integer
-from convert import runPhenixProgram, getProgram, MOLPROBITY
+from phenix.convert import runPhenixProgram, getProgram, MOLPROBITY
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):

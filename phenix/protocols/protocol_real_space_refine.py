@@ -27,7 +27,7 @@
 
 import os
 from pyworkflow.protocol.params import BooleanParam,  IntParam, EnumParam
-from convert import runPhenixProgram, getProgram, REALSPACEREFINE, \
+from phenix.convert import runPhenixProgram, getProgram, REALSPACEREFINE, \
     MOLPROBITY, SUPERPOSE
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.em import PdbFile
