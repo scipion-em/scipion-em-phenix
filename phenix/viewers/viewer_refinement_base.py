@@ -35,8 +35,8 @@ from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
 from pyworkflow.em.viewers import TableView, Chimera
 from pyworkflow.protocol.params import LabelParam, EnumParam
 from pyworkflow.utils import importFromPlugin
+from phenix import Plugin
 
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 
 
@@ -1455,7 +1455,7 @@ if data.model_stats.ligands is not None:
             f.write(command)
 
         # execute file with phenix.python
-        phenixPlugin.runPhenixProgram("", pythonFileName)
+        Plugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
         with open(ANALYSISTMPFILENAME, "r") as f:

@@ -27,17 +27,18 @@
 
 import json
 import os
+import collections
+import glob
+from PIL import Image
 from tkMessageBox import showerror
 from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from pyworkflow.protocol.params import LabelParam, EnumParam
 from pyworkflow.utils import importFromPlugin
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
 from pyworkflow.em.viewers import TableView, Chimera
-import collections
-import glob
-from PIL import Image
+from phenix import Plugin
 
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
+
 
 def errorWindow(tkParent, msg):
     try:
@@ -299,4 +300,4 @@ show_residue(ringer_results[index])
         with open(self.EMRINGERSUBPLOTSFILENAME, "w") as f:
             f.write(command)
         # execute file with phenix.python
-        phenixPlugin.runPhenixProgram("", self.EMRINGERSUBPLOTSFILENAME)
+        Plugin.runPhenixProgram("", self.EMRINGERSUBPLOTSFILENAME)
