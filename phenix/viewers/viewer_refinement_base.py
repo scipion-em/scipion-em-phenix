@@ -25,20 +25,18 @@
 # *
 # **************************************************************************
 
-from tkMessageBox import showerror
-from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
-from pyworkflow.em.viewer import TableView
-from pyworkflow.protocol.params import LabelParam, EnumParam
-from pyworkflow.em.packages.ccp4.convert import getProgram, runCCP4Program
-from pyworkflow.em.viewers.chimera_utils import \
-    createCoordinateAxisFile, runChimeraProgram
 import collections
 import json
 import os
 import glob
-from phenix.convert import runPhenixProgram
 import matplotlib.pyplot as plt
+from tkMessageBox import showerror
+from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
+from pyworkflow.em.viewers import TableView, Chimera
+from pyworkflow.protocol.params import LabelParam, EnumParam
+from pyworkflow.utils import importFromPlugin
 
+phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 
 
@@ -596,7 +594,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             dim = 150.
             sampling = 1.
 
-        createCoordinateAxisFile(dim,
+        Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
         counter = 0
@@ -640,8 +638,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
         f.close()
         # run in the background
-        from pyworkflow.em.viewers.chimera_utils import getProgram
-        runChimeraProgram(getProgram(), fnCmd + "&")
+        chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
         return []
 
     def _visualizeMolProbityResults(self, e=None):
@@ -683,7 +681,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                     self.protocol.REALSPACEFILE))
             args += " --map " + VOLUMEFILENAME
         # run coot with args
-        runCCP4Program(getProgram(self.COOT), args)
+        ccpPlugin = importFromPlugin('ccp4', 'Plugin', doRaise=True)
+        ccpPlugin.runCCP4Program(ccpPlugin.getProgram(self.COOT), args)
 
     def _getInputVolume(self):
         if self.protocol.inputVolume.get() is None:
@@ -802,7 +801,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
-        runPhenixProgram("", self.TMPFILENAME)
+        phenixPlugin.runPhenixProgram("", self.TMPFILENAME)
 
     def _showRamaOutliersTable(self, e=None):
         headerList = self.dictOverall['_rama_headers']
@@ -854,7 +853,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
-        runPhenixProgram("", self.TMPFILENAME)
+        phenixPlugin.runPhenixProgram("", self.TMPFILENAME)
 
 
     def _showOverallRSCResults(self, e=None):
@@ -1456,7 +1455,7 @@ if data.model_stats.ligands is not None:
             f.write(command)
 
         # execute file with phenix.python
-        runPhenixProgram("", pythonFileName)
+        phenixPlugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
         with open(ANALYSISTMPFILENAME, "r") as f:

@@ -28,10 +28,9 @@
 import os
 
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
-from pyworkflow.em.viewers.chimera_utils import \
-    createCoordinateAxisFile, runChimeraProgram, getProgram
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer
-
+from pyworkflow.em.viewers import Chimera
+from pyworkflow.utils import importFromPlugin
 
 class PhenixProtRunSuperposePDBsViewer(Viewer):
     """ Visualize the output of protocols  superpose pdb """
@@ -58,7 +57,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
 
         bildFileName = os.path.abspath(self.protocol._getTmpPath(
             "axis_output.bild"))
-        createCoordinateAxisFile(dim,
+        Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
 
@@ -76,7 +75,8 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
                 f.write("open %s\n" % os.path.abspath(filename))
 
         # run in the background
-        runChimeraProgram(getProgram(), fnCmd+"&")
+        chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd+"&")
         return []
 
     def _getVols(self):
