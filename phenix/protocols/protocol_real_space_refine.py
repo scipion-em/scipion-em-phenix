@@ -27,11 +27,13 @@
 
 import os
 from pyworkflow.protocol.params import BooleanParam,  IntParam, EnumParam
-from phenix.convert import runPhenixProgram, getProgram, REALSPACEREFINE, \
-    MOLPROBITY, SUPERPOSE
+from pyworkflow.utils import importFromPlugin
+from phenix.constants import REALSPACEREFINE, MOLPROBITY, SUPERPOSE
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.em import PdbFile
 from protocol_refinement_base import PhenixProtRunRefinementBase
+
+phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 PDB = 0
 mmCIF = 1
@@ -168,7 +170,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += " model_format=%s" % OUTPUT_FORMAT[int(self.outputFormat)]
         args += " write_pkl_stats=True"
         try:
-            runPhenixProgram(getProgram(REALSPACEREFINE), args,
+            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(REALSPACEREFINE), args,
                          cwd=self._getExtraPath())
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
@@ -180,7 +182,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
-            runPhenixProgram(getProgram(REALSPACEREFINE), args,
+            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(REALSPACEREFINE), args,
                              cwd=self._getExtraPath())
 
     def runMolprobityStep(self, tmpMapFile):

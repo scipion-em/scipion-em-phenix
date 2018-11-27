@@ -24,10 +24,9 @@
 
 # protocol to test the validation method EMRinger
 
-from pyworkflow.em.protocol.protocol_import import ProtImportPdb, \
-    ProtImportVolumes
-from pyworkflow.em.packages.phenix.protocol_emringer import \
-    PhenixProtRunEMRinger
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+                                                    ProtImportVolumes)
+from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from pyworkflow.tests import *
 import json
 

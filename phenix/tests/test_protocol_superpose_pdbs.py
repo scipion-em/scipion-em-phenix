@@ -23,11 +23,10 @@
 # ***************************************************************************/
 
 # protocol to test the phenix protocol superpose_pdbs
-
-from pyworkflow.em.protocol.protocol_import import ProtImportPdb,\
-    ProtImportVolumes
-from pyworkflow.em.packages.phenix.protocol_superpose_pdbs import \
-    PhenixProtRunSuperposePDBs
+import os
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+                                                    ProtImportVolumes)
+from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from pyworkflow.tests import *
 
 

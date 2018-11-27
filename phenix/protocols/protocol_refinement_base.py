@@ -3,9 +3,13 @@ import os
 from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam, FloatParam
-from pyworkflow.em.headers import adaptFileToCCP4, START
-from phenix.convert import runPhenixProgram, getProgram, MOLPROBITY
-from pyworkflow.utils import magentaStr
+from pyworkflow.utils import importFromPlugin
+from pyworkflow.em.convert.headers import Ccp4Header
+from phenix.constants import MOLPROBITY
+
+phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
+
+
 
 class PhenixProtRunRefinementBase(EMProtocol):
     """MolProbity is a Phenix application to validate the geometry of an
@@ -60,7 +64,7 @@ atomic structure derived from a cryo-EM density map.
         newFn = self._getExtraPath(tmpMapFileName)
         origin = vol.getOrigin(force=True).getShifts()
         sampling = vol.getSamplingRate()
-        adaptFileToCCP4(inVolName, newFn, origin, sampling, START)  # ORIGIN
+        Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
 
 
     def _summary(self):
@@ -92,7 +96,7 @@ atomic structure derived from a cryo-EM density map.
     def validateBase(self, program, label):
         errors = []
         # Check that the program exists
-        program = getProgram(program)
+        program = phenixPlugin.getProgram(program)
         if program is None:
             errors.append("Missing variables %s and/or PHENIX_HOME" % label)
         elif not os.path.exists(program):

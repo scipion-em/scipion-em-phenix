@@ -24,10 +24,9 @@
 
 # protocol to test the validation method MolProbity
 
-from pyworkflow.em.protocol.protocol_import import ProtImportPdb, \
-    ProtImportVolumes
-from pyworkflow.em.packages.phenix.protocol_molprobity import \
-    PhenixProtRunMolprobity
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+                                                    ProtImportVolumes)
+from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
 
 

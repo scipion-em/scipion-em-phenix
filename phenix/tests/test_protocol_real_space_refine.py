@@ -24,12 +24,11 @@
 
 # protocol to test the phenix method real_spacerefine
 
-from pyworkflow.em.protocol.protocol_import import ProtImportPdb, \
-    ProtImportVolumes
-from pyworkflow.em.packages.phenix.protocol_real_space_refine import \
-    PhenixProtRunRSRefine, mmCIF
-from pyworkflow.em.packages.phenix.protocol_molprobity \
-    import PhenixProtRunMolprobity
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+                                                    ProtImportVolumes)
+from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
+                                                         mmCIF)
+from phenix.protocols.protocol_molprobity  import PhenixProtRunMolprobity
 from pyworkflow.tests import *
 
 

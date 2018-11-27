@@ -27,13 +27,14 @@
 import glob
 import json
 import os
-
-from phenix.convert import runPhenixProgram, getProgram, EMRINGER
-from pyworkflow.em.headers import adaptFileToCCP4, START
+from pyworkflow.utils import importFromPlugin
+from phenix.constants import EMRINGER
+from pyworkflow.em.convert.headers import Ccp4Header
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 
+phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -87,7 +88,7 @@ the atomic structure backbone has been perfectly fitted to the map.
         newFn = self._getExtraPath(self.EMRINGERFILE)
         origin = vol.getOrigin(force=True).getShifts()
         sampling = vol.getSamplingRate()
-        adaptFileToCCP4(inVolName, newFn, origin, sampling, START)  # ORIGIN
+        Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
 
     def runEMRingerStep(self):
 
@@ -98,7 +99,7 @@ the atomic structure backbone has been perfectly fitted to the map.
         args.append(vol)
 
         # script with auxiliary files
-        runPhenixProgram(getProgram(EMRINGER), args,
+        phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(EMRINGER), args,
                          cwd=self._getExtraPath())
 
     def createOutputStep(self):
@@ -210,7 +211,7 @@ dataDict['_residues_dict'] = dictResidue
             f.write(command)
 
         # execute file with phenix.python
-        runPhenixProgram("", pythonFileName)
+            phenixPlugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
         with open(EMRINGERTRANSFERFILENAME, "r") as f:
@@ -224,7 +225,7 @@ dataDict['_residues_dict'] = dictResidue
     def _validate(self):
         errors = []
         # Check that the program exists
-        program = getProgram(EMRINGER)
+        program = phenixPlugin.getProgram(EMRINGER)
         if program is None:
             errors.append("Missing variables EMRINGER and/or PHENIX_HOME")
         elif not os.path.exists(program):
