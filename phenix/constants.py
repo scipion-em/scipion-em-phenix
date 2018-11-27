@@ -23,6 +23,26 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-
+PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = 'phenix_env.sh'
 PHENIXVERSION = '1.13'
+
+#python used to run phenix scripts
+PHENIX_PYTHON = 'phenix.python '  # keep the ending space
+
+#phenix binaries are in several directories
+PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
+PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
+
+# list of phenix scripts and corresponding binary directory
+SUPERPOSE = 'superpose_pdbs.py'
+REALSPACEREFINE = 'real_space_refine.py'
+MOLPROBITY = 'molprobity.py'
+EMRINGER = 'emringer.py'
+
+mapBinarytoDirectory ={
+    REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
+    SUPERPOSE : PHENIX_SCRIPT_PATH2,
+    MOLPROBITY : PHENIX_SCRIPT_PATH1,
+    EMRINGER : PHENIX_SCRIPT_PATH1
+}
