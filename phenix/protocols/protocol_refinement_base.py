@@ -6,8 +6,7 @@ from pyworkflow.protocol.params import PointerParam, FloatParam
 from pyworkflow.utils import importFromPlugin
 from pyworkflow.em.convert.headers import Ccp4Header
 from phenix.constants import MOLPROBITY
-
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
+from phenix import Plugin
 
 
 
@@ -96,7 +95,7 @@ atomic structure derived from a cryo-EM density map.
     def validateBase(self, program, label):
         errors = []
         # Check that the program exists
-        program = phenixPlugin.getProgram(program)
+        program = Plugin.getProgram(program)
         if program is None:
             errors.append("Missing variables %s and/or PHENIX_HOME" % label)
         elif not os.path.exists(program):
@@ -110,8 +109,8 @@ atomic structure derived from a cryo-EM density map.
                           "properly."% label)
             if program is not None:
                 errors.append("Current values:")
-                errors.append("PHENIX_HOME = %s" % os.environ['PHENIX_HOME'])
-                errors.append("%s = %s" % label, program)
+                errors.append("PHENIX_HOME = %s" % Plugin.getHome())
+                #errors.append("%s = %s" % label, program)
 
         return errors
 

@@ -28,8 +28,8 @@ import os
 from pyworkflow.object import Float, Integer
 from pyworkflow.utils import importFromPlugin
 from phenix.constants import MOLPROBITY
+from phenix import Plugin
 
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
@@ -76,7 +76,7 @@ atomic structure derived from a cryo-EM density map.
             # args += " wxplots=True" # TODO: Avoid the direct opening of plots
         # script with auxiliary files
         try:
-            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(MOLPROBITY), args,
+            Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                          cwd=self._getExtraPath())
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
@@ -88,7 +88,7 @@ atomic structure derived from a cryo-EM density map.
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
-            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(MOLPROBITY), args,
+            Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                              cwd=self._getExtraPath())
 
 

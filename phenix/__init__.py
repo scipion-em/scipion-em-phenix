@@ -39,7 +39,6 @@ _references = ['Adams_2010']
 
 class Plugin(pyworkflow.em.Plugin):
     _homeVar = PHENIX_HOME
-    _pathVars = [PHENIX_HOME]
     _supportedVersions = PHENIXVERSION
 
     @classmethod
@@ -50,15 +49,14 @@ class Plugin(pyworkflow.em.Plugin):
     def getEnviron(cls, first=True):
         environ = pwutils.Environ()
         pos = pwutils.Environ.BEGIN if first else pwutils.Environ.END
-
         # add to variable
         environ.update({
-            'PATH': str.join(Plugin.getHome(), 'build', 'bin'),
+            'PATH': os.path.join(Plugin.getHome(), 'build', 'bin'),
         }, position=pos)
 
         # replace variable value
         environ.update({
-            'LIBTBX_BUILD': str.join(cls.getHome(), 'build'),
+            'LIBTBX_BUILD': os.path.join(cls.getHome(), 'build'),
             'LIBTBX_OPATH': os.environ['PATH'],
         }, position=pwutils.Environ.REPLACE)  # replace
 
