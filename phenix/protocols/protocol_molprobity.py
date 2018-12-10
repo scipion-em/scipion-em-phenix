@@ -73,6 +73,7 @@ atomic structure derived from a cryo-EM density map.
             args += "d_min=%f" % self.resolution.get()
         args += " "
         args += "pickle=True"
+        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
             # args += " wxplots=True" # TODO: Avoid the direct opening of plots
         # script with auxiliary files
         try:

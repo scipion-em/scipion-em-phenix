@@ -33,8 +33,7 @@ from pyworkflow.em.convert.headers import Ccp4Header
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
-
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
+from phenix import Plugin
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -99,7 +98,7 @@ the atomic structure backbone has been perfectly fitted to the map.
         args.append(vol)
 
         # script with auxiliary files
-        phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(EMRINGER), args,
+        Plugin.runPhenixProgram(Plugin.getProgram(EMRINGER), args,
                          cwd=self._getExtraPath())
 
     def createOutputStep(self):
@@ -211,7 +210,7 @@ dataDict['_residues_dict'] = dictResidue
             f.write(command)
 
         # execute file with phenix.python
-            phenixPlugin.runPhenixProgram("", pythonFileName)
+            Plugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
         with open(EMRINGERTRANSFERFILENAME, "r") as f:
@@ -225,7 +224,7 @@ dataDict['_residues_dict'] = dictResidue
     def _validate(self):
         errors = []
         # Check that the program exists
-        program = phenixPlugin.getProgram(EMRINGER)
+        program = Plugin.getProgram(EMRINGER)
         if program is None:
             errors.append("Missing variables EMRINGER and/or PHENIX_HOME")
         elif not os.path.exists(program):

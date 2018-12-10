@@ -39,6 +39,7 @@ _references = ['Adams_2010']
 
 class Plugin(pyworkflow.em.Plugin):
     _homeVar = PHENIX_HOME
+    _pathVars = [PHENIX_HOME]
     _supportedVersions = PHENIXVERSION
 
     @classmethod

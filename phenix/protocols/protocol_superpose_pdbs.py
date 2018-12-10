@@ -32,8 +32,7 @@ from pyworkflow.utils import importFromPlugin
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import  SUPERPOSE
 from pyworkflow.em import PdbFile
-
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
+from phenix import Plugin
 
 
 class PhenixProtRunSuperposePDBs(EMProtocol):
@@ -66,7 +65,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         args += " "
         args += os.path.abspath(self.inputStructureMoving.get().getFileName())
 
-        phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(SUPERPOSE), args,
+        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
                          cwd=self._getExtraPath())
 
     def createOutputStep(self):
@@ -88,7 +87,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
     def _validate(self):
         errors = []
         # Check that the program exists
-        program = phenixPlugin.getProgram(SUPERPOSE)
+        program = Plugin.getProgram(SUPERPOSE)
         if not os.path.exists(program):
             errors.append("Cannot find " + program)
 

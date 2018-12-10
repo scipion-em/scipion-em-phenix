@@ -32,8 +32,8 @@ from phenix.constants import REALSPACEREFINE, MOLPROBITY, SUPERPOSE
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.em import PdbFile
 from protocol_refinement_base import PhenixProtRunRefinementBase
+from phenix import Plugin
 
-phenixPlugin = importFromPlugin('phenix', 'Plugin', doRaise=True)
 
 PDB = 0
 mmCIF = 1
@@ -170,7 +170,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += " model_format=%s" % OUTPUT_FORMAT[int(self.outputFormat)]
         args += " write_pkl_stats=True"
         try:
-            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(REALSPACEREFINE), args,
+            Plugin.runPhenixProgram(Plugin.getProgram(REALSPACEREFINE), args,
                          cwd=self._getExtraPath())
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
@@ -182,7 +182,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
-            phenixPlugin.runPhenixProgram(phenixPlugin.getProgram(REALSPACEREFINE), args,
+            Plugin.runPhenixProgram(Plugin.getProgram(REALSPACEREFINE), args,
                              cwd=self._getExtraPath())
 
     def runMolprobityStep(self, tmpMapFile):
@@ -205,7 +205,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                                   # Ramachandran, Chi1-Chi2 and
                                   # Multi-criterion plots)
                                   # script with auxiliary files
-        runPhenixProgram(getProgram(MOLPROBITY), args,
+        Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                          cwd=self._getExtraPath())
 
     def createOutputStep(self):
@@ -264,7 +264,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " "
             args += os.path.abspath(self.outPdbName)
 
-            runPhenixProgram(getProgram(SUPERPOSE), args,
+            Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
                                  cwd=self._getExtraPath())
             self.fitPdbName = self._getExtraPath(inPdbName.replace(
                 "." + inPdbName.split(".")[1],
