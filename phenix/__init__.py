@@ -69,7 +69,8 @@ class Plugin(pyworkflow.em.Plugin):
         env = cls.getEnviron()
         if extraEnvDict is not None:
             env.update(extraEnvDict)
-        program = PHENIX_PYTHON + program
+        program = os.path.join(Plugin.getHome(), 'build', 'bin',
+                               PHENIX_PYTHON + program)
         pwutils.runJob(None, program, args, env=env, cwd=cwd)
 
     @classmethod

@@ -24,7 +24,7 @@
 # *
 # **************************************************************************
 PHENIX_HOME = 'PHENIX_HOME'
-PHENIXVERSIONFILENAME = 'phenix_env.sh'
+PHENIXVERSIONFILENAME = './phenix_env.sh'
 PHENIXVERSION = '1.13'
 
 #python used to run phenix scripts
