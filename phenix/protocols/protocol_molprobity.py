@@ -74,7 +74,10 @@ atomic structure derived from a cryo-EM density map.
         args += " "
         args += "pickle=True"
         args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
-            # args += " wxplots=True" # TODO: Avoid the direct opening of plots
+        numberOfThreads = self.numberOfThreads.get()
+        if numberOfThreads > 1:
+            args += " nproc=%d" % numberOfThreads
+        # args += " wxplots=True" # TODO: Avoid the direct opening of plots
         # script with auxiliary files
         try:
             Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
