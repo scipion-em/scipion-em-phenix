@@ -210,7 +210,7 @@ dataDict['_residues_dict'] = dictResidue
             f.write(command)
 
         # execute file with phenix.python
-            Plugin.runPhenixProgram("", pythonFileName)
+        Plugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
         with open(EMRINGERTRANSFERFILENAME, "r") as f:
