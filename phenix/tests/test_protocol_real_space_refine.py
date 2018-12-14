@@ -214,7 +214,8 @@ class TestPhenixRSRefine(TestImportData):
         # real_space_refine
         args = {
                 'resolution': 3.5,
-                'inputStructure': structure_refmac3
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine\nrefmac3.pdb\n')
@@ -250,7 +251,8 @@ class TestPhenixRSRefine(TestImportData):
         args = {
                 'inputVolume': volume_refmac3,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac3
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -269,7 +271,8 @@ class TestPhenixRSRefine(TestImportData):
         # real_space_refine
         args = {'inputVolume': volume_refmac3,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac3
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4
                 # default parameters in Optimization strategy options
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
@@ -308,7 +311,8 @@ class TestPhenixRSRefine(TestImportData):
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
-               }
+                'numberOfThreads': 4
+        }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
                                    'volume and pdb\n')
@@ -326,7 +330,8 @@ class TestPhenixRSRefine(TestImportData):
         # real_space_refine
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_pdb
+                'inputStructure': structure_hemo_pdb,
+                'numberOfThreads': 4
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
@@ -364,6 +369,7 @@ class TestPhenixRSRefine(TestImportData):
             'inputVolume': volume_hemo_org,
             'resolution': 3.2,
             'inputStructure': structure_hemo_cif,
+            'numberOfThreads': 4
         }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -382,7 +388,8 @@ class TestPhenixRSRefine(TestImportData):
         # real_space_refine
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif
+                'inputStructure': structure_hemo_cif,
+                'numberOfThreads': 4
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
@@ -420,6 +427,7 @@ class TestPhenixRSRefine(TestImportData):
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
+                'numberOfThreads': 4
         }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -442,7 +450,8 @@ class TestPhenixRSRefine(TestImportData):
                 'localGridSearch': True,
                 'morphing': True,
                 'simulatedAnnealing': True,
-                'adp': False
+                'adp': False,
+                'numberOfThreads': 4
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
