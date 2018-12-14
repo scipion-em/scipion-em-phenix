@@ -296,8 +296,9 @@ class TestMolprobityValidation2(TestImportData):
         structure_PDB = self._importStructurePDBWoVol()
         self.assertTrue(structure_PDB.getFileName())
         self.assertFalse(structure_PDB.getVolume())
-        args = {'inputStructure': structure_PDB
-               }
+        args = {'inputStructure': structure_PDB,
+                'numberOfThreads': 4
+                }
 
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('Molprobity validation\n'
@@ -326,7 +327,8 @@ class TestMolprobityValidation2(TestImportData):
         self.assertTrue(volume.getFileName())
 
         args = {'inputVolume': volume,
-                'resolution': 3.5
+                'resolution': 3.5,
+                'numberOfThreads': 4
                }
 
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
@@ -358,7 +360,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {
                 'resolution': 3.5,
-                'inputStructure': structure2_PDB
+                'inputStructure': structure2_PDB,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -390,7 +393,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {
                 'resolution': 2.2,
-                'inputStructure': structure_6
+                'inputStructure': structure_6,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -424,7 +428,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume_coot1,
                 'resolution': 3.5,
-                'inputStructure': structure_coot1
+                'inputStructure': structure_coot1,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n coot1.mrc and '
@@ -457,7 +462,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume_coot2,
                 'resolution': 3.5,
-                'inputStructure': structure_coot2
+                'inputStructure': structure_coot2,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n coot2.mrc and '
@@ -490,7 +496,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume_refmac1,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac1
+                'inputStructure': structure_refmac1,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n refmac1.mrc and '
@@ -523,7 +530,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume_refmac2,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac2
+                'inputStructure': structure_refmac2,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n refmac2.mrc and '
@@ -556,7 +564,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume_refmac3,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac3
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n refmac3.mrc and '
@@ -589,7 +598,8 @@ class TestMolprobityValidation2(TestImportData):
         # MolProbity
         args = {'inputVolume': volume3,
                 'resolution': 2.2,
-                'inputStructure': structure5_PDB
+                'inputStructure': structure5_PDB,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n volume and pdb\n')
@@ -617,7 +627,8 @@ class TestMolprobityValidation2(TestImportData):
 
         # MolProbity
         args = {
-                'inputStructure': structure6_PDB
+                'inputStructure': structure6_PDB,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n pdb\n')
@@ -645,7 +656,8 @@ class TestMolprobityValidation2(TestImportData):
 
         # MolProbity
         args = {
-                'inputStructure': structure7_PDB
+                'inputStructure': structure7_PDB,
+                'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n pdb\n')
