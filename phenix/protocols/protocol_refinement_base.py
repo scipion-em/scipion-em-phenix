@@ -52,6 +52,7 @@ atomic structure derived from a cryo-EM density map.
                       help="Set the atomic structure to be processed.\n"
                            "Supported formats are PDB or mmCIF; this last one"
                            " is especially useful for very large structures.")
+        form.addParallelSection(threads=1, mpi=0)
 
     # --------------------------- STEPS functions --------------------------
 
