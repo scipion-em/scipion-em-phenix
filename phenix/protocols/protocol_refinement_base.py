@@ -1,12 +1,12 @@
 
 import os
-from pyworkflow.object import String, Float, Integer
+from pyworkflow.object import Float, Integer
 from pyworkflow.em.protocol import EMProtocol
-from pyworkflow.protocol.params import PointerParam, FloatParam
-from pyworkflow.utils import importFromPlugin
+from pyworkflow.protocol.params import (PointerParam, FloatParam, \
+    StringParam)
 from pyworkflow.em.convert.headers import Ccp4Header
-from phenix.constants import MOLPROBITY
 from phenix import Plugin
+from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
 
 
@@ -23,6 +23,7 @@ atomic structure derived from a cryo-EM density map.
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
+        form.addParallelSection(threads=1, mpi=0)
         form.addSection(label='Input')
         # TODO: Consider the possibility of including .mtz files in Scipion
         # TODO: input volume (read the next comment)
@@ -47,12 +48,17 @@ atomic structure derived from a cryo-EM density map.
                       default=3.0,
                       help='Set the resolution of the input volume.')
         form.addParam('inputStructure', PointerParam,
-                      pointerClass="PdbFile", allowsNull=False,
+                      pointerClass="AtomStruct", allowsNull=False,
                       label='Input atomic structure.',
                       help="Set the atomic structure to be processed.\n"
                            "Supported formats are PDB or mmCIF; this last one"
                            " is especially useful for very large structures.")
-        form.addParallelSection(threads=1, mpi=0)
+        form.addParam('extraParams', StringParam,
+                       label="Extra Params ",
+                       default="",
+                       expertLevel=LEVEL_ADVANCED,
+                       help="This string will be added to the phenix command.\n"
+                            "Syntax: paramName1=value1 paramName2=value2 ")
 
     # --------------------------- STEPS functions --------------------------
 
