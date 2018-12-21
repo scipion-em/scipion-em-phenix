@@ -26,11 +26,10 @@
 # **************************************************************************
 
 import os
-from pyworkflow.protocol.params import BooleanParam,  IntParam, EnumParam
-from pyworkflow.utils import importFromPlugin
-from phenix.constants import REALSPACEREFINE, MOLPROBITY, SUPERPOSE
+from pyworkflow.protocol.params import BooleanParam,  IntParam
+from phenix.constants import REALSPACEREFINE, MOLPROBITY
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
-from pyworkflow.em import PdbFile
+from pyworkflow.em import AtomStruct
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
 
@@ -55,11 +54,6 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
         super(PhenixProtRunRSRefine, self)._defineParams(form)
-        form.addParam('outputFormat', EnumParam, choices=OUTPUT_FORMAT,
-                      default=PDB, label="Output format",
-                      help="Refined atomic structure is the protocol output. "
-                           "You can choose PDB or mmCIF as output format. "
-                           "PDB format has been selected by default.")
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
                       default=False, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
@@ -136,6 +130,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "B-factors) refinement against the map is "
                             "performed at the last macro-cycle only. ")
 
+        # form.addParallelSection(threads=1, mpi=0)
+
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
@@ -146,9 +142,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     # --------------------------- STEPS functions --------------------------
     def runRSrefineStep(self, tmpMapFile):
         pdb = os.path.abspath(self.inputStructure.get().getFileName())
-        args = "" + pdb
+        args = "model_file=%s" % pdb
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        args += " " + vol
+        args += " map_file=%s" % vol
         args += " resolution=%f" % self.resolution
         args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="
@@ -167,8 +163,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args = args[:-1]
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
         args += " macro_cycles=%d" % self.macroCycles
-        args += " model_format=%s" % OUTPUT_FORMAT[int(self.outputFormat)]
+        args += " model_format=pdb+mmcif"
         args += " write_pkl_stats=True"
+        args += " %s " % self.extraParams.get()
+        numberOfThreads = self.numberOfThreads.get()
+        if numberOfThreads > 1:
+            args += " nproc=%d" % numberOfThreads
         try:
             Plugin.runPhenixProgram(Plugin.getProgram(REALSPACEREFINE), args,
                          cwd=self._getExtraPath())
@@ -189,10 +189,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         # PDBx/mmCIF
         self._getRSRefineOutput()
         args = ""
-        if self.outputFormat == PDB:
-            args += os.path.abspath(self.outPdbName)
-        elif self.outputFormat == mmCIF:
-            args += os.path.abspath(self.fitPdbName)
+        args += os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args += " "
@@ -201,17 +198,17 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += "d_min=%f" % self.resolution.get()
         args += " "
         args += "pickle=True"
-        # args += " wxplots=True" # Direct opening of the three wx plots (
-                                  # Ramachandran, Chi1-Chi2 and
-                                  # Multi-criterion plots)
-                                  # script with auxiliary files
+        numberOfThreads = self.numberOfThreads.get()
+        if numberOfThreads > 1:
+            args += " nproc=%d" % numberOfThreads
+
         Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                          cwd=self._getExtraPath())
 
     def createOutputStep(self):
         # self._getRSRefineOutput()
-        pdb = PdbFile()
-        pdb.setFileName(self.outPdbName)
+        pdb = AtomStruct()
+        pdb.setFileName(self.outAtomStructName)
 
         if self.inputVolume.get() is not None:
             pdb.setVolume(self.inputVolume.get())
@@ -251,22 +248,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     def _getRSRefineOutput(self):
         inPdbName = os.path.basename(self.inputStructure.get().getFileName())
-        if self.outputFormat == PDB:
-            self.outPdbName = self._getExtraPath(
-                inPdbName.replace("." + inPdbName.split(".")[1],
-                                  "_real_space_refined.pdb"))
-        elif self.outputFormat == mmCIF:
-            self.outPdbName = self._getExtraPath(
-                inPdbName.replace("." + inPdbName.split(".")[1],
-                                  "_real_space_refined.cif"))
-            # cif files should be fitted to the initial atomic structure files
-            args = os.path.abspath(self.inputStructure.get().getFileName())
-            args += " "
-            args += os.path.abspath(self.outPdbName)
-
-            Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
-                                 cwd=self._getExtraPath())
-            self.fitPdbName = self._getExtraPath(inPdbName.replace(
-                "." + inPdbName.split(".")[1],
-                "_real_space_refined.cif_fitted.pdb"))
+        self.outAtomStructName = self._getExtraPath(
+            inPdbName.replace("." + inPdbName.split(".")[1],
+                          "_real_space_refined.cif"))
 
