@@ -31,7 +31,7 @@ from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.utils import importFromPlugin
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import  SUPERPOSE
-from pyworkflow.em import PdbFile
+from pyworkflow.em import AtomStruct
 from phenix import Plugin
 
 
@@ -45,11 +45,11 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
     def _defineParams(self, form):
         form.addSection(label='Input')
         form.addParam('inputStructureFixed', PointerParam,
-                      pointerClass="PdbFile",
+                      pointerClass="AtomStruct",
                       label='Fixed atomic structure', important=True,
                       help="The moving PDB will be aligned to the fixed one")
         form.addParam('inputStructureMoving', PointerParam,
-                      pointerClass="PdbFile",
+                      pointerClass="AtomStruct",
                       label='Moving atomic structure',
                       help="PDBx/mmCIF to be aligned")
         
@@ -70,7 +70,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
 
     def createOutputStep(self):
         fnPdb = os.path.basename(self.inputStructureMoving.get().getFileName())
-        pdb = PdbFile()
+        pdb = AtomStruct()
         pdb.setFileName(self._getExtraPath(fnPdb+"_fitted.pdb"))
         if self.inputStructureFixed.get().getVolume() is not None:
             pdb.setVolume(self.inputStructureFixed.get().getVolume())
