@@ -27,13 +27,13 @@
 import glob
 import json
 import os
-from pyworkflow.utils import importFromPlugin
 from phenix.constants import EMRINGER
 from pyworkflow.em.convert.headers import Ccp4Header
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
+from pyworkflow.em.convert.atom_struct import toPdb
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -61,7 +61,7 @@ the atomic structure backbone has been perfectly fitted to the map.
                       label='Input Volume', allowsNull=True,
                       help="Set the starting volume")
         form.addParam('inputStructure', PointerParam,
-                      pointerClass="PdbFile",
+                      pointerClass="AtomStruct",
                       label='Input atomic structure',
                       help="PDBx/mmCIF to be validated against the volume. ")
         form.addParam('doTest', BooleanParam, default=False,
@@ -90,8 +90,11 @@ the atomic structure backbone has been perfectly fitted to the map.
         Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
 
     def runEMRingerStep(self):
-
-        pdb = os.path.abspath(self.inputStructure.get().getFileName())
+        # inAtomStructFile = self.inputStructure.get().getFileName()
+        # inPDBAtomStructFile = self._getExtraPath("inPDBAtomStructFile.pdb")
+        # inPDBAtomStructFile = toPdb(inAtomStructFile, inPDBAtomStructFile)
+        inPDBAtomStructFile = self.inputStructure.get().getFileName()
+        pdb = os.path.abspath(inPDBAtomStructFile)
         args = []
         args.append(pdb)
         vol = os.path.abspath(self._getExtraPath(self.EMRINGERFILE))
