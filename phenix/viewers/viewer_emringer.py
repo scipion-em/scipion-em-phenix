@@ -201,6 +201,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         # run in the background
         chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
+
         return []
 
     def _getInputVolume(self):
@@ -301,3 +302,4 @@ show_residue(ringer_results[index])
             f.write(command)
         # execute file with phenix.python
         Plugin.runPhenixProgram("", self.EMRINGERSUBPLOTSFILENAME)
+
