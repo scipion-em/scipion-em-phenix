@@ -53,6 +53,7 @@ class Plugin(pyworkflow.em.Plugin):
         pos = pwutils.Environ.BEGIN if first else pwutils.Environ.END
         # add to variable
         environ.update({
+            'DISPLAY': os.environ['DISPLAY'],
             'LIBTBX_BUILD': os.path.join(cls.getHome(), 'build'),
             'LIBTBX_OPATH': os.environ['PATH'],
             'PATH': os.path.join(Plugin.getHome(), 'build', 'bin') +
