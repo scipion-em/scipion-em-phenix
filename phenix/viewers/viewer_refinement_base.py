@@ -633,8 +633,6 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             pdbFileName = os.path.abspath(
                 self.protocol.outputPdb.getFileName())
             f.write("open %s\n" % pdbFileName)
-            if pdbFileName.endswith(".cif"):
-                f.write("match #%d #%d" % (counter, counter - 1))
 
         f.close()
         # run in the background
@@ -657,19 +655,12 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         args += " --python " + MOLPROBITYCOOTFILENAME
         # pdb file
         if (len(os.listdir(self.protocol._getExtraPath())) > 5):
-            pdb = os.path.abspath(self.protocol.outputPdb.getFileName())
-            if pdb.endswith(".cif"):
-                self.protocol._getRSRefineOutput()
-                pdb = os.path.abspath(self.protocol.fitPdbName)
-            else:
-                pdb = os.path.abspath(self.protocol.outputPdb.getFileName())
+            self.protocol._getRSRefineOutput()
+            pdb = os.path.abspath(self.protocol.outAtomStructName)
         else:
             pdb = os.path.abspath(
                 self.protocol.inputStructure.get().getFileName())
-        if pdb.endswith(".pdb"):
-            args += " --pdb " + pdb
-        elif pdb.endswith(".cif"):
-            args += " --coords " + pdb
+        args += " --coords " + pdb
         # volume
         vol = self._getInputVolume()
         if vol is not None:
@@ -682,7 +673,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             args += " --map " + VOLUMEFILENAME
         # run coot with args
         ccpPlugin = importFromPlugin('ccp4', 'Plugin', doRaise=True)
-        ccpPlugin.runCCP4Program(ccpPlugin.getProgram(self.COOT), args)
+        runCCP4Program = importFromPlugin('ccp4.convert', 'runCCP4Program', doRaise=True)
+        runCCP4Program(ccpPlugin.getProgram(self.COOT), args)
 
     def _getInputVolume(self):
         if self.protocol.inputVolume.get() is None:
@@ -801,7 +793,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
-        phenixPlugin.runPhenixProgram("", self.TMPFILENAME)
+        Plugin.runPhenixProgram("", self.TMPFILENAME)
 
     def _showRamaOutliersTable(self, e=None):
         headerList = self.dictOverall['_rama_headers']
@@ -853,7 +845,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
-        phenixPlugin.runPhenixProgram("", self.TMPFILENAME)
+        Plugin.runPhenixProgram("", self.TMPFILENAME)
 
 
     def _showOverallRSCResults(self, e=None):
