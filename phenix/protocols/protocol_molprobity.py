@@ -74,6 +74,8 @@ atomic structure derived from a cryo-EM density map.
         args += " "
         args += "pickle=True"
         args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
+        args += " %s " % self.extraParams.get()
+
         numberOfThreads = self.numberOfThreads.get()
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
