@@ -29,7 +29,11 @@ import os
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import REALSPACEREFINE, MOLPROBITY
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
-from pyworkflow.em import AtomStruct
+try:
+    from pyworkflow.em.data import AtomStruct
+except:
+    from pyworkflow.em.data import PdbFile as AtomStruct
+
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
 

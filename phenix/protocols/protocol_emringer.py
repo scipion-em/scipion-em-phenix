@@ -33,7 +33,6 @@ from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import toPdb
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between

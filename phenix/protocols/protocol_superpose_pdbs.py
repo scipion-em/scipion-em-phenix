@@ -31,7 +31,11 @@ from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.utils import importFromPlugin
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import  SUPERPOSE
-from pyworkflow.em import AtomStruct
+try:
+    from pyworkflow.em.data import AtomStruct
+except:
+    from pyworkflow.em.data import PdbFile as AtomStruct
+
 from phenix import Plugin
 
 
