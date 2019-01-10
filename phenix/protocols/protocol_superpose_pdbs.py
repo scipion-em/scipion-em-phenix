@@ -25,12 +25,11 @@
 # **************************************************************************
 
 import os
-import collections
 from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
-from pyworkflow.utils import importFromPlugin
 from pyworkflow.protocol.params import PointerParam
-from phenix.constants import  SUPERPOSE
+from phenix.constants import SUPERPOSE, PHENIX_HOME
+
 try:
     from pyworkflow.em.data import AtomStruct
 except:
@@ -43,6 +42,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
     """Superpose two PDBs so that they optimally match """
     _label = 'superpose pdbs'
     _program = ""
+
     # _version = VERSION_1_2
 
     # --------------------------- DEFINE param functions -------------------
@@ -56,7 +56,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                       pointerClass="AtomStruct",
                       label='Moving atomic structure',
                       help="PDBx/mmCIF to be aligned")
-        
+
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
         self._insertFunctionStep('runSuperposePDBsStep')
@@ -70,12 +70,12 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         args += os.path.abspath(self.inputStructureMoving.get().getFileName())
 
         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
-                         cwd=self._getExtraPath())
+                                cwd=self._getExtraPath())
 
     def createOutputStep(self):
         fnPdb = os.path.basename(self.inputStructureMoving.get().getFileName())
         pdb = AtomStruct()
-        pdb.setFileName(self._getExtraPath(fnPdb+"_fitted.pdb"))
+        pdb.setFileName(self._getExtraPath(fnPdb + "_fitted.pdb"))
         if self.inputStructureFixed.get().getVolume() is not None:
             pdb.setVolume(self.inputStructureFixed.get().getVolume())
         self._defineOutputs(outputPdb=pdb)
@@ -95,13 +95,13 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         if not os.path.exists(program):
             errors.append("Cannot find " + program)
 
-        # If there is any error at this point it is related to config variables
+            # If there is any error at this point it is related to config variables
             errors.append("Check configuration file: "
                           "~/.config/scipion/scipion.conf")
             errors.append("and set PHENIX_HOME variables properly.")
             if program is not None:
                 errors.append("Current values:")
-                errors.append("PHENIX_HOME = %s" % os.environ['PHENIX_HOME'])
+                errors.append("PHENIX_HOME = %s" % Plugin.getVar(PHENIX_HOME))
                 errors.append("SUPERPOSE = %s" % SUPERPOSE)
 
         return errors
@@ -110,11 +110,11 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         summary = []
         try:
             summary.append("RMSD between fixed and moving atoms (start): " +
-                       str(self.startRMSD))
+                           str(self.startRMSD))
             summary.append("RMSD between fixed and moving atoms (final): " +
-                       str(self.finalRMSD))
+                           str(self.finalRMSD))
         except:
-            summary.append("RMSD not yet computed" )
+            summary.append("RMSD not yet computed")
         summary.append(
             "http://www.phenix-online.org/documentation/superpose_pdbs.htm")
         summary.append("Peter Zwart, Pavel Afonine, Ralf W. Grosse-Kunstleve")
@@ -129,8 +129,8 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
             while line:
                 words = line.strip().split()
                 if len(words) > 1:
-                    if (words[0] == 'RMSD' and words[1] == 'between'and
-                        words[6] == '(start):'):
+                    if (words[0] == 'RMSD' and words[1] == 'between' and
+                            words[6] == '(start):'):
                         self.startRMSD = Float(words[7])
                     elif (words[0] == 'RMSD' and words[1] == 'between' and
                           words[6] == '(final):'):

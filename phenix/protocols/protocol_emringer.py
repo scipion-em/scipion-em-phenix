@@ -33,6 +33,7 @@ from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
+from phenix.constants import PHENIX_HOME
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -240,7 +241,7 @@ dataDict['_residues_dict'] = dictResidue
                           "properly.")
             if program is not None:
                 errors.append("Current values:")
-                errors.append("PHENIX_HOME = %s" % os.environ['PHENIX_HOME'])
+                errors.append("PHENIX_HOME = %s" % Plugin.getVar(PHENIX_HOME))
                 errors.append("EMRINGER = %s" % EMRINGER)
 
         # Check that the input volume exist
