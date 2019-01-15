@@ -18,3 +18,5 @@ Installation
 
   b) In developer mode: 
   ``scipion installp -p /path/to/scipion-em-phenix --devel``
+  
+  TODO: add link to buildbot
