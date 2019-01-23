@@ -28,7 +28,7 @@ from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
-from phenix.protocols.protocol_molprobity  import PhenixProtRunMolprobity
+from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
 
 
@@ -185,26 +185,26 @@ class TestPhenixRSRefine(TestImportData):
                              protRSRefine, places=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
-        self.assertAlmostEqual(protRSRefine.ramachandranOutliers,
+        self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                ramOutliers, places)
-        self.assertAlmostEqual(protRSRefine.ramachandranFavored,
-                               ramFavored, places)
-        self.assertAlmostEqual(protRSRefine.rotamerOutliers,
+        self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
+                               ramFavored, delta=1)
+        self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
                                rotOutliers, places)
-        self.assertAlmostEqual(protRSRefine.cbetaOutliers,
+        self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                cbetaOutliers, places)
-        self.assertAlmostEqual(protRSRefine.clashscore,
-                               clashScore, places)
-        self.assertAlmostEqual(protRSRefine.overallScore,
-                               overallScore, places)
-    #
+        self.assertAlmostEqual(protRSRefine.clashscore.get(),
+                               clashScore, delta=0.5)
+        self.assertAlmostEqual(protRSRefine.overallScore.get(),
+                               overallScore, delta=0.25)
+
     def testPhenixRSRefineFromPDB(self):
         """ This test checks that phenix real space refine protocol runs
         with an atomic structure; No Volume was provided and an error message
         is expected
         """
-        print "Run phenix real space refine protocol from imported pdb file " \
-              "without imported or pdb-associated volume"
+        print ("Run phenix real space refine protocol from imported pdb file "
+               "without imported or pdb-associated volume")
 
         # import PDB
         structure_refmac3 = self._importStructRefmac3()
@@ -223,8 +223,8 @@ class TestPhenixRSRefine(TestImportData):
             self.launchProtocol(protRSRefine)
         except Exception as e:
             self.assertTrue(True)
-            print "This test should return a error message as '" \
-                  " Input volume cannot be EMPTY.\n"
+            print("This test should return a error message as '"
+                  " Input volume cannot be EMPTY.'\n")
 
             return
         self.assertTrue(False)
@@ -236,10 +236,10 @@ class TestPhenixRSRefine(TestImportData):
         in another project; (MolProbity has been run to compare values before
         and after refinement); default refine strategy
         """
-        print "Run phenix real_space_refine from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask " \
-              "(MolProbity has been run to compare values before and after " \
-              "refinement); default refine strategy"
+        print ("Run phenix real_space_refine from imported volume and pdb file "
+               "previously fitted and refined by Coot and Refmac without mask "
+               "(MolProbity has been run to compare values before and after "
+               "refinement); default refine strategy")
 
         # Import Volume
         volume_refmac3 = self._importVolRefmac3()
@@ -295,10 +295,10 @@ class TestPhenixRSRefine(TestImportData):
         data banks; default refine strategy; (MolProbity has been run to
         compare values before and after refinement).
         """
-        print "Run phenix real_space_refine from imported volume and pdb file " \
-              "from data banks (vol origin 0.0, 0.0, 0.0); default refine " \
-              "strategy; (MolProbity has been run to compare values before " \
-              "and after refinement)."
+        print("Run phenix real_space_refine from imported volume and pdb file "
+              "from data banks (vol origin 0.0, 0.0, 0.0); default refine "
+              "strategy; (MolProbity has been run to compare values before "
+              "and after refinement).")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -353,10 +353,10 @@ class TestPhenixRSRefine(TestImportData):
         data banks; default refine strategy; (MolProbity has been run to
         compare values before and after refinement).
         """
-        print "Run phenix real_space_refine from imported volume and cif file " \
-              "from data banks (vol origin 0.0, 0.0, 0.0); default refine " \
-              "strategy; (MolProbity has been run to compare values before " \
-              "and after refinement)."
+        print ("Run phenix real_space_refine from imported volume and cif file "
+               "from data banks (vol origin 0.0, 0.0, 0.0); default refine "
+               "strategy; (MolProbity has been run to compare values before "
+               "and after refinement).")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -411,10 +411,10 @@ class TestPhenixRSRefine(TestImportData):
         data banks; alternative refine strategy; (MolProbity has been run to
         compare values before and after refinement).
         """
-        print "Run phenix real_space_refine from imported volume and pdb " \
-              "file from data banks (vol origin 0.0, 0.0, 0.0); alternative " \
-              "refine strategy; (MolProbity has been run to compare values " \
-              "before and after refinement)."
+        print ("Run phenix real_space_refine from imported volume and pdb "
+               "file from data banks (vol origin 0.0, 0.0, 0.0); alternative "
+               "refine strategy; (MolProbity has been run to compare values "
+               "before and after refinement).")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -431,7 +431,7 @@ class TestPhenixRSRefine(TestImportData):
         }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
-                                       'volume and pdb\n')
+                                   'volume and pdb\n')
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
@@ -455,7 +455,7 @@ class TestPhenixRSRefine(TestImportData):
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
-                                     '5ni1.pdb\nalternative refine strategy')
+                                 '5ni1.pdb\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
@@ -473,10 +473,10 @@ class TestPhenixRSRefine(TestImportData):
         data banks; alternative refine strategy; (MolProbity has been run
         to compare values before and after refinement).
         """
-        print "Run phenix real_space_refine from imported volume and cif " \
-              "file from data banks (vol origin 0.0, 0.0, 0.0); " \
-              "alternative refine strategy; (MolProbity has been run to " \
-              "compare values before and after refinement)."
+        print("Run phenix real_space_refine from imported volume and cif "
+              "file from data banks (vol origin 0.0, 0.0, 0.0); "
+              "alternative refine strategy; (MolProbity has been run to "
+              "compare values before and after refinement).")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -492,7 +492,7 @@ class TestPhenixRSRefine(TestImportData):
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
-                                       'volume and cif\n')
+                                   'volume and cif\n')
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
@@ -515,7 +515,7 @@ class TestPhenixRSRefine(TestImportData):
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
-                                     '5ni1.cif\nalternative refine strategy')
+                                 '5ni1.cif\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
@@ -533,10 +533,10 @@ class TestPhenixRSRefine(TestImportData):
         data banks; default refine strategy; (MolProbity has been run to
         compare values before and after refinement); outputFormat = mmCIF.
         """
-        print "Run phenix real_space_refine from imported volume and cif file " \
-              "from data banks (vol origin 0.0, 0.0, 0.0); default refine " \
-              "strategy; (MolProbity has been run to compare values before " \
-              "and after refinement); outputFormat = mmCIF."
+        print ("Run phenix real_space_refine from imported volume and cif file "
+               "from data banks (vol origin 0.0, 0.0, 0.0); default refine "
+               "strategy; (MolProbity has been run to compare values before "
+               "and after refinement); outputFormat = mmCIF.")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -591,12 +591,12 @@ class TestPhenixRSRefine(TestImportData):
             to compare values before and after refinement); outputFormat =
             mmCIF.
         """
-        print "Run phenix real_space_refine from imported cif " \
-              "file from data banks (vol origin 0.0, 0.0, 0.0) and " \
-              "associated volume; " \
-              "alternative refine strategy; (MolProbity has been run to " \
-              "compare values before and after refinement); outputFormat = " \
-              "mmCIF."
+        print("Run phenix real_space_refine from imported cif "
+              "file from data banks (vol origin 0.0, 0.0, 0.0) and "
+              "associated volume; "
+              "alternative refine strategy; (MolProbity has been run to "
+              "compare values before and after refinement); outputFormat = "
+              "mmCIF.")
 
         # import PDB
         structure_hemo_cif2 = self._importStructHemoCIF2()
