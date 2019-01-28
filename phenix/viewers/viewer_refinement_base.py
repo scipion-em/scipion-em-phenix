@@ -146,7 +146,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         group = form.addGroup('Basic Geometry: Bond Length Restraints')
         group.addParam('showBLrestraints', LabelParam,
                        label="Deviations",
-                       help="Check here the number of outlier atoms "
+                       help="Check here the number of outlier pairs of atoms "
                             "according to the bond length restraints "
                             "between pairs of linked atoms.\nWarning!!!: "
                             "Refined structures should not have any outliers"
@@ -156,14 +156,14 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         if self.outliers > 0:
             group.addParam('showBLoutliers', LabelParam, important=True,
                            label="Outliers",
-                           help="List of outlier atoms (sorted by deviation) "
+                           help="List of outlier pairs of atoms (sorted by deviation) "
                                 "according to the bond length restraints.\n")
         group = form.addGroup('Basic Geometry: Bond Angle Restraints')
         group.addParam('showBArestraints', LabelParam,
                        label="Deviations",
-                       help="Check here the number of outlier residues "
+                       help="Check here the number of outlier triplets of atoms "
                             "according "
-                            "to the tau (N-alphaC-C) bond angle restraints.\n"
+                            "to the bond angle restraints.\n"
                             "Warning!!!: Refined structures should not "
                             "have any outliers except those are obvious in "
                             "high resolution electron density maps.")
@@ -171,7 +171,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         if self.outliers > 0:
             group.addParam('showBAoutliers', LabelParam, important=True,
                            label="Outliers",
-                           help="List of outlier residues (sorted by "
+                           help="List of outlier triplets of atoms (sorted by "
                                 "deviation) according to the bond angle "
                                 "restraints")
         group = form.addGroup('Basic Geometry: Dihedral Angle Restraints')
