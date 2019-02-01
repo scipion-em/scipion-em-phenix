@@ -73,7 +73,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         group.addParam('minimizationGlobal', BooleanParam,
                        label="Global minimization: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
-                       help="Phenix default parameter to look the global "
+                       help="Phenix default parameter to look for the global "
                             "minimum of the model.\nGenerally, refinement "
                             "with all defaults is "
                             "sufficient.\nOther options "
