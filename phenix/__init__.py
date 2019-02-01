@@ -44,7 +44,7 @@ class Plugin(pyworkflow.em.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
+        cls._defineEmVar(PHENIX_HOME, 'phenix-1.14')
 
     @classmethod
     def getEnviron(cls, first=True):
