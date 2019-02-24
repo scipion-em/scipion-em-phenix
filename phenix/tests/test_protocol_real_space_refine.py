@@ -218,12 +218,11 @@ class TestPhenixRSRefine(TestImportData):
                 'numberOfThreads': 4
                 }
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
-        protRSRefine.setObjLabel('RSRefine\nrefmac3.pdb\n')
+        protRSRefine.setObjLabel('RSRefine without\nvolume, should NOT work')
         try:
             self.launchProtocol(protRSRefine)
         except Exception as e:
-            self.assertTrue(True)
-            print("This test should return a error message as '"
+            self.assertTrue(True, "This test should return a error message as '"
                   " Input volume cannot be EMPTY.'\n")
 
             return
