@@ -69,7 +69,6 @@ atomic structure derived from a cryo-EM density map.
         # read file
         with open(fileName,'r') as f:
             content = f.read()
-            print content
 
         import re
         f = open(localCIFFileName, "w")
