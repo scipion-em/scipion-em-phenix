@@ -190,13 +190,13 @@ class TestPhenixRSRefine(TestImportData):
         self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
                                ramFavored, delta=1)
         self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                               rotOutliers, places)
+                               rotOutliers, delta=3)
         self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                cbetaOutliers, places)
         self.assertAlmostEqual(protRSRefine.clashscore.get(),
                                clashScore, delta=0.5)
         self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                               overallScore, delta=0.25)
+                               overallScore, delta=0.5)
 
     def testPhenixRSRefineFromPDB(self):
         """ This test checks that phenix real space refine protocol runs
