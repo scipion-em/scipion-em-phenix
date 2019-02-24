@@ -52,7 +52,8 @@ atomic structure derived from a cryo-EM density map.
         if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
                 is not None:
             self._insertFunctionStep('convertInputStep', self.MOLPROBITYFILE)
-        self._insertFunctionStep('sanitizeAtomStruct', self.inputStructure.get().getFileName())
+        if self.inputStructure.get().getFileName().endswith(".cif"):
+            self._insertFunctionStep('sanitizeAtomStruct', self.inputStructure.get().getFileName())
         self._insertFunctionStep('runMolprobityStep')
         self._insertFunctionStep('createOutputStep')
 
@@ -79,7 +80,10 @@ atomic structure derived from a cryo-EM density map.
     def runMolprobityStep(self):
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
-        pdb = self._sanitizedStructureFileName(fileName)
+        if fileName.endswith(".cif"):
+            pdb = self._sanitizedStructureFileName(fileName)
+        else:
+            pdb = os.path.abspath(fileName)
         args = ""
         args += pdb
         # starting volume (.mrc)
@@ -146,5 +150,7 @@ atomic structure derived from a cryo-EM density map.
         if inFileName.endswith(".pdb") or inFileName.endswith(".ent"):
             inFileName = inFileName.replace(".pdb", ".cif").replace(".ent", ".cif")
         return os.path.abspath(self._getExtraPath(os.path.basename(inFileName)))
+
+
 
 

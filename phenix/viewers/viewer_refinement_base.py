@@ -177,7 +177,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         group = form.addGroup('Basic Geometry: Dihedral Angle Restraints')
         group.addParam('showDArestraints', LabelParam,
                        label="Deviations",
-                       help="Check here the number of outlier residues "
+                       help="Check here the number of outlier tetrads of atoms "
                             "according "
                             "to the side chain dihedral torsion (chi) angle "
                             "restraints.\n"
@@ -187,14 +187,14 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         self.outliers = self.dictDARestraints['Number of outliers > 4sigma']
         if self.outliers > 0:
             group.addParam('showDAoutliers', LabelParam, important=True,
-                           label="Outliers", help="List of outlier residues ("
+                           label="Outliers", help="List of outlier tetrads of atoms ("
                                                   "sorted by deviation) "
                                                   "according to the dihedral "
                                                   "angle restraints")
         group = form.addGroup('Basic Geometry: Chirality Restraints')
         group.addParam('showCHILrestraints', LabelParam,
                        label="Deviations",
-                       help="Check here the number of outlier residues "
+                       help="Check here the number of outlier tetrads of atoms "
                             "according to the volume chirality "
                             "restraints.\n"
                             "Warning!!!: Refined structures should not "
@@ -203,7 +203,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         self.outliers = self.dictChilRestraints['Number of outliers > 4sigma']
         if self.outliers > 0:
             group.addParam('showCHILoutliers', LabelParam, important=True,
-                           label="Outliers", help="List of outlier residues ("
+                           label="Outliers", help="List of outlier tetrads of atoms ("
                                                   "sorted by deviation) "
                                                   "according to the volume "
                                                   "chirality restraints")
