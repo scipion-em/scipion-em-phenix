@@ -19,4 +19,14 @@ Installation
   b) In developer mode: 
   ``scipion installp -p /path/to/scipion-em-phenix --devel``
   
+  TESTS:
+  
+  * scipion test phenix.tests.test_protocol_emringer
+  * scipion test phenix.tests.test_protocol_real_space_refine
+  * scipion test phenix.tests.test_protocol_molprobity
+  * scipion test phenix.tests.test_protocol_superpose_pdbs
+
+  
   TODO: add link to buildbot
+  
+  
