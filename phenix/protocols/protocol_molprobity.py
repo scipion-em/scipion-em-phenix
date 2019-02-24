@@ -29,7 +29,7 @@ from pyworkflow.object import Float, Integer
 from pyworkflow.utils import importFromPlugin
 from phenix.constants import MOLPROBITY
 from phenix import Plugin
-
+from pyworkflow.em.convert.atom_struct import toCIF
 
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
@@ -60,10 +60,20 @@ atomic structure derived from a cryo-EM density map.
 
     def sanitizeAtomStruct(self, fileName):
         """molprobity does not like CIF files produced by biopython"""
+        """molprobity does not like CIF files produced by coot"""
+        # transform to CIF
+        localCIFFileName = self._sanitizedStructureFileName(fileName)
+        fileName = toCIF(fileName, localCIFFileName)
+
+        # read file
+        with open(fileName,'r') as f:
+            content = f.read()
+            print content
+
         import re
-        content = open(fileName,"r").read()
-        f = open(self._sanitizedStructureFileName(fileName), "w")
-        f.write(re.sub(' +', ' ', content))
+        f = open(localCIFFileName, "w")
+        f.write(re.sub(' +', ' ', content)) # remove double spaces
+
         f.close()
 
     def runMolprobityStep(self):
@@ -132,7 +142,9 @@ atomic structure derived from a cryo-EM density map.
     def _citations(self):
         return ['Chen_2010']
 
-    def _sanitizedStructureFileName(self, fileName):
-        return os.path.abspath(self._getExtraPath(os.path.basename(fileName)))
+    def _sanitizedStructureFileName(self, inFileName):
+        if inFileName.endswith(".pdb") or inFileName.endswith(".ent"):
+            inFileName = inFileName.replace(".pdb", ".cif").replace(".ent", ".cif")
+        return os.path.abspath(self._getExtraPath(os.path.basename(inFileName)))
 
 
