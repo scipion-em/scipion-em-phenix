@@ -2,7 +2,12 @@
 Scipion-em-phenix
 =================
 
-Wrapper to use Phenix in Scipion. Supports `Phenix-1.13 <https://www.phenix-online.org/download/nightly_builds.cgi>`_ .
+Wrapper to use Phenix in Scipion. Supports `Phenix-1.13 <https://www.phenix-online.org/download/nightly_builds.cgi>`_ . So far we have implemented:
+
+  * emringer
+  * real_space_refinement
+  * molprobity
+  * superpose pdbs
 
 Installation
 ============
