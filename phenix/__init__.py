@@ -44,7 +44,7 @@ class Plugin(pyworkflow.em.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(PHENIX_HOME, 'phenix-1.14')
+        cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
 
     @classmethod
     def getEnviron(cls, first=True):
@@ -52,8 +52,13 @@ class Plugin(pyworkflow.em.Plugin):
         environ = pwutils.Environ()
         pos = pwutils.Environ.BEGIN if first else pwutils.Environ.END
         # add to variable
+        if "DISPLAY" in os.environ:
+            display = os.environ['DISPLAY']
+        else:
+            display = ''
+
         environ.update({
-            'DISPLAY': os.environ['DISPLAY'],
+            'DISPLAY': display,
             'LIBTBX_BUILD': os.path.join(cls.getHome(), 'build'),
             'LIBTBX_OPATH': os.environ['PATH'],
             'PATH': os.path.join(Plugin.getHome(), 'build', 'bin') +
