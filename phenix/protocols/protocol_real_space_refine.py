@@ -36,6 +36,7 @@ except:
 
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
+from pyworkflow.em.convert.atom_struct import AtomicStructHandler
 
 
 PDB = 0
@@ -213,6 +214,11 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         # self._getRSRefineOutput()
         pdb = AtomStruct()
         pdb.setFileName(self.outAtomStructName)
+
+        # rewrite cif file so user and label names match
+        aSH = AtomicStructHandler()
+        aSH.read(self.outAtomStructName)
+        aSH.write(self.outAtomStructName)
 
         if self.inputVolume.get() is not None:
             pdb.setVolume(self.inputVolume.get())
