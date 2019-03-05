@@ -32,6 +32,8 @@ Installation
   * scipion test phenix.tests.test_protocol_superpose_pdbs
 
   
-  TODO: add link to buildbot
+![alt text](http://arquimedes.cnb.csic.es:9980/badges/phenix_devel.svg)
+
+Builbot_URL: http://arquimedes.cnb.csic.es:9980/#/builders/25
   
   
