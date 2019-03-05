@@ -1,7 +1,3 @@
-=================
-Scipion-em-phenix
-=================
-
 Wrapper to use Phenix in Scipion. Supports `Phenix-1.13 <https://www.phenix-online.org/download/nightly_builds.cgi>`_ . So far we have implemented:
 
   * emringer
@@ -9,8 +5,7 @@ Wrapper to use Phenix in Scipion. Supports `Phenix-1.13 <https://www.phenix-onli
   * molprobity
   * superpose pdbs
 
-Installation
-============
+INSTALLATION
 
 1. Install `Phenix-1.13 <https://www.phenix-online.org/download/nightly_builds.cgi>`_
 
@@ -33,9 +28,6 @@ Installation
 
   
 ![alt text](http://arquimedes.cnb.csic.es:9980/badges/phenix_devel.svg)
-
-
-![alt text](http://arquimedes.cnb.csic.es:9980/badges/ccp4_devel.svg)
 
 
 Builbot_URL: http://arquimedes.cnb.csic.es:9980/#/builders/25
