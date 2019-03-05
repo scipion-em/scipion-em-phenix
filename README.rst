@@ -34,6 +34,10 @@ Installation
   
 ![alt text](http://arquimedes.cnb.csic.es:9980/badges/phenix_devel.svg)
 
+
+![alt text](http://arquimedes.cnb.csic.es:9980/badges/ccp4_devel.svg)
+
+
 Builbot_URL: http://arquimedes.cnb.csic.es:9980/#/builders/25
   
   
