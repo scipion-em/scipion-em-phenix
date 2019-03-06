@@ -28,6 +28,7 @@
 
 import os
 import pyworkflow.em
+import subprocess
 
 import pyworkflow.utils as pwutils
 from phenix.constants import *
@@ -82,6 +83,25 @@ class Plugin(pyworkflow.em.Plugin):
         return os.path.join(Plugin.getHome(),
                             mapBinarytoDirectory[progName],
                             os.path.basename(progName))
+
+    @classmethod
+    def getProgram(cls, progName):
+        """ Return the program binary that will be used. """
+        return os.path.join(Plugin.getHome(),
+                            mapBinarytoDirectory[progName],
+                            os.path.basename(progName))
+
+    @classmethod
+    def getPhenixVersion(cls):
+        """ Return the program binary that will be used. """
+        pid = subprocess.Popen(cls.getProgram("phenix.version"),
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
+        stdout, stderr = pid.communicate()
+        searchKey = "Version: "
+        place = stdout.find(searchKey)
+        return stdout[place + len(searchKey):place + len(searchKey)+4]
 
     @classmethod
     def isVersionActive(cls):

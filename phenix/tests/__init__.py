@@ -33,3 +33,4 @@ from test_protocol_real_space_refine import (TestImportBase, TestImportData,
 from test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs,
                                           TestProtSuperposePdbs)
 
+from test_phenix import (TestVersion)

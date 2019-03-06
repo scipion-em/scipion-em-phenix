@@ -77,6 +77,11 @@ atomic structure derived from a cryo-EM density map.
         f.close()
 
     def runMolprobityStep(self):
+        version = Plugin.getPhenixVersion()
+        if version == '1.13':
+            print "1.13"
+        else:
+            print "1.14"
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
         if fileName.endswith(".cif"):
