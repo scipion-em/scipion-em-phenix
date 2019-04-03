@@ -28,7 +28,7 @@ INSTALLATION
 
 .. code-block::
 
-    scipion installp -p scipion-em-powerfit
+    scipion installp -p scipion-em-phenix
 
 OR
 
@@ -38,7 +38,7 @@ Alternatively, in devel mode:
 
 .. code-block::
 
-    scipion installp -p local/path/to/scipion-em-powerfit --devel
+    scipion installp -p local/path/to/scipion-em-phenix --devel
 
 - **TESTS:**
   
