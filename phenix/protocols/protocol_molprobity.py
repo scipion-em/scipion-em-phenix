@@ -35,7 +35,7 @@ from protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
-atomic structure derived from a cryo-EM density map.
+atomic structure inferred from an electron density map.
 """
     _label = 'molprobity'
     _program = ""
@@ -79,9 +79,9 @@ atomic structure derived from a cryo-EM density map.
     def runMolprobityStep(self):
         version = Plugin.getPhenixVersion()
         if version == '1.13':
-            print "1.13"
+            print "PHENIX version: 1.13"
         else:
-            print "1.14"
+            print "PHENIX version: ", version
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
         if fileName.endswith(".cif"):
