@@ -39,7 +39,7 @@ class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
 the initial map and the derived low-resolution atomic structure. This program
 samples the density around Chi1 angles of protein sidechains. Electronic
-density and appropriate rotameric angles must to coincide for each residue if
+density and appropriate rotameric angles must coincide for each residue if
 the atomic structure backbone has been perfectly fitted to the map.
 """
     _label = 'emringer'
