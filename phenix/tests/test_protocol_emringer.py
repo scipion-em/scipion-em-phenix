@@ -44,7 +44,7 @@ class TestImportData(TestImportBase):
 
     def _importVolume3(self):
         args = {'filesPath': self.dsModBuild.getFile(
-            'volumes/emd_4116.map'),
+                'volumes/emd_4116.map'),
                 'samplingRate': 0.637,
                 'setOrigCoord': False
                 }
@@ -57,10 +57,10 @@ class TestImportData(TestImportBase):
 
     def _importVolCoot1(self):
         args = {'filesPath': self.dsModBuild.getFile(
-            'volumes/coot1.mrc'),
-            'samplingRate': 1.5,
-            'setOrigCoord': False
-            }
+                'volumes/coot1.mrc'),
+                'samplingRate': 1.5,
+                'setOrigCoord': False
+                }
         protImportVol = self.newProtocol(ProtImportVolumes, **args)
         protImportVol.setObjLabel('import volume coot1.mrc\set'
                                   'origin default\n')
