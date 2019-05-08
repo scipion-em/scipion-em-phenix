@@ -25,7 +25,7 @@
 # **************************************************************************
 PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = './phenix_env.sh'
-PHENIXVERSION = '1.13' # plugin version
+PHENIXVERSION = '1.15' # plugin version
 
 #python used to run phenix scripts
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
