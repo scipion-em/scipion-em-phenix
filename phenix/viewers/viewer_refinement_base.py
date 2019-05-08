@@ -36,9 +36,8 @@ from pyworkflow.em.viewers import TableView, Chimera
 from pyworkflow.protocol.params import LabelParam, EnumParam
 from pyworkflow.utils import importFromPlugin
 from phenix import Plugin
-
-
-
+from pyworkflow.tests import *
+from pyworkflow.em.data import String
 
 def errorWindow(tkParent, msg):
     try:
@@ -653,6 +652,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             self.protocol.MOLPROBITYCOOTFILENAME)
         args = ""
         args += " --python " + MOLPROBITYCOOTFILENAME
+
         # pdb file
         if (len(os.listdir(self.protocol._getExtraPath())) > 5):
             self.protocol._getRSRefineOutput()
@@ -660,21 +660,26 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         else:
             pdb = os.path.abspath(
                 self.protocol.inputStructure.get().getFileName())
-        args += " --coords " + pdb
+
+        CootRefine = importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
+        project = self.protocol.getProject()
+
+        args = {
+                'pdbFileToBeRefined': self.protocol.inputStructure.get(),
+                'doInteractive': True,
+                'phythonscript': String(MOLPROBITYCOOTFILENAME),
+                'inputProtocol': self.protocol
+                }
+
         # volume
         vol = self._getInputVolume()
+
         if vol is not None:
-            try:
-                VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                    self.protocol.MOLPROBITYFILE))
-            except:
-                VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                    self.protocol.REALSPACEFILE))
-            args += " --map " + VOLUMEFILENAME
-        # run coot with args
-        ccpPlugin = importFromPlugin('ccp4', 'Plugin', doRaise=True)
-        runCCP4Program = importFromPlugin('ccp4.convert', 'runCCP4Program', doRaise=True)
-        runCCP4Program(ccpPlugin.getProgram(self.COOT), args)
+            args['inputVolumes'] = [vol]
+
+        protCoot = project.newProtocol(CootRefine, **args)
+        protCoot.setObjLabel('coot refinement\noutliers\n')
+        project.launchProtocol(protCoot)
 
     def _getInputVolume(self):
         if self.protocol.inputVolume.get() is None:
@@ -992,7 +997,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         self.dictSummary['RMS (angles)'] = float(words[2])
                     elif (words[0] == 'MolProbity' and words[1] == 'score'):
                         self.dictSummary['Overall score'] = float(words[3])
-                    elif (words[0] == 'bond' and words[1] == ':'):
+                    elif (words[0] == ('bond' or 'Bond') and words[1] == ':'):
                         self.dictBLRestraints['Number of restraints'] = int(
                             words[4])
                         self.dictBLRestraints['RMS (deviation)'] = float(
@@ -1018,7 +1023,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                                   self.ModelValue,
                                                   self.Deviation)
 
-                    elif (words[0] == 'angle' and words[1] == ':'):
+                    elif (words[0] == ('angle' or 'Angle') and words[1] == ':'):
                         self.dictBARestraints['Number of restraints'] = int(
                             words[4])
                         self.dictBARestraints['RMS (deviation)'] = float(
@@ -1048,7 +1053,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                 self.baDataList.append((a1 + ", " + a2 + ", "
                                                                          "" +
                                                         a3, iv, mv, d))
-                    elif (words[0] == 'dihedral' and words[1] == ':'):
+                    elif (words[0] == ('dihedral' or 'Dihedral') and words[1] == ':'):
                         self.dictDARestraints['Number of restraints'] = int(
                             words[4])
                         self.dictDARestraints['RMS (deviation)'] = float(
@@ -1083,7 +1088,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                                               "...")
                                 self.daDataList.append((element,
                                                        iv, mv, d))
-                    elif (words[0] == 'chirality' and words[1] == ':'):
+                    elif (words[0] == ('chirality' or 'Chilarity') and words[1] == ':'):
                         self.dictChilRestraints['Number of restraints'] = int(
                             words[4])
                         self.dictChilRestraints['RMS (deviation)'] = float(
@@ -1117,7 +1122,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                     element = element.replace(element[46:],
                                                               "...")
                                 self.chilDataList.append((element, iv, mv, d))
-                    elif (words[0] == 'planarity' and words[1] == ':'):
+                    elif (words[0] == ('planarity' or 'Planarity') and words[1] == ':'):
                         self.dictPlanarRestraints['Number of restraints'] = \
                             int(words[4])
                         self.dictPlanarRestraints['RMS (deviation)'] = float(
