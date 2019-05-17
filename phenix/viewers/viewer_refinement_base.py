@@ -997,7 +997,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         self.dictSummary['RMS (angles)'] = float(words[2])
                     elif (words[0] == 'MolProbity' and words[1] == 'score'):
                         self.dictSummary['Overall score'] = float(words[3])
-                    elif (words[0] == ('bond' or 'Bond') and words[1] == ':'):
+                    elif (words[0] == 'bond' or words[0] =='Bond' and words[1] == ':'):
                         self.dictBLRestraints['Number of restraints'] = int(
                             words[4])
                         self.dictBLRestraints['RMS (deviation)'] = float(
@@ -1023,7 +1023,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                                   self.ModelValue,
                                                   self.Deviation)
 
-                    elif (words[0] == ('angle' or 'Angle') and words[1] == ':'):
+                    elif (words[0] == 'angle' or words[0] == 'Angle' and words[1] == ':'):
                         self.dictBARestraints['Number of restraints'] = int(
                             words[4])
                         self.dictBARestraints['RMS (deviation)'] = float(
@@ -1038,22 +1038,16 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         if (words[0] == 'All' and words[1] == 'restrained'):
                             self.dictBARestraints[
                                 'Number of outliers > 4sigma'] = 0
-                        elif (words[0] == 'atoms'):
+                        elif (words[0] == 'Using' and words[1] == 'conformation-dependent'):
+                            f.readline()
                             line = f.readline()
                             words = line.strip().split()
-                            self._parseFileAtom123(words, f)
-                            self.dictBARestraints[
-                                'Number of outliers > 4sigma'] = len(self.Atom1)
-                            for a1, a2, a3, iv, mv, d in zip (self.Atom1,
-                                                              self.Atom2,
-                                                              self.Atom3,
-                                                              self.IdealValue,
-                                                              self.ModelValue,
-                                                              self.Deviation):
-                                self.baDataList.append((a1 + ", " + a2 + ", "
-                                                                         "" +
-                                                        a3, iv, mv, d))
-                    elif (words[0] == ('dihedral' or 'Dihedral') and words[1] == ':'):
+                            print "words: ", words
+                            if (words[0] == 'atoms'):
+                                self._wrapParseFileAtom123(words, f)
+                        elif (words[0] == 'atoms'):
+                            self._wrapParseFileAtom123(words, f)
+                    elif (words[0] == 'dihedral' or words[0] == 'Dihedral' and words[1] == ':'):
                         self.dictDARestraints['Number of restraints'] = int(
                             words[4])
                         self.dictDARestraints['RMS (deviation)'] = float(
@@ -1088,7 +1082,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                                               "...")
                                 self.daDataList.append((element,
                                                        iv, mv, d))
-                    elif (words[0] == ('chirality' or 'Chilarity') and words[1] == ':'):
+                    elif (words[0] == 'chirality' or words[0] == 'Chirality' and words[1] == ':'):
                         self.dictChilRestraints['Number of restraints'] = int(
                             words[4])
                         self.dictChilRestraints['RMS (deviation)'] = float(
@@ -1122,7 +1116,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                     element = element.replace(element[46:],
                                                               "...")
                                 self.chilDataList.append((element, iv, mv, d))
-                    elif (words[0] == ('planarity' or 'Planarity') and words[1] == ':'):
+                    elif (words[0] == 'planarity' or words[0] == 'Planarity' and words[1] == ':'):
                         self.dictPlanarRestraints['Number of restraints'] = \
                             int(words[4])
                         self.dictPlanarRestraints['RMS (deviation)'] = float(
@@ -1188,6 +1182,22 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                     (words[8].split('*')[0]))
             line = f.readline()
             words = line.strip().split()
+
+    def _wrapParseFileAtom123(self, words, f):
+        line = f.readline()
+        words = line.strip().split()
+        self._parseFileAtom123(words, f)
+        self.dictBARestraints[
+            'Number of outliers > 4sigma'] = len(self.Atom1)
+        for a1, a2, a3, iv, mv, d in zip(self.Atom1,
+                                         self.Atom2,
+                                         self.Atom3,
+                                         self.IdealValue,
+                                         self.ModelValue,
+                                         self.Deviation):
+            self.baDataList.append((a1 + ", " + a2 + ", "
+                                                     "" +
+                                    a3, iv, mv, d))
 
     def _parseFileAtom123(self, words, f):
         self.Atom1 = []
