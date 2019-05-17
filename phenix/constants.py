@@ -25,7 +25,7 @@
 # **************************************************************************
 PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = './phenix_env.sh'
-PHENIXVERSION = '1.13' # plugin version
+PHENIXVERSION = 'dev_3500' # plugin version
 
 #python used to run phenix scripts
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
@@ -39,12 +39,14 @@ PHENIX_GETVERSION_PATH = 'build/bin'
 SUPERPOSE = 'superpose_pdbs.py'
 REALSPACEREFINE = 'real_space_refine.py'
 MOLPROBITY = 'molprobity.py'
+VALIDATION_CRYOEM = 'validation_cryoem'
 EMRINGER = 'emringer.py'
 GETVERSION = 'phenix.version'
 mapBinarytoDirectory ={
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,
     MOLPROBITY : PHENIX_SCRIPT_PATH1,
+    VALIDATION_CRYOEM: PHENIX_SCRIPT_PATH2,
     EMRINGER : PHENIX_SCRIPT_PATH1,
     GETVERSION: PHENIX_GETVERSION_PATH
 }
