@@ -27,10 +27,9 @@
 import os
 from pyworkflow.object import Float, Integer
 from pyworkflow.utils import importFromPlugin
-from phenix.constants import MOLPROBITY
+from phenix.constants import MOLPROBITY, PHENIXVERSION
 from phenix import Plugin
 from pyworkflow.em.convert.atom_struct import toCIF
-
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
@@ -45,6 +44,12 @@ atomic structure inferred from an electron density map.
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
         super(PhenixProtRunMolprobity, self)._defineParams(form)
+        param = form.getParam('inputVolume')
+        param.help.set("\nSet the starting volume.\nOnly with version 1.13, "
+                       "Phenix will calculate real-space correlation.\n"
+                       "If the volume and atomic structure are not correctly "
+                       "fitted, values of real-space correlation will indicate "
+                       "not correlation at all.\n")
 
     # --------------------------- INSERT steps functions --------------------
 
@@ -95,8 +100,9 @@ atomic structure inferred from an electron density map.
                 is not None:
             tmpMapFile = self.MOLPROBITYFILE
             volume = os.path.abspath(self._getExtraPath(tmpMapFile))
-            args += " "
-            args += "map_file_name=%s" % volume
+            if PHENIXVERSION == '1.13':
+                args += " "
+                args += "map_file_name=%s" % volume
             args += " "
             args += "d_min=%f" % self.resolution.get()
         args += " "
