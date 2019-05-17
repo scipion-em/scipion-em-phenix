@@ -27,7 +27,7 @@
 
 import os
 from pyworkflow.protocol.params import BooleanParam,  IntParam
-from phenix.constants import REALSPACEREFINE, MOLPROBITY
+from phenix.constants import REALSPACEREFINE, MOLPROBITY, PHENIXVERSION
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 try:
     from pyworkflow.em.data import AtomStruct
@@ -59,6 +59,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
         super(PhenixProtRunRSRefine, self)._defineParams(form)
+        param = form.getParam('inputVolume')
+        param.help.set("\nSet the starting volume.\nPhenix will refine the "
+                       "atomic structure according to the volume density.\n"
+                       "Volume and atomic structure have to be correctly fitted. "
+                       "Otherwise, values of real-space correlation will indicate "
+                       "not correlation at all.\n")
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
                       default=False, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
@@ -197,8 +203,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        args += " "
-        args += "map_file_name=%s" % vol
+        if PHENIXVERSION == '1.13':
+            args += " "
+            args += "map_file_name=%s" % vol
         args += " "
         args += "d_min=%f" % self.resolution.get()
         args += " "
