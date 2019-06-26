@@ -30,6 +30,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
+from phenix import PHENIXVERSION
 
 
 class TestImportBase(BaseTest):
@@ -280,13 +281,22 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=95.75,
-                                  rotOutliers=0.00,
-                                  cbetaOutliers=0,
-                                  clashScore=2.09,
-                                  overallScore=1.27,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.75,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.09,
+                                      overallScore=1.27,
+                                      protRSRefine=protRSRefine)
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=96.70,
+                                      rotOutliers=3.98,
+                                      cbetaOutliers=0,
+                                      clashScore=4.47,
+                                      overallScore=1.89,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB4(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -338,13 +348,22 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=98.23,
-                                  rotOutliers=0.00,
-                                  cbetaOutliers=0,
-                                  clashScore=1.99,
-                                  overallScore=0.97,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.43,
+                                      overallScore=1.12,
+                                      protRSRefine=protRSRefine)
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.70,
+                                      rotOutliers=2.82,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.66,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF5(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -396,13 +415,22 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=98.23,
-                                  rotOutliers=0.00,
-                                  cbetaOutliers=0,
-                                  clashScore=1.99,
-                                  overallScore=0.97,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.43,
+                                      overallScore=1.12,
+                                      protRSRefine=protRSRefine)
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.70,
+                                      rotOutliers=2.82,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.66,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB6(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -458,13 +486,22 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=97.17,
-                                  rotOutliers=2.17,
-                                  cbetaOutliers=0,
-                                  clashScore=2.32,
-                                  overallScore=1.42,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.35,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.10,
+                                      overallScore=1.11,
+                                      protRSRefine=protRSRefine)
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.35,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF7(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -518,13 +555,23 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=97.17,
-                                  rotOutliers=2.17,
-                                  cbetaOutliers=0,
-                                  clashScore=2.32,
-                                  overallScore=1.42,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.35,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.10,
+                                      overallScore=1.11,
+                                      protRSRefine=protRSRefine)
+
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.35,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF8(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -575,13 +622,23 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=98.23,
-                                  rotOutliers=0.00,
-                                  cbetaOutliers=0,
-                                  clashScore=1.99,
-                                  overallScore=0.97,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.43,
+                                      overallScore=1.12,
+                                      protRSRefine=protRSRefine)
+
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.70,
+                                      rotOutliers=2.82,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.66,
+                                      protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF9(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -637,10 +694,19 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=97.17,
-                                  rotOutliers=2.17,
-                                  cbetaOutliers=0,
-                                  clashScore=2.32,
-                                  overallScore=1.42,
-                                  protRSRefine=protRSRefine)
+        if PHENIXVERSION == '1.13':
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.35,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.10,
+                                      overallScore=1.11,
+                                      protRSRefine=protRSRefine)
+        else:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=4.86,
+                                      overallScore=1.35,
+                                      protRSRefine=protRSRefine)

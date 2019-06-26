@@ -40,6 +40,7 @@ atomic structure inferred from an electron density map.
     _program = ""
     #_version = VERSION_1_2
     VALIDATIONCRYOEMFILE = 'validation_cryoem.mrc'
+    VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -54,8 +55,11 @@ atomic structure inferred from an electron density map.
     # --------------------------- INSERT steps functions --------------------
 
     def _insertAllSteps(self):
-        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
-                is not None:
+        if self.inputVolume.get() is not None:
+            self.vol = self.inputVolume.get()
+        elif self.inputStructure.get().getVolume() is not None:
+            self.vol = self.inputStructure.get().getVolume()
+        if self.vol is not None:
             self._insertFunctionStep('convertInputStep', self.VALIDATIONCRYOEMFILE)
         if self.inputStructure.get().getFileName().endswith(".cif"):
             self._insertFunctionStep('sanitizeAtomStruct', self.inputStructure.get().getFileName())
@@ -95,23 +99,26 @@ atomic structure inferred from an electron density map.
             pdb = os.path.abspath(fileName)
 
         # starting volume (.mrc)
-        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
-                is not None:
+        if self.vol is not None:
             tmpMapFile = self.VALIDATIONCRYOEMFILE
             volume = os.path.abspath(self._getExtraPath(tmpMapFile))
+        else:
+            volume = None
 
+        # MolProbity is run to get the file molprobity.out
+        # (necessary to get geometry outliers)
         numberOfThreads = self.numberOfThreads.get()
 
         args = " " + pdb
-        if volume is not None:
+        if PHENIXVERSION == '1.13' and volume is not None:
             args += (" map_file_name=%s" % volume) + \
-                    (" d_min=%f" % self.resolution.get())
-        args += " pickle=True" + \
-                " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                        (" d_min=%f" % self.resolution.get())
+            args += " pickle=True"
+        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
                 + (" %s " % self.extraParams.get())
 
         if numberOfThreads > 1:
-                args += " nproc=%d" % numberOfThreads
+            args += " nproc=%d" % numberOfThreads
         # args += " wxplots=True" # TODO: Avoid the direct opening of plots
         # script with auxiliary files
         try:
@@ -119,20 +126,35 @@ atomic structure inferred from an electron density map.
                                     cwd=self._getExtraPath())
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
-                  " failure: High number of nonbonded interaction distances " \
-                  "< 0.5. This error has been disable by running the same " \
-                  "command with the same following additional " \
-                  "argument:\npdb_interpretation.clash_guard." \
-                  "nonbonded_distance_threshold=None "
+                " failure: High number of nonbonded interaction distances " \
+                "< 0.5. This error has been disable by running the same " \
+                "command with the same following additional " \
+                "argument:\npdb_interpretation.clash_guard." \
+                "nonbonded_distance_threshold=None "
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
             Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                                     cwd=self._getExtraPath())
 
-        if PHENIXVERSION != '1.13' and volume is not None:
-            args = " " + pdb + (" " + volume) + " "+ \
-                   ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+        if PHENIXVERSION != '1.13' and self.vol is not None:
+
+            if self.vol.getHalfMaps():
+                halves = []
+                for halfMap in self.vol.getHalfMaps().split(','):
+                    if not os.path.abspath(halfMap).endswith(".mrc"):
+                        half = os.path.abspath(halfMap).split(".")[0] + ".mrc"
+                    else:
+                        half = os.path.abspath(halfMap)
+                    halves.append(half)
+                args = " " + pdb + (" " + volume) + (" " + halves[0]) + (" " + halves[1]) \
+                       + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+                       " slim=False" + \
+                       " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                       + (" %s " % self.extraParams.get())
+            else:
+                args = " " + pdb + (" " + volume) \
+                   + " "+ ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
                    " slim=False" + \
                    " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
                    + (" %s " % self.extraParams.get())
@@ -140,19 +162,27 @@ atomic structure inferred from an electron density map.
                                     cwd=self._getExtraPath())
 
     def createOutputStep(self):
-        MOLPROBITYOUTFILENAME = self._getExtraPath(
-            self.MOLPROBITYOUTFILENAME)
-        self._parseFile(MOLPROBITYOUTFILENAME)
+        VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
+            self.VALIDATIONCRYOEMPKLFILE)
+        self._readValidationPklFile(VALIDATIONCRYOEMPKLFILENAME)
         self._store()
 
     # --------------------------- INFO functions ---------------------------
     def _validate(self):
         errors = self.validateBase(VALIDATION_CRYOEM, 'VALIDATION_CRYOEM')
+
+        # Check that the input volume exist
+        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
+                is None:
+            errors.append("Error: You should provide a volume.\n")
+
         return errors
+
 
     def _summary(self):
         summary = PhenixProtRunRefinementBase._summary(self)
-        summary.append("MolProbity: http://molprobity.biochem.duke.edu/")
+        summary.append("https://www.phenix-online.org/documentation/"
+                       "reference/validation_cryo_em.html")
         return summary
 
     def _methods(self):
@@ -161,7 +191,7 @@ atomic structure inferred from an electron density map.
         return methodsMsgs
 
     def _citations(self):
-        return ['Chen_2010']
+        return ['Afonine_2018']
 
     def _sanitizedStructureFileName(self, inFileName):
         if inFileName.endswith(".pdb") or inFileName.endswith(".ent"):

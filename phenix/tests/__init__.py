@@ -30,6 +30,8 @@ from test_protocol_molprobity import (TestImportBase, TestImportData,
                                       TestMolprobityValidation2)
 from test_protocol_real_space_refine import (TestImportBase, TestImportData,
                                              TestPhenixRSRefine)
+from test_protocol_validation_cryoem import (TestImportBase, TestImportData,
+                                             TestValCryoEM)
 from test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs,
                                           TestProtSuperposePdbs)
 

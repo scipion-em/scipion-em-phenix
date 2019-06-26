@@ -29,6 +29,7 @@ import collections
 import json
 import os
 import glob
+from phenix import PHENIXVERSION
 import matplotlib.pyplot as plt
 from tkMessageBox import showerror
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
@@ -57,7 +58,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
     COOT = 'coot'
     ANALYSISTMPFILE = 'tmpAnalysisFile.txt'
-    RAMATMPFILE = 'Rhamachandran_write_plot.py'
+    RAMATMPFILE = 'Ramachandran_write_plot.py'
     ROTATMPFILE = "Rotamer_write_plot.py"
     MULTICPLOTTMPFILE = "Multi_criterion_plot.py"
 
@@ -66,24 +67,27 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         MOLPROBITYOUTFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYOUTFILENAME)
         self._parseFile(MOLPROBITYOUTFILENAME)
-        self.MOLPROBITYPKLFILENAME = self.protocol._getExtraPath(
+        if PHENIXVERSION == '1.13' or os.path.exists(self.protocol._getExtraPath(
+                self.protocol.MOLPROBITYPKLFILENAME)):
+            self.MOLPROBITYPKLFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYPKLFILENAME)
-        self._writePickleData()
-        self.dictOverall = json.loads(self.dictOverall,
+            self._writePickleData()
+            self.dictOverall = json.loads(self.dictOverall,
                                    object_pairs_hook=collections.OrderedDict)
 
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('displayMapModel', LabelParam,
                       label="Volume and models in Chimera",
-                      help="Display of input volume, input pdb that has to be"
-                           "refined and final refined model of the structure.")
-        form.addSection(label='MolProbity results')
-        group = form.addGroup('Summary MolProbity')
-        group.addParam('showMolProbityResults', LabelParam,
-                      important=True,
-                      label="MolProbity Basic Statistics",
-                      help="Validation of protein geometry. Statistics "
+                      help="Display of input volume(s) and atomic structure(s).")
+        if PHENIXVERSION == '1.13' or os.path.exists(self.protocol._getExtraPath(
+                self.protocol.MOLPROBITYPKLFILENAME)):
+            form.addSection(label='MolProbity results')
+            group = form.addGroup('Summary MolProbity')
+            group.addParam('showMolProbityResults', LabelParam,
+                           important=True,
+                           label="MolProbity Basic Statistics",
+                           help="Validation of protein geometry. Statistics "
                            "computed by the "
                            "PHENIX package using the same distributions as "
                            "the MolProbity web server."
@@ -131,123 +135,128 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                            "experimental resolution expected for a model of "
                            "this quality; ideally the score should be lower "
                            "than the actual resolution.\n")
-        group.addParam('showCootOutliers', LabelParam,
-                      important=True,
-                      label="Open in Coot",
-                      help="Interactive visualization of outliers and clashes"
+            group.addParam('showCootOutliers', LabelParam,
+                            important=True,
+                            label="Open in Coot",
+                            help="Interactive visualization of outliers and clashes"
                            " with Coot:\n\nRamachandran outliers\n"
                             "Rotamer outliers\nC-beta outliers\n"
                             "Severe clashes ")
-        if self.dictOverall['_len_missing_atoms'] > 0:
-            group.addParam('showMissingAtoms', LabelParam,
-                           label="Missing atoms",
-                           help="For clarity, hydrogen atoms are not included")
-        group = form.addGroup('Basic Geometry: Bond Length Restraints')
-        group.addParam('showBLrestraints', LabelParam,
-                       label="Deviations",
-                       help="Check here the number of outlier pairs of atoms "
+            if self.dictOverall['_len_missing_atoms'] > 0:
+                group.addParam('showMissingAtoms', LabelParam,
+                                label="Missing atoms",
+                                help="For clarity, hydrogen atoms are not included")
+            group = form.addGroup('Basic Geometry: Bond Length Restraints')
+            group.addParam('showBLrestraints', LabelParam,
+                           label="Deviations",
+                           help="Check here the number of outlier pairs of atoms "
                             "according to the bond length restraints "
                             "between pairs of linked atoms.\nWarning!!!: "
                             "Refined structures should not have any outliers"
                             " except those are obvious in high "
                             "resolution electron density maps.\n")
-        self.outliers = self.dictBLRestraints['Number of outliers > 4sigma']
-        if self.outliers > 0:
-            group.addParam('showBLoutliers', LabelParam, important=True,
-                           label="Outliers",
-                           help="List of outlier pairs of atoms (sorted by deviation) "
+            self.outliers = self.dictBLRestraints['Number of outliers > 4sigma']
+            if self.outliers > 0:
+                group.addParam('showBLoutliers', LabelParam, important=True,
+                               label="Outliers",
+                               help="List of outlier pairs of atoms (sorted by deviation) "
                                 "according to the bond length restraints.\n")
-        group = form.addGroup('Basic Geometry: Bond Angle Restraints')
-        group.addParam('showBArestraints', LabelParam,
-                       label="Deviations",
-                       help="Check here the number of outlier triplets of atoms "
+            group = form.addGroup('Basic Geometry: Bond Angle Restraints')
+            group.addParam('showBArestraints', LabelParam,
+                            label="Deviations",
+                            help="Check here the number of outlier triplets of atoms "
                             "according "
                             "to the bond angle restraints.\n"
                             "Warning!!!: Refined structures should not "
                             "have any outliers except those are obvious in "
                             "high resolution electron density maps.")
-        self.outliers = self.dictBARestraints['Number of outliers > 4sigma']
-        if self.outliers > 0:
-            group.addParam('showBAoutliers', LabelParam, important=True,
-                           label="Outliers",
-                           help="List of outlier triplets of atoms (sorted by "
+            self.outliers = self.dictBARestraints['Number of outliers > 4sigma']
+            if self.outliers > 0:
+                group.addParam('showBAoutliers', LabelParam, important=True,
+                                label="Outliers",
+                                help="List of outlier triplets of atoms (sorted by "
                                 "deviation) according to the bond angle "
                                 "restraints")
-        group = form.addGroup('Basic Geometry: Dihedral Angle Restraints')
-        group.addParam('showDArestraints', LabelParam,
-                       label="Deviations",
-                       help="Check here the number of outlier tetrads of atoms "
+            group = form.addGroup('Basic Geometry: Dihedral Angle Restraints')
+            group.addParam('showDArestraints', LabelParam,
+                            label="Deviations",
+                            help="Check here the number of outlier tetrads of atoms "
                             "according "
                             "to the side chain dihedral torsion (chi) angle "
                             "restraints.\n"
                             "Warning!!!: Refined structures should not "
                             "have any outliers except those are obvious in "
                             "high resolution electron density maps.")
-        self.outliers = self.dictDARestraints['Number of outliers > 4sigma']
-        if self.outliers > 0:
-            group.addParam('showDAoutliers', LabelParam, important=True,
-                           label="Outliers", help="List of outlier tetrads of atoms ("
+            self.outliers = self.dictDARestraints['Number of outliers > 4sigma']
+            if self.outliers > 0:
+                group.addParam('showDAoutliers', LabelParam, important=True,
+                                label="Outliers",
+                                help="List of outlier tetrads of atoms ("
                                                   "sorted by deviation) "
                                                   "according to the dihedral "
                                                   "angle restraints")
-        group = form.addGroup('Basic Geometry: Chirality Restraints')
-        group.addParam('showCHILrestraints', LabelParam,
-                       label="Deviations",
-                       help="Check here the number of outlier tetrads of atoms "
+            group = form.addGroup('Basic Geometry: Chirality Restraints')
+            group.addParam('showCHILrestraints', LabelParam,
+                            label="Deviations",
+                            help="Check here the number of outlier tetrads of atoms "
                             "according to the volume chirality "
                             "restraints.\n"
                             "Warning!!!: Refined structures should not "
                             "have any outliers except those are obvious "
                             "in high resolution electron density maps.")
-        self.outliers = self.dictChilRestraints['Number of outliers > 4sigma']
-        if self.outliers > 0:
-            group.addParam('showCHILoutliers', LabelParam, important=True,
-                           label="Outliers", help="List of outlier tetrads of atoms ("
+            self.outliers = self.dictChilRestraints['Number of outliers > 4sigma']
+            if self.outliers > 0:
+                group.addParam('showCHILoutliers', LabelParam, important=True,
+                                label="Outliers",
+                                help="List of outlier tetrads of atoms ("
                                                   "sorted by deviation) "
                                                   "according to the volume "
                                                   "chirality restraints")
-        group = form.addGroup('Basic Geometry: Planarity Restraints')
-        group.addParam('showPLANARrestraints', LabelParam,
-                       label="Deviations",
-                       help="Check here the number of outliers of planar "
+            group = form.addGroup('Basic Geometry: Planarity Restraints')
+            group.addParam('showPLANARrestraints', LabelParam,
+                            label="Deviations",
+                            help="Check here the number of outliers of planar "
                             "groups, such as aromatic rings,"
                             "according to the planar "
                             "restraints.\n"
                             "Warning!!!: Refined structures should not "
                             "have any outliers except those are obvious "
                             "in high resolution electron density maps.")
-        self.outliers = self.dictPlanarRestraints['Number of outliers > 4sigma']
-        if self.outliers > 0:
-            group.addParam('showPLANARoutliers', LabelParam, important=True,
-                           label="Outliers",
-                           help='List of planar group outliers '
+            self.outliers = self.dictPlanarRestraints['Number of outliers > 4sigma']
+            if self.outliers > 0:
+                group.addParam('showPLANARoutliers', LabelParam, important=True,
+                                label="Outliers",
+                                help='List of planar group outliers '
                                 '(sorted by deviation)')
-        if (self.dictOverall['_protein'] == True):
-            group = form.addGroup('Protein')
-            self.plotList = [u'Ramachandran plot', u'Chi1-Chi2 plot']
-            group.addParam('plotType', EnumParam,
-                           choices=self.plotList, default=0,
-                           label="Select plot:",
-                           help="Select a plot type. Ramachandran plot is "
+            if (self.dictOverall['_protein'] == True):
+                group = form.addGroup('Protein')
+                self.plotList = [u'Ramachandran plot', u'Chi1-Chi2 plot']
+                group.addParam('plotType', EnumParam,
+                                choices=self.plotList, default=0,
+                                label="Select plot:",
+                                help="Select a plot type. Ramachandran plot is "
                                 "chosen by default. Chi1-Chi2 plot shows "
                                 "rotameric angles\n")
-            group.addParam('showPlotType', LabelParam, important=True,
+                group.addParam('showPlotType', LabelParam, important=True,
                            label="View plot",
                            help="")
-            if (self.dictOverall['_percent_rama_outliers'] > 0.):
-                group.addParam('showRamaOutliersTable', LabelParam,
-                                important=True,
-                                label="Ramachandran outliers:",
-                                help="")
-            else:
-                group.addParam('showMesgNoRamaOutliers', LabelParam,
-                                label="No Ramachandran outliers detected",
-                                help="")
-            if (self.dictOverall['_percent_rota_outliers'] > 0.):
-                group.addParam('showRotaOutliersTable', LabelParam,
-                                important=True,
-                                label="Rotamer outliers: ",
-                                help="Although a residue may lie in the "
+                if (self.dictOverall['_percent_rama_outliers'] > 0.):
+                    group.addParam('showRamaOutliersTable', LabelParam,
+                                    important=True,
+                                    label="Ramachandran outliers:",
+                                    help="Ramachandran outliers are those aminoacids"
+                                         " with non-favourable dihedral angles. "
+                                         "Most of the time, Ramachandran outliers are "
+                                         "a consequence of mistakes during the data "
+                                         "processing.")
+                else:
+                    group.addParam('showMesgNoRamaOutliers', LabelParam,
+                                    label="No Ramachandran outliers detected")
+                if (self.dictOverall['_percent_rota_outliers'] > 0.):
+                    group.addParam('showRotaOutliersTable', LabelParam,
+                                    important=True,
+                                    label="Rotamer outliers: ",
+                                    help="Although a residue may lie in the "
                                      "favored regions of the Chi1-Chi2 plot, "
                                      "outliers are flagged based on the "
                                      "distribution of all non-branched Chi "
@@ -256,23 +265,14 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                      "justified by sufficiently strong " \
                                      "electron density, van der Waals "
                                      "packing, and/or hydrogen bonds.\n")
-            else:
-                group.addParam('showMesgNoRotaOutliers', LabelParam,
-                                label="No Rotamer outliers detected",
-                                help="Although a residue may lie in the "
-                                     "favored regions of the Chi1-Chi2 plot,"
-                                     " outliers are flagged based on the "
-                                     "distribution of all non-branched Chi "
-                                     "angles in a residue.\nZero outliers "
-                                     "is not the goal. Rotamer outliers can"
-                                     " be  justified by sufficiently strong " \
-                                     "electron density, van der Waals "
-                                     "packing, and/or hydrogen bonds.\n")
-            if (self.dictOverall['_n_cbeta_outliers'] > 0):
-                group.addParam('showCbetaOutliersTable', LabelParam,
-                                important=True,
-                                label="C-beta outliers:",
-                                help="C-beta position outliers (position "
+                else:
+                    group.addParam('showMesgNoRotaOutliers', LabelParam,
+                                    label="No Rotamer outliers detected")
+                if (self.dictOverall['_n_cbeta_outliers'] > 0):
+                    group.addParam('showCbetaOutliersTable', LabelParam,
+                                    important=True,
+                                    label="C-beta outliers:",
+                                    help="C-beta position outliers (position "
                                      "deviates from ideal by more than "
                                      "0.25A).\n\nIdeal CB position is "
                                      "determined from the average of the "
@@ -280,10 +280,10 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                      " This measure is more sensitive than"
                                      " individual measures to both sidechain "
                                      "and mainchain misfittings.\n")
-            else:
-                group.addParam('showMesgNoCbetaOutliers', LabelParam,
-                                label="No C-beta position outliers detected",
-                                help="C-beta position outliers (position "
+                else:
+                    group.addParam('showMesgNoCbetaOutliers', LabelParam,
+                                    label="No C-beta position outliers detected",
+                                    help="C-beta position outliers (position "
                                      "deviates from ideal by more than "
                                      "0.25A).\n\nIdeal CB position is "
                                      "determined from the average of the "
@@ -291,12 +291,12 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                      " This measure is more sensitive than"
                                      " individual measures to both sidechain "
                                      "and mainchain misfittings.\n")
-            if (self.dictOverall['_n_nqh_flips_outliers'] > 0):
-                group.addParam('showBackAsnGlnHisSidechains', LabelParam,
-                                important=True,
-                                label="Recommended Asn/Gln/His sidechain "
+                if (self.dictOverall['_n_nqh_flips_outliers'] > 0):
+                    group.addParam('showBackAsnGlnHisSidechains', LabelParam,
+                                    important=True,
+                                    label="Recommended Asn/Gln/His sidechain "
                                       "flips:",
-                                help="Asn, Gln, and His sidechains are "
+                                    help="Asn, Gln, and His sidechains are "
                                      "asymmetric and may require flipping to "
                                      "form favorable van der Waals contacts "
                                      "and hydrogen bonding.\n\nREDUCE "
@@ -307,10 +307,10 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                      "as needing to be flipped. Note that "
                                      "phenix.refine will often perform these "
                                      "flips by default.\n")
-            else:
-                group.addParam('showMesgNoSidechainFlips', LabelParam,
-                                label="No sidechain flips required",
-                                help="Asn, Gln, and His sidechains are "
+                else:
+                    group.addParam('showMesgNoSidechainFlips', LabelParam,
+                                    label="No sidechain flips required",
+                                    help="Asn, Gln, and His sidechains are "
                                      "asymmetric and may require flipping to "
                                      "form favorable van der Waals contacts "
                                      "and hydrogen bonding.\n\nREDUCE "
@@ -321,105 +321,105 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                      "as needing to be flipped. Note that "
                                      "phenix.refine will often perform these "
                                      "flips by default.\n")
-            if (self.dictOverall['_n_omega_outliers'] > 0):
-                group.addParam('showCisAndTwistedPeptides', LabelParam,
-                                important=True,
-                                label="Cis and Twisted peptides:",
-                                help="Cis conformations are observed in "
+                if (self.dictOverall['_n_omega_outliers'] > 0):
+                    group.addParam('showCisAndTwistedPeptides', LabelParam,
+                                    important=True,
+                                    label="Cis and Twisted peptides:",
+                                    help="Cis conformations are observed in "
                                      "about 5% of Prolines.\n\nCis "
                                      "conformations are observed in about "
                                      "0.03% of general residues.\n\nTwisted "
                                      "peptides are almost certainly "
                                      "modeling errors.\n")
-            else:
-                group.addParam('showMesgNoNonTransPeptides', LabelParam,
-                                label="No non-trans peptides detected",
-                               help="Cis conformations are observed in "
+                else:
+                    group.addParam('showMesgNoNonTransPeptides', LabelParam,
+                                    label="No non-trans peptides detected",
+                                    help="Cis conformations are observed in "
                                     "about 5% of Prolines.\n\nCis "
                                     "conformations are observed in about "
                                     "0.03% of general residues.\n\nTwisted "
                                     "peptides are almost certainly "
                                     "modeling errors.\n")
-        if (self.dictOverall['_clashes'] == True):
-            group = form.addGroup('Clashes')
-            if (self.dictOverall['_n_clashes_outliers'] > 0):
-                group.addParam('showClashes', LabelParam, important=True,
-                                label="All atom-contact analysis",
-                                help="This list summarizes all severe clashes "
+            if (self.dictOverall['_clashes'] == True):
+                group = form.addGroup('Clashes')
+                if (self.dictOverall['_n_clashes_outliers'] > 0):
+                    group.addParam('showClashes', LabelParam, important=True,
+                                    label="All atom-contact analysis",
+                                    help="This list summarizes all severe clashes "
                                      "(more than 0.4 Angstrom non-H-bond "
                                      "overlap) found by PROBE; you can view "
                                      "these graphically in Coot. If no "
                                      "hydrogens were present, REDUCE was "
                                      "used to add them prior to running "
                                      "PROBE.")
-            else:
-                group.addParam('showMesgNoClashes', LabelParam,
-                                label="No bad contacts (> 0.4A overlap) found.",
-                                help="This list summarizes all severe clashes "
+                else:
+                    group.addParam('showMesgNoClashes', LabelParam,
+                                    label="No bad contacts (> 0.4A overlap) found.",
+                                    help="This list summarizes all severe clashes "
                                      "(more than 0.4 Angstrom non-H-bond "
                                      "overlap) found by PROBE; you can view "
                                      "these graphically in Coot. If no "
                                      "hydrogens were present, REDUCE was "
                                      "used to add them prior to running "
                                      "PROBE.")
-        if (self.dictOverall['_rna_group'] == True):
-            group = form.addGroup('RNA restraint outliers')
-            # TODO: Describe functions for RNA (Validation.Molprobity.py)
-            if (self.dictOverall['_n_bonds_rna_outliers'] > 0):
-                group.addParam('_showRNABonds', LabelParam,
-                               important=True,
-                               label="RNA nucleotides with excessive bond"
+            if (self.dictOverall['_rna_group'] == True):
+                group = form.addGroup('RNA restraint outliers')
+                # TODO: Describe functions for RNA (Validation.Molprobity.py)
+                if (self.dictOverall['_n_bonds_rna_outliers'] > 0):
+                    group.addParam('_showRNABonds', LabelParam,
+                                    important=True,
+                                    label="RNA nucleotides with excessive bond"
                                      " lengths:",
-                               help="")
-            else:
-                group.addParam('showMesgNoBonds', LabelParam,
-                               label="All bonds within expected limits",
-                               help="")
-            if (self.dictOverall['_n_angles_rna_outliers'] > 0):
-                group.addParam('_showRNAAngles', LabelParam,
-                               important=True,
-                               label="RNA nucleotides with improper dihedral "
+                                    help="")
+                else:
+                    group.addParam('showMesgNoBonds', LabelParam,
+                                    label="All bonds within expected limits",
+                                    help="")
+                if (self.dictOverall['_n_angles_rna_outliers'] > 0):
+                    group.addParam('_showRNAAngles', LabelParam,
+                                    important=True,
+                                    label="RNA nucleotides with improper dihedral "
                                      "angles:",
-                               help="")
-            else:
-                group.addParam('showMesgNoAngles', LabelParam,
-                               label="All dihedral angles within expected "
+                                    help="")
+                else:
+                    group.addParam('showMesgNoAngles', LabelParam,
+                                    label="All dihedral angles within expected "
                                      "limits",
-                               help="")
-            if (self.dictOverall['_n_puckers_rna_outliers'] > 0):
-                group.addParam('_showRNASugarPuckers', LabelParam,
-                               important=True,
-                               label="RNA nucleotides with improper sugar "
+                                    help="")
+                if (self.dictOverall['_n_puckers_rna_outliers'] > 0):
+                    group.addParam('_showRNASugarPuckers', LabelParam,
+                                    important=True,
+                                    label="RNA nucleotides with improper sugar "
                                      "puckers:",
-                               help="")
-            else:
-                group.addParam('showMesgNoPuckers', LabelParam,
-                               label="All sugar puckers in appropriate "
+                                    help="")
+                else:
+                    group.addParam('showMesgNoPuckers', LabelParam,
+                                    label="All sugar puckers in appropriate "
                                      "conformations",
-                               help="")
-            if (self.dictOverall['_n_suites_rna_outliers'] > 0):
-                group.addParam('_showRNASuites', LabelParam,
-                               important=True,
-                               label="RNA nucleotides with bad backbone "
+                                    help="")
+                if (self.dictOverall['_n_suites_rna_outliers'] > 0):
+                    group.addParam('_showRNASuites', LabelParam,
+                                    important=True,
+                                    label="RNA nucleotides with bad backbone "
                                      "angles:",
-                               help="")
-            else:
-                group.addParam('showMesgNosuites', LabelParam,
-                               label="Backbone angles within expected ranges",
-                               help="")
-        if (self.dictOverall['_overall_rsc'] == True):
-            form.addSection(label='Real-space correlation')
-            group = form.addGroup('Real-space correlation to electron density')
-            group.addParam('showMultiCriterionPlot', LabelParam,
-                           important=True,
-                           label="View Multi-criterion plot",
-                           help="This plot shows simultaneously "
+                                    help="")
+                else:
+                    group.addParam('showMesgNosuites', LabelParam,
+                                    label="Backbone angles within expected ranges",
+                                    help="")
+            if (self.dictOverall['_overall_rsc'] == True):
+                form.addSection(label='Real-space correlation')
+                group = form.addGroup('Real-space correlation to electron density')
+                group.addParam('showMultiCriterionPlot', LabelParam,
+                                important=True,
+                                label="View Multi-criterion plot",
+                                help="This plot shows simultaneously "
                                 "Real-space correlation coefficients "
                                 "and B-factor values for each residue.\n")
-            group.addParam('showOverallRSCResults', LabelParam,
-                            important=True,
-                            label="Correlation Coefficients",
-                            help="Real-space correlation\n\nFor a detailed "
+                group.addParam('showOverallRSCResults', LabelParam,
+                                important=True,
+                                label="Correlation Coefficients",
+                                help="Real-space correlation\n\nFor a detailed "
                                  "definition of Mask CC, Volume CC and Peak "
                                  "CC, see Afonine, P. V., Klaholz, B. K., "
                                  "Moriarty, N. W., Poon, B. K., Sobolev, "
@@ -441,24 +441,24 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                  "the N highest peaks in the model-calculated "
                                  "map and the N highest peaks in the "
                                  "experimental map.\n")
-            self.residueTypeList = [u'Protein', u'Other', u'Water',
-                                    u'Everything']
-            group.addParam('residueType', EnumParam,
-                            choices=self.residueTypeList, default=0,
-                            label="Residue Type:",
-                            help="Select a residue Type. Protein is chosen by "
+                self.residueTypeList = [u'Protein', u'Other', u'Water',
+                                        u'Everything']
+                group.addParam('residueType', EnumParam,
+                                choices=self.residueTypeList, default=0,
+                                label="Residue Type:",
+                                help="Select a residue Type. Protein is chosen by "
                                  "default.\n")
-            self.ccBelowList = [u'0.1', u'0.2', u'0.3', u'0.4', u'0.5', u'0.6',
-                                u'0.7', u'0.8', u'0.9', u'1.0']
-            group.addParam('ccIndex', EnumParam,
-                            choices=self.ccBelowList, default=7,
-                            label="Show CC below:",
-                            help="Select a decimal. CC 0.8 is chosen by "
+                self.ccBelowList = [u'0.1', u'0.2', u'0.3', u'0.4', u'0.5', u'0.6',
+                                    u'0.7', u'0.8', u'0.9', u'1.0']
+                group.addParam('ccIndex', EnumParam,
+                                choices=self.ccBelowList, default=7,
+                                label="Show CC below:",
+                                help="Select a decimal. CC 0.8 is chosen by "
                                  "default.")
-            group.addParam('showCCTable', LabelParam,
-                            label="Table of Real-space correlation "
+                group.addParam('showCCTable', LabelParam,
+                                label="Table of Real-space correlation "
                                   "coefficients",
-                            help="Residue: Protein chain, "
+                                help="Residue: Protein chain, "
                                  "aminoacid index, and aminoacid name.\n"
                                  "B_iso: Isotropic B-factor value for "
                                  "residue (Disorder measure that quantitates "
@@ -476,26 +476,26 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                  "including all scales.\nCC: Correlation "
                                  "coefficent between the observed map and "
                                  "model-derived map in the real space.\n")
-            group = form.addGroup('Fourier shell correlations')
-            _atomRadius = "%0.3f" % self.dictOverall['_atom_radius']
-            group.addParam('showAtomRadius', LabelParam,
-                            important=True,
-                            label="Atom Mask Radius (Angstroms): " +
+                group = form.addGroup('Fourier shell correlations')
+                _atomRadius = "%0.3f" % self.dictOverall['_atom_radius']
+                group.addParam('showAtomRadius', LabelParam,
+                                important=True,
+                                label="Atom Mask Radius (Angstroms): " +
                                 str(_atomRadius),
-                            help='Radius of the "Fourier Shell", a spherical '
+                                help='Radius of the "Fourier Shell", a spherical '
                                  'volume mask in Fourier space.\n')
-            group.addParam('displayFSCplot', LabelParam,
-                            label="Fourier Shell Correlation plot",
-                            help="FSC regarding spatial frequency "
+                group.addParam('displayFSCplot', LabelParam,
+                                label="Fourier Shell Correlation plot",
+                                help="FSC regarding spatial frequency "
                                  "(1/Angstroms)")
-        form.addSection(label='Atomic properties')
-        group = form.addGroup('Occupancies')
-        self._computeOccBFactor(self.dictOverall['_occ_bf_outliers'])
-        if (len(self.occupancyList) == 0):
-            group.addParam('showMesgNoOccupancies', LabelParam,
-                            important=True, label="All occupancies okay")
-        else:
-            group.addParam('showOccupancies', LabelParam,
+            form.addSection(label='Atomic properties')
+            group = form.addGroup('Occupancies')
+            self._computeOccBFactor(self.dictOverall['_occ_bf_outliers'])
+            if (len(self.occupancyList) == 0):
+                group.addParam('showMesgNoOccupancies', LabelParam,
+                                important=True, label="All occupancies okay")
+            else:
+                group.addParam('showOccupancies', LabelParam,
                                 important=True,
                                 label="Table of occupancies",
                                 help="The table shows occupancy values lower "
@@ -505,16 +505,16 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                  "the atoms in a residue are not the same ("
                                  "Type = residue). Please check"
                                  " that they are correct.\n")
-        group = form.addGroup('B-factor/ADPs')
-        if ((self.dictOverall['_n_aniso_h'] is not None) and
-            (self.dictOverall['_n_aniso_h'] > 0)):
-           group.addParam('showWarningAnisoH', LabelParam, important= True,
-                          label="WARNING: %d hydrogens have anisotropic "
+            group = form.addGroup('B-factor/ADPs')
+            if ((self.dictOverall['_n_aniso_h'] is not None) and
+                (self.dictOverall['_n_aniso_h'] > 0)):
+                group.addParam('showWarningAnisoH', LabelParam, important= True,
+                                label="WARNING: %d hydrogens have anisotropic "
                                 "B-factors." % self.dictOverall['_n_aniso_h'])
-        group.addParam('showIsotropicB', LabelParam,
-                       important=True,
-                       label="Isotropic B:",
-                       help="The refinement against the map of B-factors or "
+            group.addParam('showIsotropicB', LabelParam,
+                            important=True,
+                            label="Isotropic B:",
+                            help="The refinement against the map of B-factors or "
                             "Atomic Displacement Parameters (ADPs) is "
                             "performed at the last macro-cycle and using "
                             "reciprocal space.\n\nIsotropic B: Temperature "
@@ -522,8 +522,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                             "the motion of the atoms so it is the same in "
                             "all three directions.\nMinimum, Maximum and Mean "
                             "are the statistic values of isotropic B-factor  ")
-        if (len(self.suspiciousBFList) > 0):
-            group.addParam('showSuspiciousBfactors', LabelParam,
+            if (len(self.suspiciousBFList) > 0):
+                group.addParam('showSuspiciousBfactors', LabelParam,
                                 label="Suspicious B-factors",
                                 help= "The table of Suspicious B-factors (ADP"
                                       " outliers) details all isotropic ADPs "
@@ -535,8 +535,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                       "it may be worth checking the atomic "
                                       "positions, occupancies or element "
                                       "types shown in this table.\n")
-            if self.dictOverall['_n_zero_b'] > 0:
-                group.addParam('showWarningSuspicious', LabelParam,
+                if self.dictOverall['_n_zero_b'] > 0:
+                    group.addParam('showWarningSuspicious', LabelParam,
                                    important=True,
                                    label="WARNING: %d atom(s) have "
                                          "B-factor(s) of zero, which indicates"
@@ -605,20 +605,36 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
         # input 3D map
         counter += 1  # 1
-        fnVol = self._getInputVolume()
-        if fnVol is not None:
+        if self._getInputVolume() is not None:
+            fnVol = self._getInputVolume()
             try:
                 VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
                     self.protocol.MOLPROBITYFILE))
             except:
-                VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                    self.protocol.REALSPACEFILE))
+                if self.protocol.hasAttribute('REALSPACEFILE'):
+                    VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
+                        self.protocol.REALSPACEFILE))
+                elif self.protocol.hasAttribute('VALIDATIONCRYOEMFILE'):
+                    VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
+                        self.protocol.VALIDATIONCRYOEMFILE))
+
             f.write("open %s\n" % VOLUMEFILENAME)
             x, y, z = fnVol.getOrigin(force=True).getShifts()
             sampling = fnVol.getSamplingRate()
             f.write("volume #%d style surface voxelSize %f\nvolume #%d origin "
                     "%0.2f,%0.2f,%0.2f\n"
                     % (counter, sampling, counter, x, y, z))
+            if len(fnVol.getHalfMaps()) > 0:
+                for halfMap in fnVol.getHalfMaps().split(','):
+                    counter += 1
+                    if not os.path.abspath(halfMap).endswith(".mrc"):
+                        f.write("open %s\n" % (os.path.abspath(halfMap).split(".")[0] + ".mrc"))
+                    else:
+                        f.write("open %s\n" % os.path.abspath(halfMap))
+                    f.write("volume#%d style surface voxelSize %f\n" %
+                            (counter, sampling))
+                    f.write("volume#%d origin %0.2f,%0.2f,%0.2f\n" %
+                            (counter, x, y, z))
 
         # input PDB (usually from coot)
         counter += 1  # 2
@@ -627,7 +643,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         f.write("open %s\n" % pdbFileName)
 
         # refined PDB
-        if (len(os.listdir(self.protocol._getExtraPath())) > 5):
+        if self.protocol.hasAttribute('outputPdb') and \
+                (len(os.listdir(self.protocol._getExtraPath())) > 5):
             counter += 1  # 3
             pdbFileName = os.path.abspath(
                 self.protocol.outputPdb.getFileName())
@@ -654,7 +671,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         args += " --python " + MOLPROBITYCOOTFILENAME
 
         # pdb file
-        if (len(os.listdir(self.protocol._getExtraPath())) > 5):
+        if self.protocol.hasAttribute('outputPdb') and \
+            (len(os.listdir(self.protocol._getExtraPath())) > 5):
             self.protocol._getRSRefineOutput()
             pdb = os.path.abspath(self.protocol.outAtomStructName)
         else:
@@ -1042,7 +1060,6 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                             f.readline()
                             line = f.readline()
                             words = line.strip().split()
-                            print "words: ", words
                             if (words[0] == 'atoms'):
                                 self._wrapParseFileAtom123(words, f)
                         elif (words[0] == 'atoms'):
@@ -1468,7 +1485,6 @@ if data.model_stats.ligands is not None:
         with open(ANALYSISTMPFILENAME, "r") as f:
             self.dictOverall = f.read()
             # self.dataDict = json.loads(f.read())
-
         self._store()
 
     def _writeCommand(self, listName):
