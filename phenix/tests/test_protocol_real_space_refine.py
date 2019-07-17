@@ -30,7 +30,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import PHENIXVERSION
+from phenix import Plugin, PHENIXVERSION
 
 
 class TestImportBase(BaseTest):
@@ -218,6 +218,8 @@ class TestPhenixRSRefine(TestImportData):
                 'inputStructure': structure_refmac3,
                 'numberOfThreads': 4
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine without\nvolume, should NOT work')
         try:
@@ -275,13 +277,15 @@ class TestPhenixRSRefine(TestImportData):
                 'numberOfThreads': 4
                 # default parameters in Optimization strategy options
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
                                    'refmac3.pdb\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=95.75,
                                       rotOutliers=0.00,
@@ -342,13 +346,15 @@ class TestPhenixRSRefine(TestImportData):
                 'inputStructure': structure_hemo_pdb,
                 'numberOfThreads': 4
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.pdb\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.53,
                                       rotOutliers=0.00,
@@ -358,11 +364,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.70,
-                                      rotOutliers=2.82,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.66,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF5(self):
@@ -409,13 +415,15 @@ class TestPhenixRSRefine(TestImportData):
                 'inputStructure': structure_hemo_cif,
                 'numberOfThreads': 4
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\ndefault refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.53,
                                       rotOutliers=0.00,
@@ -425,11 +433,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.70,
-                                      rotOutliers=2.82,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.66,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB6(self):
@@ -480,13 +488,15 @@ class TestPhenixRSRefine(TestImportData):
                 'adp': False,
                 'numberOfThreads': 4
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.pdb\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.35,
                                       rotOutliers=0.00,
@@ -496,11 +506,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
-                                      overallScore=1.35,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF7(self):
@@ -549,13 +559,15 @@ class TestPhenixRSRefine(TestImportData):
                 'simulatedAnnealing': True,
                 'adp': False
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.35,
                                       rotOutliers=0.00,
@@ -566,11 +578,11 @@ class TestPhenixRSRefine(TestImportData):
 
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
-                                      overallScore=1.35,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF8(self):
@@ -616,13 +628,15 @@ class TestPhenixRSRefine(TestImportData):
                 'inputStructure': structure_hemo_cif,
                 'outputFormat': mmCIF
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\ndefault refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.53,
                                       rotOutliers=0.00,
@@ -633,11 +647,11 @@ class TestPhenixRSRefine(TestImportData):
 
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.70,
-                                      rotOutliers=2.82,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.66,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF9(self):
@@ -686,6 +700,8 @@ class TestPhenixRSRefine(TestImportData):
                 'simulatedAnnealing': True,
                 'adp': False
                 }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n'
                                  '5ni1.cif and associated map\n'
@@ -694,7 +710,7 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.35,
                                       rotOutliers=0.00,
@@ -704,9 +720,9 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
-                                      overallScore=1.35,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
