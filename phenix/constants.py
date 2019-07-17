@@ -23,10 +23,10 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
+
 PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = './phenix_env.sh'
-PHENIXVERSION = '1.16'
-#PHENIXVERSION = '1.13' # plugin version
+PHENIXVERSION = '1.13' # plugin version
 
 #python used to run phenix scripts
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
