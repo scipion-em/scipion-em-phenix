@@ -110,7 +110,7 @@ atomic structure inferred from an electron density map.
         numberOfThreads = self.numberOfThreads.get()
 
         args = " " + pdb
-        if PHENIXVERSION == '1.13' and volume is not None:
+        if Plugin.getPhenixVersion() == PHENIXVERSION and volume is not None:
             args += (" map_file_name=%s" % volume) + \
                         (" d_min=%f" % self.resolution.get())
             args += " pickle=True"
@@ -137,7 +137,7 @@ atomic structure inferred from an electron density map.
             Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
                                     cwd=self._getExtraPath())
 
-        if PHENIXVERSION != '1.13' and self.vol is not None:
+        if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
 
             if self.vol.getHalfMaps():
                 halves = []
