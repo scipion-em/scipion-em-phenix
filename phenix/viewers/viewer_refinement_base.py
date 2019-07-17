@@ -67,7 +67,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         MOLPROBITYOUTFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYOUTFILENAME)
         self._parseFile(MOLPROBITYOUTFILENAME)
-        if PHENIXVERSION == '1.13' or os.path.exists(self.protocol._getExtraPath(
+        if Plugin.getPhenixVersion() == PHENIXVERSION or \
+                os.path.exists(self.protocol._getExtraPath(
                 self.protocol.MOLPROBITYPKLFILENAME)):
             self.MOLPROBITYPKLFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYPKLFILENAME)
@@ -80,7 +81,8 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         form.addParam('displayMapModel', LabelParam,
                       label="Volume and models in Chimera",
                       help="Display of input volume(s) and atomic structure(s).")
-        if PHENIXVERSION == '1.13' or os.path.exists(self.protocol._getExtraPath(
+        if Plugin.getPhenixVersion() == PHENIXVERSION or \
+                os.path.exists(self.protocol._getExtraPath(
                 self.protocol.MOLPROBITYPKLFILENAME)):
             form.addSection(label='MolProbity results')
             group = form.addGroup('Summary MolProbity')
@@ -671,19 +673,16 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         args += " --python " + MOLPROBITYCOOTFILENAME
 
         # pdb file
-        if self.protocol.hasAttribute('outputPdb') and \
-            (len(os.listdir(self.protocol._getExtraPath())) > 5):
-            self.protocol._getRSRefineOutput()
-            pdb = os.path.abspath(self.protocol.outAtomStructName)
+        if self.protocol.hasAttribute('outputPdb'):
+            pdb = self.protocol.outputPdb
         else:
-            pdb = os.path.abspath(
-                self.protocol.inputStructure.get().getFileName())
+            pdb = self.protocol.inputStructure.get()
 
         CootRefine = importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
         project = self.protocol.getProject()
 
         args = {
-                'pdbFileToBeRefined': self.protocol.inputStructure.get(),
+                'pdbFileToBeRefined': pdb,
                 'doInteractive': True,
                 'phythonscript': String(MOLPROBITYCOOTFILENAME),
                 'inputProtocol': self.protocol
@@ -1030,6 +1029,13 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         if (words[0] == 'All' and words[1] == 'restrained'):
                             self.dictBLRestraints['Number of outliers ' \
                                                   '> 4sigma'] = 0
+                        elif (words[0] == 'Using' and words[1] == 'conformation-dependent'):
+                            f.readline()
+                            line = f.readline()
+                            words = line.strip().split()
+                            if (words[0] == 'All' and words[1] == 'restrained'):
+                                self.dictBLRestraints['Number of outliers ' \
+                                                      '> 4sigma'] = 0
                         elif (words[0] == 'atoms'):
                             line = f.readline()
                             words = line.strip().split()
@@ -1060,8 +1066,9 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                             f.readline()
                             line = f.readline()
                             words = line.strip().split()
-                            if (words[0] == 'atoms'):
-                                self._wrapParseFileAtom123(words, f)
+                            if (words[0] == 'All' and words[1] == 'restrained'):
+                                self.dictBARestraints[
+                                    'Number of outliers > 4sigma'] = 0
                         elif (words[0] == 'atoms'):
                             self._wrapParseFileAtom123(words, f)
                     elif (words[0] == 'dihedral' or words[0] == 'Dihedral' and words[1] == ':'):
@@ -1079,6 +1086,13 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         if (words[0] == 'All' and words[1] == 'restrained'):
                             self.dictDARestraints[
                                 'Number of outliers > 4sigma'] = 0
+                        elif (words[0] == 'Using' and words[1] == 'conformation-dependent'):
+                            f.readline()
+                            line = f.readline()
+                            words = line.strip().split()
+                            if (words[0] == 'All' and words[1] == 'restrained'):
+                                self.dictDARestraints[
+                                    'Number of outliers > 4sigma'] = 0
                         elif (words[0] == 'atoms'):
                             line = f.readline()
                             words = line.strip().split()
@@ -1114,6 +1128,13 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         if (words[0] == 'All' and words[1] == 'restrained'):
                             self.dictChilRestraints[
                                 'Number of outliers > 4sigma'] = 0
+                        elif (words[0] == 'Using' and words[1] == 'conformation-dependent'):
+                            f.readline()
+                            line = f.readline()
+                            words = line.strip().split()
+                            if (words[0] == 'All' and words[1] == 'restrained'):
+                                self.dictChilRestraints[
+                                    'Number of outliers > 4sigma'] = 0
                         elif (words[0] == 'atoms'):
                             line = f.readline()
                             words = line.strip().split()
@@ -1148,6 +1169,13 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         if (words[0] == 'All' and words[1] == 'restrained'):
                             self.dictPlanarRestraints[
                                 'Number of outliers > 4sigma'] = 0
+                        elif (words[0] == 'Using' and words[1] == 'conformation-dependent'):
+                            f.readline()
+                            line = f.readline()
+                            words = line.strip().split()
+                            if (words[0] == 'All' and words[1] == 'restrained'):
+                                self.dictPlanarRestraints[
+                                    'Number of outliers > 4sigma'] = 0
                         elif (words[0] == 'atoms'):
                             line = f.readline()
                             words = line.strip().split()
