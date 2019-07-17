@@ -100,11 +100,11 @@ atomic structure inferred from an electron density map.
                 is not None:
             tmpMapFile = self.MOLPROBITYFILE
             volume = os.path.abspath(self._getExtraPath(tmpMapFile))
-            if PHENIXVERSION == '1.13':
+            if version == PHENIXVERSION:
                 args += " "
                 args += "map_file_name=%s" % volume
-            args += " "
-            args += "d_min=%f" % self.resolution.get()
+                args += " "
+                args += "d_min=%f" % self.resolution.get()
         args += " "
         args += "pickle=True"
         args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
