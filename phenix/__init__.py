@@ -45,15 +45,18 @@ class Plugin(pyworkflow.em.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
-        # if PHENIXVERSION == 'dev_3500':
-        #     cls._defineEmVar(PHENIX_HOME, 'phenix_dev-3500')
         else:
-            cls._defineEmVar(PHENIX_HOME, ('phenix-' + PHENIXVERSION))
+            cls._defineEmVar(PHENIX_HOME, ('phenix-' + Plugin.getPhenixVersion()))
 
     @classmethod
     def getEnviron(cls, first=True):
+
+
+
+
+
         # environ = pwutils.Environ(os.environ)
         environ = pwutils.Environ()
         pos = pwutils.Environ.BEGIN if first else pwutils.Environ.END
