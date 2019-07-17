@@ -53,7 +53,7 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
 
     def __init__(self,  **kwargs):
          PhenixProtRefinementBaseViewer.__init__(self, **kwargs)
-         if PHENIXVERSION != '1.13':
+         if Plugin.getPhenixVersion() != PHENIXVERSION:
             # VALIDATIONCRYOEMFILE = self.protocol._getExtraPath(
             #     self.protocol.VALIDATIONCRYOEMFILE)
 
@@ -64,7 +64,7 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                                   object_pairs_hook=collections.OrderedDict)
 
     def _defineParams(self, form):
-        if PHENIXVERSION != '1.13':
+        if Plugin.getPhenixVersion() != PHENIXVERSION:
             if (self.protocol.inputVolume.get() \
                 or self.protocol.inputStructure.get().getVolume()) \
                     is not None:
@@ -399,10 +399,10 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                                 "(1/Angstroms) and resolution (Angstroms).")
             group.addParam('exportFiles5', LabelParam,
                            label='Save FSC plot data as text')
-        elif PHENIXVERSION == '1.13':
+        elif Plugin.getPhenixVersion() == PHENIXVERSION:
             PhenixProtRefinementBaseViewer._defineParams(self, form)
 
-    if PHENIXVERSION != '1.13':
+    if Plugin.getPhenixVersion() != PHENIXVERSION:
         def _getVisualizeDict(self):
             return{
                    'displayMapModel': self._displayMapModel,
@@ -443,7 +443,7 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                    'showPlotFSC2': self._showPlotFSC2,
                    'exportFiles5': self._exportFiles5
                   }
-    if PHENIXVERSION == '1.13':
+    if Plugin.getPhenixVersion() == PHENIXVERSION:
         def _getVisualizeDict(self):
             return{
                    'displayMapModel': self._displayMapModel,
