@@ -60,7 +60,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     _program = ""
     # _version = VERSION_1_2
     REALSPACEFILE = 'real_space.mrc'
-    if PHENIXVERSION != '1.13':
+    if Plugin.getPhenixVersion() != PHENIXVERSION:
         VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
     # --------------------------- DEFINE param functions -------------------
@@ -73,9 +73,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                        "Otherwise, values of real-space correlation will indicate "
                        "not correlation at all.\n")
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
-                      default=False, expertLevel=LEVEL_ADVANCED,
+                      default=True, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
-                           "restraints.\n")
+                           "restraints.\nOnly for PHENIX versions higher than 1.13.")
         form.addParam("macroCycles", IntParam, label="Macro cycles",
                       default=5, expertLevel=LEVEL_ADVANCED,
                       help="Number of iterations of refinement.\nAlthough 5 "
@@ -155,7 +155,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
         self._insertFunctionStep('runRSrefineStep', self.REALSPACEFILE)
         self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
-        if PHENIXVERSION != '1.13':
+        if Plugin.getPhenixVersion() != PHENIXVERSION:
             self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
         self._insertFunctionStep('createOutputStep')
 
@@ -212,19 +212,35 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             args += " "
             args += " map_file_name=%s" % vol
             args += " pickle=True"
-        args += " "
-        args += " d_min=%f" % self.resolution.get()
+            args += " "
+            args += " d_min=%f" % self.resolution.get()
         args += " "
         numberOfThreads = self.numberOfThreads.get()
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
 
+        print "args: ", args
         Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                         cwd=self._getExtraPath())
+                                cwd=self._getExtraPath())
+
+        # try:
+        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
+        #                     cwd=self._getExtraPath())
+        # except:
+        #     aSH = AtomicStructHandler()
+        #     aSH.read(self.outAtomStructName)
+        #     aSH.write(self.outAtomStructName)
+        #     args = ""
+        #     args += os.path.abspath(aSH)
+        #     if numberOfThreads > 1:
+        #         args += " nproc=%d" % numberOfThreads
+        #
+        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
+        #                             cwd=self._getExtraPath())
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
@@ -284,7 +300,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         if self.inputVolume.get() is not None:
             self._defineSourceRelation(self.inputVolume.get(), pdb)
 
-        if PHENIXVERSION == '1.13':
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
             MOLPROBITYOUTFILENAME = self._getExtraPath(
                 self.MOLPROBITYOUTFILENAME)
             self._parseFile(MOLPROBITYOUTFILENAME)
