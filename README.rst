@@ -46,7 +46,7 @@ OR
 
 *PHENIX* binaries will *NOT* be installed automatically with the plugin. The independent installation of PHENIX software suite by the user is required before running the programs. Default installation path assumed is */usr/local/phenix-1.13-2998*; this path or any other of your preference has to be set in *PHENIX_HOME* in *scipion.conf* file. We recommend to install PHENIX version 1.13-2998.
 
-
+  the plug-in also requires imagemagick package:  sudo apt-get install imagemagick
 
 - **Tests**
 
