@@ -27,7 +27,7 @@
 import glob
 import json
 import os
-from phenix.constants import EMRINGER
+from phenix.constants import EMRINGER, DISPLAY
 from pyworkflow.em.convert.headers import Ccp4Header
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.object import String
@@ -232,6 +232,9 @@ dataDict['_residues_dict'] = dictResidue
             errors.append("Missing variables EMRINGER and/or PHENIX_HOME")
         elif not os.path.exists(program):
             errors.append("Binary '%s' does not exists.\n" % program)
+        elif not self.is_tool(DISPLAY):
+            errors.append("display program missing.\n "
+                          "Please install imagemagick package")
 
         # If there is any error at this point it is related to config variables
         if errors:
@@ -285,3 +288,8 @@ dataDict['_residues_dict'] = dictResidue
         else:
             fnVol = self.inputVolume.get()
         return fnVol
+
+    def is_tool(self, name):
+        """Check whether `name` is on PATH."""
+        from distutils.spawn import find_executable
+        return find_executable(name) is not None
