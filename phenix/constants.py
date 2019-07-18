@@ -51,3 +51,4 @@ mapBinarytoDirectory ={
     EMRINGER : PHENIX_SCRIPT_PATH1,
     GETVERSION: PHENIX_GETVERSION_PATH
 }
+DISPLAY='display'
