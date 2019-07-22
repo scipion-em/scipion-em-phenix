@@ -8,7 +8,7 @@ This plugin allows to use programs from the *PHENIX* software suite within the S
   * real space refine
   * molprobity
   * superpose pdbs
-
+  * validation cryoem
 
 
 ===================
@@ -58,12 +58,13 @@ To check the installation, simply run the following Scipion tests:
   * scipion test phenix.tests.test_protocol_real_space_refine
   * scipion test phenix.tests.test_protocol_molprobity
   * scipion test phenix.tests.test_protocol_superpose_pdbs
-
+  * scipion test phenix.tests.test_protocol_validation_cryoem
 
 
 - **Supported versions of PHENIX**
 
-Supports `Phenix-1.13-2998 <https://www.phenix-online.org/download/nightly_builds.cgi>`_.
+Tested with  `Phenix-1.13-2998 <https://www.phenix-online.org/download/nightly_builds.cgi>`_
+  and Phenix-1.16-3549
 
 
 
@@ -76,8 +77,7 @@ Protocols
 * molprobity: Validates the geometry of an atomic structure inferred from an electron density map.
 * real_space_refine: Designed for extensive real-space refinement of an atomic structure against the map provided. The map can be derived from X-ray or neutron crystallography, or cryoEM. The program obtains a model that fits the map as well as possible having appropriate geometry. The model should not show validation outliers, such as Ramachandran plot or rotamer outliers.
 * superpose_pdbs: Superposes two atomic structures so that they optimally match.
-
-
+* validation_cryoem: generalization of molprobity implemented by Phenix package.
 
 
 ========
@@ -86,9 +86,6 @@ Examples
 
 See `Model Building Tutorial <https://github.com/I2PC/scipion/wiki/tutorials/tutorial_model_building_basic.pdf>`_
 
- 
- 
- 
   
 ===============
 Buildbot status
