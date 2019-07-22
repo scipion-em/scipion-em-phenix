@@ -29,3 +29,4 @@ from protocol_molprobity import PhenixProtRunMolprobity
 from protocol_real_space_refine import PhenixProtRunRSRefine
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
+from protocol_validation_cryoem import PhenixProtRunValidationCryoEM

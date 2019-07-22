@@ -45,7 +45,10 @@ class Plugin(pyworkflow.em.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
+        else:
+            cls._defineEmVar(PHENIX_HOME, ('phenix-' + Plugin.getPhenixVersion()))
 
     @classmethod
     def getEnviron(cls, first=True):
@@ -57,9 +60,14 @@ class Plugin(pyworkflow.em.Plugin):
             display = os.environ['DISPLAY']
         else:
             display = ''
+        if "HOME" in os.environ:
+            home = os.environ['HOME']
+        else:
+            home = ''
 
         environ.update({
             'DISPLAY': display,
+            'HOME': home,
             'LIBTBX_BUILD': os.path.join(cls.getHome(), 'build'),
             'LIBTBX_OPATH': os.environ['PATH'],
             'PATH': os.path.join(Plugin.getHome(), 'build', 'bin') +

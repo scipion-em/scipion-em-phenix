@@ -1,4 +1,4 @@
 include *.txt
-include *.md
 include *.rst
 include LICENCE
+include phenix/protocols.conf

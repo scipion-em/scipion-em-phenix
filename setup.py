@@ -40,12 +40,12 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.3',  # Required
+    version='1.0.4',  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='PHENIX programs in Scipion. Warning: Install PHENIX v. 1-13-2998',  # Required
+    description='PHENIX programs in Scipion. Warning: Install PHENIX v. 1-13-2998 or 1-16-3549',  # Required
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -97,7 +97,7 @@ setup(
     # project page. What does your project relate to?
     #
     # Note that this is a string of words separated by whitespace, not a list.
-    keywords='scipion cryoem imageprocessing scipion-1.2',  # Optional
+    keywords='scipion cryoem imageprocessing scipion-2.0',  # Optional
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
@@ -136,7 +136,7 @@ setup(
     #
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
-    # include_package_data=True,
+    include_package_data=True,
     package_data={  # Optional
        'phenix': ['phenix.png', 'protocols.conf'],
     },
