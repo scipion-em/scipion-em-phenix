@@ -69,9 +69,9 @@ Tested with  `Phenix-1.13-2998 <https://www.phenix-online.org/download/nightly_b
 
 
 
-========
+=========
 Protocols
-========
+=========
 
 * emringer: Validates the agreement between the initial map and the derived low-resolution atomic structure. This program samples the density around Chi1 angles of protein sidechains. Electronic density and appropriate rotameric angles must coincide for each residue if the atomic structure backbone has been perfectly fitted to the map.
 * molprobity: Validates the geometry of an atomic structure inferred from an electron density map.
