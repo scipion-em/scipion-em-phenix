@@ -29,3 +29,4 @@ from viewer_molprobity import PhenixProtRunMolprobityViewer
 from viewer_real_space_refine import PhenixProtRunRSRefineViewer
 from viewer_refinement_base import PhenixProtRefinementBaseViewer
 from viewer_superpose_pdbs import PhenixProtRunSuperposePDBsViewer
+from viewer_validation_cryoem import PhenixProtRunValidationCryoEMViewer

@@ -25,22 +25,23 @@
 # **************************************************************************
 
 from phenix.protocols.protocol_real_space_refine import PhenixProtRunRSRefine
-from viewer_refinement_base import PhenixProtRefinementBaseViewer
+from viewer_validation_cryoem import PhenixProtRunValidationCryoEMViewer
 
-class PhenixProtRunRSRefineViewer(PhenixProtRefinementBaseViewer):
+class PhenixProtRunRSRefineViewer(PhenixProtRunValidationCryoEMViewer):
     """ Viewer for Phenix program real space refine
     """
     _label = 'Real Space Refine viewer'
     _targets = [PhenixProtRunRSRefine]
 
     def __init__(self,  **kwargs):
-         PhenixProtRefinementBaseViewer.__init__(self, **kwargs)
+         PhenixProtRunValidationCryoEMViewer.__init__(self, **kwargs)
          REALSPACEFILE = self.protocol._getExtraPath(
              self.protocol.REALSPACEFILE)
          self.protocol._parseFile(REALSPACEFILE)
 
     def _defineParams(self, form):
-        PhenixProtRefinementBaseViewer._defineParams(self,form)
+        PhenixProtRunValidationCryoEMViewer._defineParams(self,form)
+
 
 
 

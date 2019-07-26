@@ -52,6 +52,18 @@ _bibtexStr = """
    url = "http://www.nature.com/articles/nmeth.3541"
 }
 
+ 
+@Article{Afonine_2018,
+   Author="Afonine, P. V.  and Klaholz, B. P.  and Moriarty, N. W.  and Poon, B. K.  and Sobolev, O. V.  and Terwilliger, T. C.  and Adams, P. D.  and Urzhumtsev, A. ",
+   Title="{{N}ew tools for the analysis and validation of cryo-{E}{M} maps and atomic models}",
+   Journal="Acta Crystallogr D Struct Biol",
+   Year="2018",
+   Volume="74",
+   Number="Pt 9",
+   Pages="814--840",
+   Month="Sep"
+}
+
 @Article{Chen_2010,
    Author="Chen, V. B.  and Arendall, W. B.  and Headd, J. J.  and Keedy, D. A.  and Immormino, R. M.  and Kapral, G. J.  and Murray, L. W.  and Richardson, J. S.  and Richardson, D. C. ",
    Title="{{M}ol{P}robity: all-atom structure validation for macromolecular crystallography}",

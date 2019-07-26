@@ -27,26 +27,27 @@
 import os
 from pyworkflow.object import Float, Integer
 from pyworkflow.utils import importFromPlugin
-from phenix.constants import MOLPROBITY, PHENIXVERSION
+from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, PHENIXVERSION
 from phenix import Plugin
 from pyworkflow.em.convert.atom_struct import toCIF
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
-class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
+class PhenixProtRunValidationCryoEM(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
 atomic structure inferred from an electron density map.
 """
-    _label = 'molprobity'
+    _label = 'validation_cryoem'
     _program = ""
     #_version = VERSION_1_2
-    MOLPROBITYFILE = 'molprobity.mrc'
+    VALIDATIONCRYOEMFILE = 'validation_cryoem.mrc'
+    VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
-        super(PhenixProtRunMolprobity, self)._defineParams(form)
+        super(PhenixProtRunValidationCryoEM, self)._defineParams(form)
         param = form.getParam('inputVolume')
-        param.help.set("\nSet the starting volume.\nOnly with version 1.13, "
-                       "Phenix will calculate real-space correlation.\n"
+        param.help.set("\nSet the starting volume.\nPhenix will calculate "
+                       "real-space correlation between map and atomic structure.\n"
                        "If the volume and atomic structure are not correctly "
                        "fitted, values of real-space correlation will indicate "
                        "not correlation at all.\n")
@@ -54,19 +55,21 @@ atomic structure inferred from an electron density map.
     # --------------------------- INSERT steps functions --------------------
 
     def _insertAllSteps(self):
-        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
-                is not None:
-            self._insertFunctionStep('convertInputStep', self.MOLPROBITYFILE)
+        if self.inputVolume.get() is not None:
+            self.vol = self.inputVolume.get()
+        elif self.inputStructure.get().getVolume() is not None:
+            self.vol = self.inputStructure.get().getVolume()
+        if self.vol is not None:
+            self._insertFunctionStep('convertInputStep', self.VALIDATIONCRYOEMFILE)
         if self.inputStructure.get().getFileName().endswith(".cif"):
             self._insertFunctionStep('sanitizeAtomStruct', self.inputStructure.get().getFileName())
-        self._insertFunctionStep('runMolprobityStep')
+        self._insertFunctionStep('runValidationCryoEMStep')
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
 
     def sanitizeAtomStruct(self, fileName):
-        """molprobity does not like CIF files produced by biopython"""
-        """molprobity does not like CIF files produced by coot"""
+
         # transform to CIF
         localCIFFileName = self._sanitizedStructureFileName(fileName)
         fileName = toCIF(fileName, localCIFFileName)
@@ -81,71 +84,105 @@ atomic structure inferred from an electron density map.
 
         f.close()
 
-    def runMolprobityStep(self):
+    def runValidationCryoEMStep(self):
         version = Plugin.getPhenixVersion()
         if version == '1.13':
             print "PHENIX version: 1.13"
         else:
             print "PHENIX version: ", version
+
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
         if fileName.endswith(".cif"):
             pdb = self._sanitizedStructureFileName(fileName)
         else:
             pdb = os.path.abspath(fileName)
-        args = ""
-        args += pdb
-        # starting volume (.mrc)
-        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
-                is not None:
-            tmpMapFile = self.MOLPROBITYFILE
-            volume = os.path.abspath(self._getExtraPath(tmpMapFile))
-            if version == PHENIXVERSION:
-                args += " "
-                args += "map_file_name=%s" % volume
-                args += " "
-                args += "d_min=%f" % self.resolution.get()
-        args += " "
-        args += "pickle=True"
-        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
-        args += " %s " % self.extraParams.get()
 
+        # starting volume (.mrc)
+        if self.vol is not None:
+            tmpMapFile = self.VALIDATIONCRYOEMFILE
+            volume = os.path.abspath(self._getExtraPath(tmpMapFile))
+        else:
+            volume = None
+
+        # MolProbity is run to get the file molprobity.out
+        # (necessary to get geometry outliers)
         numberOfThreads = self.numberOfThreads.get()
+
+        args = " " + pdb
+        if Plugin.getPhenixVersion() == PHENIXVERSION and volume is not None:
+            args += (" map_file_name=%s" % volume) + \
+                        (" d_min=%f" % self.resolution.get())
+            args += " pickle=True"
+        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                + (" %s " % self.extraParams.get())
+
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
         # args += " wxplots=True" # TODO: Avoid the direct opening of plots
         # script with auxiliary files
         try:
             Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                         cwd=self._getExtraPath())
+                                    cwd=self._getExtraPath())
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
-                  " failure: High number of nonbonded interaction distances " \
-                  "< 0.5. This error has been disable by running the same " \
-                  "command with the same following additional " \
-                  "argument:\npdb_interpretation.clash_guard." \
-                  "nonbonded_distance_threshold=None "
+                " failure: High number of nonbonded interaction distances " \
+                "< 0.5. This error has been disable by running the same " \
+                "command with the same following additional " \
+                "argument:\npdb_interpretation.clash_guard." \
+                "nonbonded_distance_threshold=None "
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
             Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                             cwd=self._getExtraPath())
+                                    cwd=self._getExtraPath())
 
+        if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
+
+            if self.vol.getHalfMaps():
+                halves = []
+                for halfMap in self.vol.getHalfMaps().split(','):
+                    if not os.path.abspath(halfMap).endswith(".mrc"):
+                        half = os.path.abspath(halfMap).split(".")[0] + ".mrc"
+                    else:
+                        half = os.path.abspath(halfMap)
+                    halves.append(half)
+                args = " " + pdb + (" " + volume) + (" " + halves[0]) + (" " + halves[1]) \
+                       + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+                       " slim=False" + \
+                       " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                       + (" %s " % self.extraParams.get())
+            else:
+                args = " " + pdb + (" " + volume) \
+                   + " "+ ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+                   " slim=False" + \
+                   " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                   + (" %s " % self.extraParams.get())
+            Plugin.runPhenixProgram(Plugin.getProgram(VALIDATION_CRYOEM), args,
+                                    cwd=self._getExtraPath())
 
     def createOutputStep(self):
-        MOLPROBITYOUTFILENAME = self._getExtraPath(
-            self.MOLPROBITYOUTFILENAME)
-        self._parseFile(MOLPROBITYOUTFILENAME)
+        VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
+            self.VALIDATIONCRYOEMPKLFILE)
+        self._readValidationPklFile(VALIDATIONCRYOEMPKLFILENAME)
         self._store()
 
     # --------------------------- INFO functions ---------------------------
     def _validate(self):
-        errors = self.validateBase(MOLPROBITY,'MOLPROBITY')
+        errors = self.validateBase(VALIDATION_CRYOEM, 'VALIDATION_CRYOEM')
+
+        # Check that the input volume exist
+        if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
+                is None:
+            errors.append("Error: You should provide a volume.\n")
+
         return errors
+
 
     def _summary(self):
         summary = PhenixProtRunRefinementBase._summary(self)
-        summary.append("MolProbity: http://molprobity.biochem.duke.edu/")
+        summary.append("https://www.phenix-online.org/documentation/"
+                       "reference/validation_cryo_em.html")
         return summary
 
     def _methods(self):
@@ -154,7 +191,7 @@ atomic structure inferred from an electron density map.
         return methodsMsgs
 
     def _citations(self):
-        return ['Chen_2010']
+        return ['Afonine_2018']
 
     def _sanitizedStructureFileName(self, inFileName):
         if inFileName.endswith(".pdb") or inFileName.endswith(".ent"):

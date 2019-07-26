@@ -4,9 +4,12 @@ from pyworkflow.object import Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import (PointerParam, FloatParam, \
     StringParam)
+from phenix.constants import PHENIXVERSION
 from pyworkflow.em.convert.headers import Ccp4Header
 from phenix import Plugin
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
+import collections
+import json
 
 
 
@@ -20,6 +23,8 @@ atomic structure derived from a cryo-EM density map.
     MOLPROBITYOUTFILENAME = 'molprobity.out'
     MOLPROBITYCOOTFILENAME = 'molprobity_coot.py'
     MOLPROBITYPKLFILENAME = 'molprobity.pkl'
+    SUMMARYFILENAME = 'validationSummary.txt'
+
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -35,14 +40,7 @@ atomic structure derived from a cryo-EM density map.
         # the resolution is detected automatically from the map coefficients.
         form.addParam('inputVolume', PointerParam, pointerClass="Volume",
                       label='Input Volume', allowsNull=True,
-                      help="Set the starting volume.\nVolumes are optional "
-                           "for validation but without a volume, "
-                           "directly provided, or associated to the atomic "
-                           "structure, Phenix will not calculate real-space "
-                           "correlation.\nMoreover, if the volume and atomic "
-                           "structure are not correctly fitted, values of "
-                           "real-space correlation will indicate not "
-                           "correlation at all.\n")
+                      help="")
         form.addParam('resolution', FloatParam,
                       label='Resolution (A):',
                       default=3.0,
@@ -107,6 +105,9 @@ atomic structure derived from a cryo-EM density map.
             errors.append("Missing variables %s and/or PHENIX_HOME" % label)
         elif not os.path.exists(program):
             errors.append("Binary '%s' does not exists.\n" % program)
+            errors.append("Check if you need to upgrade your PHENIX version"
+                          " to run %s.\nYour current PHENIX version is %s.\n"
+                          % (label, PHENIXVERSION))
 
         # If there is any error at this point it is related to config variables
         if errors:
@@ -149,3 +150,52 @@ atomic structure derived from a cryo-EM density map.
                     elif (words[0] == 'MolProbity' and words[1] == 'score'):
                         self.overallScore = Float(words[3])
                 line = f.readline()
+
+
+    def _readValidationPklFile(self, fileName):
+        self.SUMMARYFILENAME = self._getTmpPath(self.SUMMARYFILENAME)
+        command = """import pickle
+import collections
+import json
+
+def pickleData(file):
+    with open(file,"r") as f:
+        return pickle.load(f)
+
+# process file {VALIDATIONCRYOEMPKLFILENAME}"
+data = pickleData('{VALIDATIONCRYOEMPKLFILENAME}')
+dictSummary = collections.OrderedDict()
+
+dictSummary['Rhama_Outliers'] = data.model.geometry.ramachandran.outliers
+dictSummary['Rhama_Favored'] = data.model.geometry.ramachandran.favored
+dictSummary['Rota_Outliers'] = data.model.geometry.rotamer.outliers
+dictSummary['Cbeta_Outliers_n'] = data.model.geometry.c_beta.cbetadev.n_outliers
+dictSummary['Clash_score'] = data.model.geometry.clash.score
+dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
+""".format(VALIDATIONCRYOEMPKLFILENAME=fileName)
+
+        command += """with open('%s',"w") as f:
+    f.write(json.dumps(dictSummary))
+""" % (self.SUMMARYFILENAME)
+
+        pythonFileName = self.SUMMARYFILENAME.replace('.txt', '.py')
+        # write script file
+        with open(pythonFileName, "w") as f:
+            f.write(command)
+
+        # execute file with phenix.python
+        Plugin.runPhenixProgram("", pythonFileName)
+
+        # read file in scipion python
+        with open(self.SUMMARYFILENAME, "r") as f:
+            dictSummary = f.read()
+
+        dictSummary = json.loads(
+            dictSummary, object_pairs_hook=collections.OrderedDict)
+
+        self.ramachandranOutliers = Float(dictSummary['Rhama_Outliers'])
+        self.ramachandranFavored = Float(dictSummary['Rhama_Favored'])
+        self.rotamerOutliers = Float(dictSummary['Rota_Outliers'])
+        self.cbetaOutliers = Integer(dictSummary['Cbeta_Outliers_n'])
+        self.clashscore = Float(dictSummary['Clash_score'])
+        self.overallScore = Float(dictSummary['MolProbity_score'])

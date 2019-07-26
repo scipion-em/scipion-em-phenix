@@ -23,6 +23,7 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
+
 PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = './phenix_env.sh'
 PHENIXVERSION = '1.15' # plugin version
@@ -39,12 +40,15 @@ PHENIX_GETVERSION_PATH = 'build/bin'
 SUPERPOSE = 'superpose_pdbs.py'
 REALSPACEREFINE = 'real_space_refine.py'
 MOLPROBITY = 'molprobity.py'
+VALIDATION_CRYOEM = 'validation_cryoem.py'
 EMRINGER = 'emringer.py'
 GETVERSION = 'phenix.version'
 mapBinarytoDirectory ={
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,
     MOLPROBITY : PHENIX_SCRIPT_PATH1,
+    VALIDATION_CRYOEM: PHENIX_SCRIPT_PATH2,
     EMRINGER : PHENIX_SCRIPT_PATH1,
     GETVERSION: PHENIX_GETVERSION_PATH
 }
+DISPLAY='display'

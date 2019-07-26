@@ -27,8 +27,13 @@
 
 import os
 from pyworkflow.protocol.params import BooleanParam,  IntParam
-from phenix.constants import REALSPACEREFINE, MOLPROBITY
+from phenix.constants import (REALSPACEREFINE,
+                              MOLPROBITY,
+                              VALIDATION_CRYOEM,
+                              PHENIXVERSION)
+
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
+
 try:
     from pyworkflow.em.data import AtomStruct
 except:
@@ -55,14 +60,22 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     _program = ""
     # _version = VERSION_1_2
     REALSPACEFILE = 'real_space.mrc'
+    if Plugin.getPhenixVersion() != PHENIXVERSION:
+        VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
         super(PhenixProtRunRSRefine, self)._defineParams(form)
+        param = form.getParam('inputVolume')
+        param.help.set("\nSet the starting volume.\nPhenix will refine the "
+                       "atomic structure according to the volume density.\n"
+                       "Volume and atomic structure have to be correctly fitted. "
+                       "Otherwise, values of real-space correlation will indicate "
+                       "not correlation at all.\n")
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
-                      default=False, expertLevel=LEVEL_ADVANCED,
+                      default=True, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
-                           "restraints.\n")
+                           "restraints.\nOnly for PHENIX versions higher than 1.13.")
         form.addParam("macroCycles", IntParam, label="Macro cycles",
                       default=5, expertLevel=LEVEL_ADVANCED,
                       help="Number of iterations of refinement.\nAlthough 5 "
@@ -142,6 +155,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
         self._insertFunctionStep('runRSrefineStep', self.REALSPACEFILE)
         self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
+        if Plugin.getPhenixVersion() != PHENIXVERSION:
+            self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
@@ -169,7 +184,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
         args += " macro_cycles=%d" % self.macroCycles
         args += " model_format=pdb+mmcif"
-        args += " write_pkl_stats=True"
+        # args += " write_pkl_stats=True"
         args += " %s " % self.extraParams.get()
         numberOfThreads = self.numberOfThreads.get()
         if numberOfThreads > 1:
@@ -197,18 +212,70 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args += os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args += " "
+            args += " map_file_name=%s" % vol
+            args += " pickle=True"
+            args += " "
+            args += " d_min=%f" % self.resolution.get()
         args += " "
-        args += "map_file_name=%s" % vol
-        args += " "
-        args += "d_min=%f" % self.resolution.get()
-        args += " "
-        args += "pickle=True"
         numberOfThreads = self.numberOfThreads.get()
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
 
+        print "args: ", args
         Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                         cwd=self._getExtraPath())
+                                cwd=self._getExtraPath())
+
+        # try:
+        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
+        #                     cwd=self._getExtraPath())
+        # except:
+        #     aSH = AtomicStructHandler()
+        #     aSH.read(self.outAtomStructName)
+        #     aSH.write(self.outAtomStructName)
+        #     args = ""
+        #     args += os.path.abspath(aSH)
+        #     if numberOfThreads > 1:
+        #         args += " nproc=%d" % numberOfThreads
+        #
+        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
+        #                             cwd=self._getExtraPath())
+
+    def runValidationCryoEMStep(self, tmpMapFile):
+        # PDBx/mmCIF
+        self._getRSRefineOutput()
+        args = ""
+        pdb = os.path.abspath(self.outAtomStructName)
+        args += pdb
+        # starting volume (.mrc)
+        volume = os.path.abspath(self._getExtraPath(tmpMapFile))
+        if self.inputVolume.get() is not None:
+            vol = self.inputVolume.get()
+        else:
+            vol = self.inputStructure.get().getVolume()
+
+        if vol.getHalfMaps():
+            halves = []
+            for halfMap in vol.getHalfMaps().split(','):
+                if not os.path.abspath(halfMap).endswith(".mrc"):
+                    half = os.path.abspath(halfMap).split(".")[0] + ".mrc"
+                else:
+                    half = os.path.abspath(halfMap)
+                halves.append(half)
+            args = " " + pdb + (" " + volume) + (" " + halves[0]) + (" " + halves[1]) \
+                    + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+                    " slim=False" + \
+                    " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                    + (" %s " % self.extraParams.get())
+        else:
+            args = " " + pdb + (" " + volume) \
+                    + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
+                    " slim=False" + \
+                    " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
+                    + (" %s " % self.extraParams.get())
+        Plugin.runPhenixProgram(Plugin.getProgram(VALIDATION_CRYOEM), args,
+                                    cwd=self._getExtraPath())
 
     def createOutputStep(self):
         # self._getRSRefineOutput()
@@ -217,8 +284,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
         # rewrite cif file so user and label names match
         aSH = AtomicStructHandler()
-        aSH.read(self.outAtomStructName)
-        aSH.write(self.outAtomStructName)
+        try:
+            aSH.read(self.outAtomStructName)
+            aSH.write(self.outAtomStructName)
+        except:
+            print("CIF file standarization with biopython failed. "
+                  "I will continue using the file created by real_space_refine. ")
 
         if self.inputVolume.get() is not None:
             pdb.setVolume(self.inputVolume.get())
@@ -229,11 +300,15 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         if self.inputVolume.get() is not None:
             self._defineSourceRelation(self.inputVolume.get(), pdb)
 
-        MOLPROBITYOUTFILENAME = self._getExtraPath(
-            self.MOLPROBITYOUTFILENAME)
-        self._parseFile(MOLPROBITYOUTFILENAME)
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            MOLPROBITYOUTFILENAME = self._getExtraPath(
+                self.MOLPROBITYOUTFILENAME)
+            self._parseFile(MOLPROBITYOUTFILENAME)
+        else:
+            VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
+                self.VALIDATIONCRYOEMPKLFILE)
+            self._readValidationPklFile(VALIDATIONCRYOEMPKLFILENAME)
         self._store()
-
     # --------------------------- INFO functions ---------------------------
 
     def _validate(self):
