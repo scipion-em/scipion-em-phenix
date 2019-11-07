@@ -4,15 +4,7 @@ from pyworkflow.object import Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import (PointerParam, FloatParam, \
     StringParam)
-from phenix.constants import (REALSPACEREFINE,
-                              MOLPROBITY,
-                              MOLPROBITY2,
-                              VALIDATION_CRYOEM,
-                              PHENIXVERSION)
-
-from pyworkflow.em.convert.atom_struct import AtomicStructHandler
-from pyworkflow.em.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
-
+from phenix.constants import (PHENIXVERSION)
 from pyworkflow.em.convert.headers import Ccp4Header
 from phenix import Plugin
 from pyworkflow.protocol.constants import LEVEL_ADVANCED

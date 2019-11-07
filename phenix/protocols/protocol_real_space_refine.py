@@ -26,6 +26,8 @@
 # **************************************************************************
 
 import os
+
+from pyworkflow.em import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
@@ -34,14 +36,9 @@ from phenix.constants import (REALSPACEREFINE,
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
-try:
-    from pyworkflow.em.data import AtomStruct
-except:
-    from pyworkflow.em.data import PdbFile as AtomStruct
-
+from phenix.protocols import retry, fromCIFTommCIF
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import retry, fromCIFTommCIF
 
 
 PDB = 0

@@ -29,13 +29,12 @@ from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
-from pyworkflow.em.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
+from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF
 
 try:
     from pyworkflow.em.data import AtomStruct
 except:
     from pyworkflow.em.data import PdbFile as AtomStruct
-from pyworkflow.em.convert.atom_struct import AtomicStructHandler
 from phenix import Plugin
 
 

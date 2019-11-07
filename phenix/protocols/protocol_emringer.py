@@ -34,8 +34,7 @@ from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
 from phenix.constants import PHENIX_HOME
-from pyworkflow.em.convert.atom_struct import AtomicStructHandler
-from pyworkflow.em.convert.atom_struct import retry, fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
+from phenix.protocols import retry
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between

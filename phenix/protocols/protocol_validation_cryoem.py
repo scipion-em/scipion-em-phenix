@@ -25,11 +25,9 @@
 # **************************************************************************
 
 import os
-from pyworkflow.object import Float, Integer
-from pyworkflow.utils import importFromPlugin
 from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, PHENIXVERSION
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import retry
+from phenix.protocols import retry
 from protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunValidationCryoEM(PhenixProtRunRefinementBase):

@@ -25,13 +25,10 @@
 # **************************************************************************
 
 import os
-from pyworkflow.object import Float, Integer
-from pyworkflow.utils import importFromPlugin
 from phenix.constants import MOLPROBITY, PHENIXVERSION
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import retry, toCIF, AtomicStructHandler
 from protocol_refinement_base import PhenixProtRunRefinementBase
-import pyworkflow.utils as pwutils
+from phenix.protocols import retry
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
