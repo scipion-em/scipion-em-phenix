@@ -191,16 +191,16 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                                     label="No Rhamachandran outliers detected")
             group.addParam('displayPlotRhama', LabelParam, important=True,
                            label="Rhamachandran graphs",
-                           help="Visualization of Rhamachandran outliers in Chi1-Chi2 plots.")
+                           help="Visualization of outliers in Rhamachandran graphs.")
             group = form.addGroup('Geometry Restraints')
             group.addParam('showHelp', LabelParam, label='',
                            help="This section reports statistics for geometry restraints "
                                 "used in refinement. As a general rule, a fully refined "
                                 "structure should not have any outliers unless these are "
                                 "exceptionally clear in the electron density (usually at "
-                                "very high resolution). Be sure to also check the MolProbity"
+                                "very high resolution). Be sure to also check the MolProbity "
                                 "validation results for this structure, as they are more "
-                                "sensitive to the geometric properties of proteins and nucleic"
+                                "sensitive to the geometric properties of proteins and nucleic "
                                 "acids (especially in the case of dihedral angles).")
             group.addParam('showBLrestraints2', LabelParam,
                            important=True,
@@ -754,7 +754,7 @@ if data.model_vs_data.cc is not None:
     chain_names = []
     chain_cc = []
     for item in data.model_vs_data.cc.cc_per_chain:
-        if item.n_atoms > 10:
+        if item.chain_id not in chain_names:
             chain_names.append(item.chain_id)
             chain_cc.append(item.cc)
     assert(len(chain_names) == len(chain_cc))
@@ -1253,7 +1253,11 @@ data = pickleData('{VALIDATIONCRYOEMPKLFILENAME}')
 dictOverall2 = collections.OrderedDict()
 
 # composition
-dictOverall2['Chains'] = data.model.composition.n_chains
+chain_names = []
+for item in data.model_vs_data.cc.cc_per_chain:
+    if item.chain_id not in chain_names:
+        chain_names.append(item.chain_id)   
+dictOverall2['Chains'] = len(chain_names)
 dictOverall2['Atoms'] = data.model.composition.n_atoms
 dictOverall2['Hydrogens'] = data.model.composition.n_hd
 dictOverall2['Protein_residues'] = data.model.composition.n_protein
@@ -1601,12 +1605,17 @@ dictOverall2['CC_box'] = round(data.model_vs_data.cc.cc_box, 2)
 dictOverall2['CC_peaks'] = round(data.model_vs_data.cc.cc_peaks, 2)
 dictOverall2['CC_volume'] = round(data.model_vs_data.cc.cc_volume, 2)
 dictOverall2['CC_main_chain'] = round(data.model_vs_data.cc.cc_main_chain.cc, 2)
-dictOverall2['CC_side_chain']= round(data.model_vs_data.cc.cc_side_chain.cc, 2)
+try:  # skip if chain has no sidechains
+    dictOverall2['CC_side_chain']= round(data.model_vs_data.cc.cc_side_chain.cc, 2)
+except:
+   pass
 
 # Model structure
 Chain_list = []
+chain_names = []
 for item in data.model_vs_data.cc.cc_per_chain:
-    if item.n_atoms > 10:
+    if item.chain_id not in chain_names:
+        chain_names.append(item.chain_id)
         Chain_list.append((item.chain_id, item.cc))
         dictOverall2['Chain_list'] = Chain_list
 Residue_list = []

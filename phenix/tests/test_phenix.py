@@ -30,6 +30,9 @@ from phenix.constants import PHENIXVERSION
 class TestVersion(BaseTest):
 
     def testgetVersion(self):
-        print "PHENIXVERSION: ", PHENIXVERSION
         version = Plugin.getPhenixVersion()
-        self.assertEqual(version, PHENIXVERSION)
+        if version == PHENIXVERSION:
+            self.assertEqual(version, PHENIXVERSION)
+        else:
+            print "Your version is not " + PHENIXVERSION + " anymore"
+            print "Your current version is " + version

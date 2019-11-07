@@ -29,12 +29,13 @@ from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
+from pyworkflow.em.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
 
 try:
     from pyworkflow.em.data import AtomStruct
 except:
     from pyworkflow.em.data import PdbFile as AtomStruct
-
+from pyworkflow.em.convert.atom_struct import AtomicStructHandler
 from phenix import Plugin
 
 
@@ -42,7 +43,6 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
     """Superpose two PDBs so that they optimally match """
     _label = 'superpose pdbs'
     _program = ""
-
     # _version = VERSION_1_2
 
     # --------------------------- DEFINE param functions -------------------
@@ -68,12 +68,23 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         args = os.path.abspath(self.inputStructureFixed.get().getFileName())
         args += " "
         args += os.path.abspath(self.inputStructureMoving.get().getFileName())
-
-        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
-                                cwd=self._getExtraPath())
+        try:
+            Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
+                                    cwd=self._getExtraPath())
+        except:
+            # This exception will run when using phenix v. 1.16 after running
+            # real space refine the .cif file generated can not be recognized by
+            # superpose pdbs program and an error is produced
+            list_args = args.split()
+            self._runChangingCifFormatSuperpose(list_args)
 
     def createOutputStep(self):
         fnPdb = os.path.basename(self.inputStructureMoving.get().getFileName())
+        fnPdb = fnPdb.split('.')[0]
+        for file in os.listdir(self._getExtraPath()):
+            if file.endswith('_fitted.pdb'):
+                os.rename(self._getExtraPath() + "/" + file,
+                          self._getExtraPath() + "/" + fnPdb + "_fitted.pdb")
         pdb = AtomStruct()
         pdb.setFileName(self._getExtraPath(fnPdb + "_fitted.pdb"))
         if self.inputStructureFixed.get().getVolume() is not None:
@@ -136,3 +147,94 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                           words[6] == '(final):'):
                         self.finalRMSD = Float(words[7])
                 line = f.readline()
+
+    def _runChangingCifFormatSuperpose(self, list_args):
+        try:
+            if list_args[0].endswith(".cif") and list_args[1].endswith(".cif"):
+                try:
+                    # upgrade cifs
+                    list_args1 = []
+                    for i in range(0, 2):
+                        list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
+                    args1 = list_args1[0] + " " + list_args1[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            cwd=self._getExtraPath())
+                except:
+                    # convert cifs to pdbs
+                    list_args2 = []
+                    for i in range(0, 2):
+                        list_args2.append(fromCIFToPDB(
+                            list_args[i], list_args[i].replace('.cif', '.pdb')))
+                    args2 = list_args2[0] + " " + list_args2[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                            cwd=self._getExtraPath())
+            elif list_args[0].endswith(".cif") and list_args[1].endswith(".pdb"):
+                try:
+                    # pdbs: convert cif to pdb
+                    list_args1 = []
+                    list_args1.append(fromCIFToPDB(
+                        list_args[0], list_args[0].replace('.cif', '.pdb')))
+                    args1 = list_args1[0] + " " + list_args[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            cwd=self._getExtraPath())
+                except:
+                    try:
+                        # cifs: convert pdb to cif
+                        list_args2 = []
+                        list_args2.append(fromPDBToCIF(
+                            list_args[1], list_args[1].replace('.pdb', '.cif')))
+                        args2 = list_args[0] + " " + list_args2[0]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                                cwd=self._getExtraPath())
+                    except:
+                        # upgrade cif
+                        list_args3 = []
+                        list_args0 = args2.split()
+                        for i in range(0, 2):
+                            list_args3[i].append(fromCIFTommCIF(
+                                list_args0[i], list_args0[i]))
+                        args3 = list_args3[0] + " " + list_args3[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                                args3, cwd=self._getExtraPath())
+            elif list_args[0].endswith(".pdb") and list_args[1].endswith(".cif"):
+                try:
+                    # pdbs: convert cif to pdb
+                    list_args1 = []
+                    list_args1.append(fromCIFToPDB(
+                        list_args[1], list_args[1].replace('.cif', '.pdb')))
+                    args1 = list_args[0] + " " + list_args1[0]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            cwd=self._getExtraPath())
+                except:
+                    try:
+                        # cifs: convert pdb to cif
+                        list_args2 = []
+                        list_args2.append(fromPDBToCIF(
+                            list_args[0], list_args[0].replace('.pdb', '.cif')))
+                        args2 = list_args2[0] + " " + list_args[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                                cwd=self._getExtraPath())
+                    except:
+                        # upgrade cifs
+                        list_args3 = []
+                        list_args0 = args2.split()
+                        for i in range(0, 2):
+                            list_args3.append(fromCIFTommCIF(
+                                list_args0[i], list_args0[i]))
+                        args3 = list_args3[0] + " " + list_args3[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                                args3, cwd=self._getExtraPath())
+        except:
+            # biopython conversion
+            aSH = AtomicStructHandler()
+            try:
+                for i in range(0, 2):
+                    aSH.read(list_args[i])
+                    aSH.write(list_args[i])
+                    args = list_args[0] + " " + list_args[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                            args, cwd=self._getExtraPath())
+            except:
+                print("CIF file standarization failed.")
+
+

@@ -29,8 +29,9 @@ from pyworkflow.object import Float, Integer
 from pyworkflow.utils import importFromPlugin
 from phenix.constants import MOLPROBITY, PHENIXVERSION
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import toCIF
+from pyworkflow.em.convert.atom_struct import retry, toCIF, AtomicStructHandler
 from protocol_refinement_base import PhenixProtRunRefinementBase
+import pyworkflow.utils as pwutils
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
@@ -40,6 +41,8 @@ atomic structure inferred from an electron density map.
     _program = ""
     #_version = VERSION_1_2
     MOLPROBITYFILE = 'molprobity.mrc'
+    TMPCIFFILENAME="inMolprobity.cif"
+    TMPPDBFILENAME="inMolprobity.pdb"
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -57,29 +60,10 @@ atomic structure inferred from an electron density map.
         if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
                 is not None:
             self._insertFunctionStep('convertInputStep', self.MOLPROBITYFILE)
-        if self.inputStructure.get().getFileName().endswith(".cif"):
-            self._insertFunctionStep('sanitizeAtomStruct', self.inputStructure.get().getFileName())
         self._insertFunctionStep('runMolprobityStep')
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
-
-    def sanitizeAtomStruct(self, fileName):
-        """molprobity does not like CIF files produced by biopython"""
-        """molprobity does not like CIF files produced by coot"""
-        # transform to CIF
-        localCIFFileName = self._sanitizedStructureFileName(fileName)
-        fileName = toCIF(fileName, localCIFFileName)
-
-        # read file
-        with open(fileName,'r') as f:
-            content = f.read()
-
-        import re
-        f = open(localCIFFileName, "w")
-        f.write(re.sub(' +', ' ', content)) # remove double spaces
-
-        f.close()
 
     def runMolprobityStep(self):
         version = Plugin.getPhenixVersion()
@@ -89,53 +73,36 @@ atomic structure inferred from an electron density map.
             print "PHENIX version: ", version
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
-        if fileName.endswith(".cif"):
-            pdb = self._sanitizedStructureFileName(fileName)
-        else:
-            pdb = os.path.abspath(fileName)
-        args = ""
-        args += pdb
+        self.atomStruct = os.path.abspath(fileName)
         # starting volume (.mrc)
         if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
                 is not None:
             tmpMapFile = self.MOLPROBITYFILE
-            volume = os.path.abspath(self._getExtraPath(tmpMapFile))
-            if version == PHENIXVERSION:
-                args += " "
-                args += "map_file_name=%s" % volume
-                args += " "
-                args += "d_min=%f" % self.resolution.get()
-        args += " "
-        args += "pickle=True"
-        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
-        args += " %s " % self.extraParams.get()
-
-        numberOfThreads = self.numberOfThreads.get()
-        if numberOfThreads > 1:
-            args += " nproc=%d" % numberOfThreads
-        # args += " wxplots=True" # TODO: Avoid the direct opening of plots
+            self.vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+            args = self._writeArgsMolProbityExpand(self.atomStruct, self.vol)
+        else:
+            args = self._writeArgsMolProbityExpand(self.atomStruct, vol=None)
         # script with auxiliary files
-        try:
-            Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                         cwd=self._getExtraPath())
-        except:
-            print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
-                  " failure: High number of nonbonded interaction distances " \
-                  "< 0.5. This error has been disable by running the same " \
-                  "command with the same following additional " \
-                  "argument:\npdb_interpretation.clash_guard." \
-                  "nonbonded_distance_threshold=None "
-            args += " "
-            args += "pdb_interpretation.clash_guard." \
-                    "nonbonded_distance_threshold=None"
-            Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                             cwd=self._getExtraPath())
-
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
+              args, cwd=os.path.abspath(self._getExtraPath()),
+              listAtomStruct=[self.atomStruct], log=self._log)
 
     def createOutputStep(self):
         MOLPROBITYOUTFILENAME = self._getExtraPath(
             self.MOLPROBITYOUTFILENAME)
-        self._parseFile(MOLPROBITYOUTFILENAME)
+        try:
+            self._parseFile(MOLPROBITYOUTFILENAME)
+        except:
+            if self.MOLPROBITYFILE is not None:
+                self.vol = os.path.abspath(self._getExtraPath(self.MOLPROBITYFILE))
+                args = self._writeArgsMolProbityExpand(self.atomStruct, self.vol)
+            else:
+                args = self._writeArgsMolProbityExpand(self.atomStruct, vol=None)
+            args += " allow_polymer_cross_special_position=True "
+            retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
+                  args, cwd=os.path.abspath(self._getExtraPath()),
+                  listAtomStruct=[self.atomStruct], log=self._log)
+            self._parseFile(MOLPROBITYOUTFILENAME)
         self._store()
 
     # --------------------------- INFO functions ---------------------------
@@ -156,11 +123,13 @@ atomic structure inferred from an electron density map.
     def _citations(self):
         return ['Chen_2010']
 
-    def _sanitizedStructureFileName(self, inFileName):
-        if inFileName.endswith(".pdb") or inFileName.endswith(".ent"):
-            inFileName = inFileName.replace(".pdb", ".cif").replace(".ent", ".cif")
-        return os.path.abspath(self._getExtraPath(os.path.basename(inFileName)))
+    # --------------------------- UTILS functions --------------------------
 
-
-
-
+    def _writeArgsMolProbityExpand(self, atomStruct, vol=None):
+        args = self._writeArgsMolProbity(atomStruct, vol)
+        if Plugin.getPhenixVersion() != PHENIXVERSION:
+            args += " pickle=True"
+        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
+        args += " %s " % self.extraParams.get()
+        # args += " wxplots=True" # TODO: Avoid the direct opening of plots
+        return args

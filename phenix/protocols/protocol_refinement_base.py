@@ -4,7 +4,15 @@ from pyworkflow.object import Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import (PointerParam, FloatParam, \
     StringParam)
-from phenix.constants import PHENIXVERSION
+from phenix.constants import (REALSPACEREFINE,
+                              MOLPROBITY,
+                              MOLPROBITY2,
+                              VALIDATION_CRYOEM,
+                              PHENIXVERSION)
+
+from pyworkflow.em.convert.atom_struct import AtomicStructHandler
+from pyworkflow.em.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
+
 from pyworkflow.em.convert.headers import Ccp4Header
 from phenix import Plugin
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
@@ -199,3 +207,37 @@ dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
         self.cbetaOutliers = Integer(dictSummary['Cbeta_Outliers_n'])
         self.clashscore = Float(dictSummary['Clash_score'])
         self.overallScore = Float(dictSummary['MolProbity_score'])
+
+    def _writeArgsMolProbity(self, atomStruct, vol=None):
+        args = ""
+        args += atomStruct
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args += " "
+            args += " map_file_name=%s" % vol
+            args += " pickle=True"
+            args += " "
+            args += " d_min=%f" % self.resolution.get()
+        args += " "
+        numberOfThreads = self.numberOfThreads.get()
+        if numberOfThreads > 1:
+            args += " nproc=%d" % numberOfThreads
+        return args
+
+    def _writeArgsValCryoEM(self, atomStruct, volume, vol):
+        args = " " + atomStruct
+        args += " " + volume
+        if vol.getHalfMaps():
+            halves = []
+            for halfMap in vol.getHalfMaps().split(','):
+                if not os.path.abspath(halfMap).endswith(".mrc"):
+                    half = os.path.abspath(halfMap).split(".")[0] + ".mrc"
+                else:
+                    half = os.path.abspath(halfMap)
+                halves.append(half)
+            args += " " + halves[0] + " " + halves[1]
+        args += " " + ("resolution=%f" % self.resolution.get())
+        args += " pickle=True"
+        args += " slim=False"
+        args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
+        args += " %s " % self.extraParams.get()
+        return args

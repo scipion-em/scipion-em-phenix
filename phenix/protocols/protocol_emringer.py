@@ -34,6 +34,8 @@ from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
 from phenix.constants import PHENIX_HOME
+from pyworkflow.em.convert.atom_struct import AtomicStructHandler
+from pyworkflow.em.convert.atom_struct import retry, fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -90,19 +92,19 @@ the atomic structure backbone has been perfectly fitted to the map.
         Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
 
     def runEMRingerStep(self):
-        # inAtomStructFile = self.inputStructure.get().getFileName()
-        # inPDBAtomStructFile = self._getExtraPath("inPDBAtomStructFile.pdb")
-        # inPDBAtomStructFile = toPdb(inAtomStructFile, inPDBAtomStructFile)
         inPDBAtomStructFile = self.inputStructure.get().getFileName()
-        pdb = os.path.abspath(inPDBAtomStructFile)
-        args = []
-        args.append(pdb)
+        atomStruct = os.path.abspath(inPDBAtomStructFile)
         vol = os.path.abspath(self._getExtraPath(self.EMRINGERFILE))
-        args.append(vol)
-
+        args = self._writeArgsEMRinger(atomStruct, vol)
         # script with auxiliary files
-        Plugin.runPhenixProgram(Plugin.getProgram(EMRINGER), args,
-                         cwd=self._getExtraPath())
+        import sys
+        sys.stdout.flush()
+        # import time
+        # time.sleep(30)
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(EMRINGER),
+              args, cwd=os.path.abspath(self._getExtraPath()),
+              listAtomStruct=[atomStruct], log=self._log)
+              # clean_dir=glob.glob(self._getExtraPath() + ("/*_plots"))[-1]
 
     def createOutputStep(self):
         # get emringer information
@@ -117,7 +119,6 @@ the atomic structure backbone has been perfectly fitted to the map.
         else:
             EMRINGERTRANSFERFILENAME = self._getTmpPath(
                 self.EMRINGERTRANSFERFILENAME)
-
         # directory with files
         plots = glob.glob(self._getExtraPath("*_plots"))[0]
 
@@ -293,3 +294,11 @@ dataDict['_residues_dict'] = dictResidue
         """Check whether `name` is on PATH."""
         from distutils.spawn import find_executable
         return find_executable(name) is not None
+
+    def _writeArgsEMRinger(self, atomStruct, vol):
+        args = " "
+        args += atomStruct
+        args += " "
+        args += vol
+        return args
+

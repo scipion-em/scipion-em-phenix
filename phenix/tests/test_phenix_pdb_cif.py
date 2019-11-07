@@ -22,7 +22,7 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # ***************************************************************************/
 
-# protocol to test the phenix method real_spacerefine
+# protocol to test the different phenix methods with .pdb and .cif files
 
 from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
@@ -32,6 +32,9 @@ from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from pyworkflow.tests import *
 from phenix import Plugin, PHENIXVERSION
+import json
+from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
+from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 
 
 class TestImportBase(BaseTest):
@@ -44,23 +47,6 @@ class TestImportBase(BaseTest):
 class TestImportData(TestImportBase):
     """ Import map volumes and atomic structures(PDBx/mmCIF files)
     """
-
-    def _importVolRefmac3(self):
-        args = {'filesPath': self.dsModBuild.getFile(
-            'volumes/refmac3.mrc'),
-            'samplingRate': 1.5,
-            'setOrigCoord': True,
-            'x': 37.5,
-            'y': 37.5,
-            'z': 37.5
-        }
-        protImportVol = self.newProtocol(ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume refmac3.mrc\nset '
-                                  'origin 37.5 37.5 37.5\n')
-        self.launchProtocol(protImportVol)
-        volume_refmac3 = protImportVol.outputVolume
-        return volume_refmac3
-
     def _importVolHemoOrg(self):
         args = {'filesPath': self.dsModBuild.getFile(
             'volumes/emd_3488.map'),
@@ -77,53 +63,6 @@ class TestImportData(TestImportBase):
         volume_hemo_orig = protImportVol.outputVolume
         return volume_hemo_orig
 
-    def _importVolNucleosome(self):
-        args = {'filesPath': self.dsModBuild.getFile(
-            'volumes/emd_6838.mrc'),
-            'samplingRate': 1.4,
-            'setOrigCoord': True,
-            'x': 0.0,
-            'y': 0.0,
-            'z': 0.0
-        }
-        protImportVol = self.newProtocol(ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume emd_6838.mrc\nset '
-                                  'origin 0.0 0.0 0.0\n')
-        self.launchProtocol(protImportVol)
-        volume_nucleosome = protImportVol.outputVolume
-        return volume_nucleosome
-
-    def _importHemoHalf1Half2(self):
-        args = {'filesPath': self.dsModBuild.getFile('volumes/emd_3488.map'),
-                'samplingRate': 1.05,
-                'setOrigCoord': True,
-                'x': 0.0,
-                'y': 0.0,
-                'z': 0.0,
-                'setHalfMaps': True,
-                'half1map': self.dsModBuild.getFile(
-                            'volumes/emd_3488_Noisy_half1.map'),
-                'half2map': self.dsModBuild.getFile(
-                            'volumes/emd_3488_Noisy_half2.map'),
-        }
-        protImportVol = self.newProtocol(ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume hemoglobin\nset '
-                                  'origin 0.0 0.0 0.0\nhalf1 and half2')
-        self.launchProtocol(protImportVol)
-        volume_hemo_half1_hal2 = protImportVol.outputVolume
-        return volume_hemo_half1_hal2
-
-    def _importStructRefmac3(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/refmac3.pdb'),
-                }
-        protImportPDB = self.newProtocol(ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n refmac3.pdb')
-        self.launchProtocol(protImportPDB)
-        structure_refmac3 = protImportPDB.outputPdb
-        return structure_refmac3
-
     def _importStructHemoPDB(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
                 'pdbFile': self.dsModBuild.getFile(
@@ -135,23 +74,48 @@ class TestImportData(TestImportBase):
         structure_hemo_pdb = protImportPDB.outputPdb
         return structure_hemo_pdb
 
-    def _importStructNucleosomePDB(self):
+    def _importStructHemoCIF(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
                 'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/chimera_3lz0.pdb'),
-                'inputVolume': self._importVolNucleosome()
+                    'PDBx_mmCIF/5ni1.cif'),
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import cif\n nucleosome\nassociated volume '
-                                  'emd_6838.mrc')
+        protImportPDB.setObjLabel('import cif\n 5ni1.cif')
         self.launchProtocol(protImportPDB)
-        structure_nucleosome_pdb = protImportPDB.outputPdb
-        self.assertTrue(structure_nucleosome_pdb.getFileName())
-        return structure_nucleosome_pdb
+        structure_hemo_cif = protImportPDB.outputPdb
+        return structure_hemo_cif
 
-class TestValCryoEM(TestImportData):
-    """ Test the protocol of Real Space Refine
+    def _importStructHemoFromDB(self):
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1'
+                }
+        protImportPDB = self.newProtocol(ProtImportPdb, **args)
+        protImportPDB.setObjLabel('import cif from PDB\n 5ni1.cif')
+        self.launchProtocol(protImportPDB)
+        structure_hemo_cif_PDB = protImportPDB.outputPdb
+        return structure_hemo_cif_PDB
+
+class TestPhenixPdbCif(TestImportData):
+    """ Test every phenix protocol
     """
+    def checkEMResults(self, optThresh, rotRatio, maxZscore, modLength,
+                     EMScore, protEMRinger, places=4):
+        # method to check EMRinger statistic results of the Final Results Table
+        textFileName = protEMRinger._getExtraPath(
+            protEMRinger.EMRINGERTRANSFERFILENAME.replace('py', 'txt'))
+        with open(textFileName, "r") as f:
+            self.resultsDict = json.loads(str(f.read()))
+            self.assertAlmostEqual(self.resultsDict[
+                                'Optimal Threshold'], optThresh, delta=0.5)
+            self.assertAlmostEqual(self.resultsDict[
+                                'Rotamer-Ratio'], rotRatio, delta=0.5)
+            self.assertAlmostEqual(self.resultsDict[
+                                'Max Zscore'], maxZscore, delta=0.5)
+            self.assertAlmostEqual(self.resultsDict[
+                                'Model Length'], modLength, delta=0.5)
+            self.assertAlmostEqual(self.resultsDict[
+                                'EMRinger Score'], EMScore, delta=0.5)
+
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
                        cbetaOutliers, clashScore, overallScore,
                        protMolProbity, places=2):
@@ -205,173 +169,107 @@ class TestValCryoEM(TestImportData):
                                clashScore, delta=0.5)
         self.assertAlmostEqual(protValCryoEM.overallScore.get(),
                                overallScore, delta=0.5)
+    def checkSuperposeResults(self, startRMSD, finalRMSD, protSuperposePdbs, places=2):
+        # method to check start and final RMSD values showed in Summary
+        logFile = os.path.abspath(protSuperposePdbs._getLogsPath()) +\
+                  "/run.stdout"
+        protSuperposePdbs._parseLogFile(logFile)
+        self.assertAlmostEqual(protSuperposePdbs.startRMSD,
+                               startRMSD, places)
+        self.assertAlmostEqual(protSuperposePdbs.finalRMSD,
+                               finalRMSD, places)
 
-    def testValCryoEMFromPDB(self):
-        """ This test checks that phenix real space refine protocol runs
-        with an atomic structure; No Volume was provided and an error message
-        is expected
-        """
-        print ("Run phenix real space refine protocol from imported pdb file "
-               "without imported or pdb-associated volume")
-
-        # import PDB
-        structure_refmac3 = self._importStructRefmac3()
-        self.assertTrue(structure_refmac3.getFileName())
-        self.assertFalse(structure_refmac3.getVolume())
-
-        # validation_cryoem
-        args = {
-                'resolution': 3.5,
-                'inputStructure': structure_refmac3
-                }
-
-        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
-        protValCryoEM.setObjLabel('ValCryoEM without\nvolume, should NOT work')
-        try:
-            self.launchProtocol(protValCryoEM)
-        except Exception as e:
-            self.assertTrue(True, "This test should return a error message as '"
-                  " Input volume cannot be EMPTY.'\n")
-
-            return
-        self.assertTrue(False)
-
-    def testValCryoEMFromVolumeAndPDB1(self):
-        """ This test checks that phenix real_space_refine protocol runs
-        with a volume provided directly as inputVol, the input PDB was fitted
-        to the volume and refined previously by coot and refmac withouth mask
-        in another project; (MolProbity has been run to compare values before
-        and after refinement); default refine strategy;
-        MolProbity and ValCryoEM after RSRefine should show identical values
-        """
-        print ("Run phenix real_space_refine from imported volume and pdb file "
-               "previously fitted and refined by Coot and Refmac without mask "
-               "(MolProbity has been run to compare values before and after "
-               "refinement); default refine strategy; MolProbity and ValCryoEM "
-               "after RSRefine should show identical values")
+    def testEMRingerValidationFromVolumeAndPDB(self):
+        """ This test checks that EMRinger validation protocol runs with a
+        volume provided directly as inputVol and the input PDB fitted to
+        the volume
+         """
+        print "Run EMRinger validation from imported volume and pdb file"
 
         # Import Volume
-        volume_refmac3 = self._importVolRefmac3()
+        volume_hemo_orig = self._importVolHemoOrg()
 
         # import PDB
-        structure_refmac3 = self._importStructRefmac3()
+        structure_hemo_pdb = self._importStructHemoPDB()
 
-        #MolProbity
-        args = {
-                'inputVolume': volume_refmac3,
-                'resolution': 3.5,
-                'inputStructure': structure_refmac3,
-                'numberOfThreads': 4
+        # EMRinger
+        args = {'inputVolume': volume_hemo_orig,
+                'inputStructure': structure_hemo_pdb,
+                'doTest': True
                 }
+        protEMRinger = self.newProtocol(PhenixProtRunEMRinger, **args)
+        protEMRinger.setObjLabel('EMRinger validation\n hemoglobin 5ni1.pdb\n')
+        self.launchProtocol(protEMRinger)
 
-        protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
-        protMolProbity.setObjLabel('MolProbity validation\n'
-                                   'volume and pdb\n')
-        self.launchProtocol(protMolProbity)
+        # check EMRinger results
+        # Values obtained fron phenix GUI v.1.16
+        self.checkEMResults(optThresh=0.07,
+                            rotRatio=0.77,
+                            maxZscore=7.65,
+                            modLength=339,
+                            EMScore=4.16,
+                            protEMRinger=protEMRinger)
 
-        # check MolProbity results
-        self.checkMPResults(ramOutliers=0.47,
-                            ramFavored=83.96,
-                            rotOutliers=5.68,
-                            cbetaOutliers=1,
-                            clashScore=4.77,
-                            overallScore=2.50,
-                            protMolProbity=protMolProbity)
+    def testEMRingerValidationFromVolumeAndCIF(self):
+        """ This test checks that EMRinger validation protocol runs with a
+        volume provided directly as inputVol and input PDB
+         """
+        print "Run EMRinger validation from imported volume and cif file"
 
-        # real_space_refine
-        args = {'inputVolume': volume_refmac3,
-                'resolution': 3.5,
-                'inputStructure': structure_refmac3
-                # default parameters in Optimization strategy options
+        # Import Volume
+        volume_hemo_orig = self._importVolHemoOrg()
+
+        # import CIF
+        structure_hemo_cif = self._importStructHemoCIF()
+
+        # EMRinger
+        args = {'inputVolume': volume_hemo_orig,
+                'inputStructure': structure_hemo_cif,
+                'doTest': True
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
-        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
-        protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
-                                   'refmac3.pdb\n')
-        self.launchProtocol(protRSRefine)
+        protEMRinger = self.newProtocol(PhenixProtRunEMRinger, **args)
+        protEMRinger.setObjLabel('EMRinger validation\n hemoglobin 5ni1.cif\n')
+        self.launchProtocol(protEMRinger)
 
-        # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.75,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.09,
-                                      overallScore=1.27,
-                                      protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.23,
-                                      rotOutliers=3.41,
-                                      cbetaOutliers=0,
-                                      clashScore=4.17,
-                                      overallScore=1.86,
-                                      protRSRefine=protRSRefine)
-        # MolProbity2
-        args = {
-            'inputVolume': volume_refmac3,
-            'resolution': 3.5,
-            'inputStructure': protRSRefine.outputPdb,
-            'numberOfThreads': 4
-        }
-        protMolProbity2 = self.newProtocol(PhenixProtRunMolprobity, **args)
-        protMolProbity2.setObjLabel('MolProbity\n'
-                                   'after RSRefine\n')
-        self.launchProtocol(protMolProbity2)
+        # check EMRinger results
+        # Values obtained fron phenix GUI v.1.16
+        self.checkEMResults(optThresh=0.07,
+                            rotRatio=0.77,
+                            maxZscore=7.65,
+                            modLength=339,
+                            EMScore=4.16,
+                            protEMRinger=protEMRinger)
 
-        # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=95.75,
-                                rotOutliers=0.00,
-                                cbetaOutliers=0,
-                                clashScore=2.09,
-                                overallScore=1.27,
-                                protMolProbity=protMolProbity2)
-        else:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.23,
-                                rotOutliers=3.41,
-                                cbetaOutliers=0,
-                                clashScore=4.17,
-                                overallScore=1.86,
-                                protMolProbity=protMolProbity2)
+    def testEMRingerValidationFromVolumeAndCIFFromPDB(self):
+        """ This test checks that EMRinger validation protocol runs with a
+        volume provided directly as inputVol and input PDB
+         """
+        print "Run EMRinger validation from imported volume and cif file from PDB"
 
-        # validation_cryoEM
-        args = {'inputVolume': volume_refmac3,
-                'resolution': 3.5,
-                'inputStructure': protRSRefine.outputPdb
+        # Import Volume
+        volume_hemo_orig = self._importVolHemoOrg()
+
+        # import CIF
+        structure_hemo_cif_PDB = self._importStructHemoFromDB()
+
+        # EMRinger
+        args = {'inputVolume': volume_hemo_orig,
+                'inputStructure': structure_hemo_cif_PDB,
+                'doTest': True
                 }
-        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
-        protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nrefmac3.mrc and '
-                                 'protRSRefine.outputPdb\n')
-        try:
-            self.launchProtocol(protValCryoEM)
-        except Exception as e:
-            self.assertTrue(True, "This test should return a error message as '"
-                  " Protocol has validation errors:\n"
-                  "Binary '/usr/local/phenix-1.13-2998/modules/phenix/phenix/"
-                  "command_line/validation_cryoem.py' does not exists.\n"
-                  "Check if you need to upgrade your PHENIX version to run "
-                  "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
-                  "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
-                  "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
+        protEMRinger = self.newProtocol(PhenixProtRunEMRinger, **args)
+        protEMRinger.setObjLabel('EMRinger validation\n hemoglobin 5ni1.cif\nfrom PDB')
+        self.launchProtocol(protEMRinger)
 
-            return
-        # self.assertTrue(False)
+        # check EMRinger results
+        self.checkEMResults(optThresh=0.07,
+                            rotRatio=0.77,
+                            maxZscore=7.65,
+                            modLength=339,
+                            EMScore=4.16,
+                            protEMRinger=protEMRinger)
 
-        # check validation cryoem results
-        self.checkValCryoEMResults(ramOutliers=0.00,
-                                  ramFavored=96.70,
-                                  rotOutliers=3.98,
-                                  cbetaOutliers=0,
-                                  clashScore=4.47,
-                                  overallScore=1.89,
-                                  protValCryoEM=protValCryoEM)
-
-    def testValCryoEMFFromVolumeAndPDB2(self):
+    def testValCryoEMFFromVolumeAndPDB(self):
         """ This test checks that phenix real_space_refine protocol runs
         with a volume provided directly as inputVol and the input PDB from
         data banks; default refine strategy; (MolProbity has been run to
@@ -436,12 +334,12 @@ class TestValCryoEM(TestImportData):
 
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                  ramFavored=95.41,
-                                  rotOutliers=3.47,
-                                  cbetaOutliers=0,
-                                  clashScore=4.75,
-                                  overallScore=1.98,
-                                  protRSRefine=protRSRefine)
+                                      ramFavored=95.41,
+                                      rotOutliers=3.47,
+                                      cbetaOutliers=0,
+                                      clashScore=4.75,
+                                      overallScore=1.98,
+                                      protRSRefine=protRSRefine)
 
         # MolProbity2
         args = {
@@ -505,138 +403,10 @@ class TestValCryoEM(TestImportData):
                                   overallScore=1.98,
                                   protValCryoEM=protValCryoEM)
 
-    def testValCryoEMFFromVolumeAssociatedToPDB3(self):
-        """ This test checks that phenix real_space_refine protocol runs
-        with a volume provided directly as inputVol and the input PDB from
-        data banks; default refine strategy; (MolProbity has been run to
-        compare values before and after refinement). MolProbity and
-        ValCryoEM after RSRefine should show identical values.
-        """
-        print("Run phenix real_space_refine from imported volume and pdb file "
-              "from data banks (vol origin 0.0, 0.0, 0.0); default refine "
-              "strategy; (MolProbity has been run to compare values before "
-              "and after refinement). MolProbity and ValCryoEM after RSRefine "
-              "should show identical values.")
-
-        # import PDB
-        structure_nucleosome_pdb = self._importStructNucleosomePDB()
-
-        # MolProbity
-        args = {
-                'inputStructure': structure_nucleosome_pdb,
-                'numberOfThreads': 4
-        }
-        protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
-        protMolProbity.setObjLabel('MolProbity validation\n'
-                                   'volume and pdb\nnucleosome')
-        self.launchProtocol(protMolProbity)
-
-        # check MolProbity results
-        self.checkMPResults(ramOutliers=1.77,
-                            ramFavored=87.62,
-                            rotOutliers=10.40,
-                            cbetaOutliers=2,
-                            clashScore=12.17,
-                            overallScore=2.98,
-                            protMolProbity=protMolProbity)
-
-        # real_space_refine
-        args = {
-                'resolution': 4.0,
-                'inputStructure': structure_nucleosome_pdb,
-                'numberOfThreads': 4
-                }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
-        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
-        protRSRefine.setObjLabel('RSRefine nucleosome\nvolume and '
-                                 'pdb\n')
-        self.launchProtocol(protRSRefine)
-
-        # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.92,
-                                      rotOutliers=0.16,
-                                      cbetaOutliers=0,
-                                      clashScore=7.46,
-                                      overallScore=1.69,
-                                      protRSRefine=protRSRefine)
-
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.10,
-                                      rotOutliers=10.40,
-                                      cbetaOutliers=0,
-                                      clashScore=11.61,
-                                      overallScore=2.69,
-                                      protRSRefine=protRSRefine)
-
-        # MolProbity2
-        args = {
-            'inputStructure': protRSRefine.outputPdb,
-            'numberOfThreads': 4
-        }
-        protMolProbity2 = self.newProtocol(PhenixProtRunMolprobity, **args)
-        protMolProbity2.setObjLabel('MolProbity validation\n'
-                                   'volume and pdb\nnucleosome')
-        self.launchProtocol(protMolProbity2)
-
-        # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=95.92,
-                                rotOutliers=0.16,
-                                cbetaOutliers=0,
-                                clashScore=7.46,
-                                overallScore=1.69,
-                                protMolProbity=protMolProbity2)
-        else:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=95.10,
-                                rotOutliers=10.40,
-                                cbetaOutliers=0,
-                                clashScore=11.75,
-                                overallScore=2.70,
-                                protMolProbity=protMolProbity2)
-
-        # validation_cryoEM
-        args = {
-                'resolution': 4.0,
-                'inputStructure': protRSRefine.outputPdb
-                }
-        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
-        protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nnucleosome and '
-                                  'protRSRefine.outputPdb\n')
-        try:
-            self.launchProtocol(protValCryoEM)
-        except Exception as e:
-            self.assertTrue(True, "This test should return a error message as '"
-                            " Protocol has validation errors:\n"
-                            "Binary '/usr/local/phenix-1.13-2998/modules/phenix/phenix/"
-                            "command_line/validation_cryoem.py' does not exists.\n"
-                            "Check if you need to upgrade your PHENIX version to run "
-                            "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
-                            "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
-                            "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
-
-            return
-        # self.assertTrue(False)
-
-        # check validation cryoem results
-        self.checkValCryoEMResults(ramOutliers=0.00,
-                                  ramFavored=95.10,
-                                  rotOutliers=10.40,
-                                  cbetaOutliers=0,
-                                  clashScore=11.61,
-                                  overallScore=2.69,
-                                  protValCryoEM=protValCryoEM)
-
-    def testValCryoEMFFromVolumeAndPDB4(self):
+    def testValCryoEMFFromVolumeAndCIF(self):
         """ This test checks that phenix real_space_refine protocol runs
         with a volume provided directly as inputVol (with half1 and half2)
-        and the input PDB from data banks; default refine strategy;
+        and the input CIF from data banks; default refine strategy;
         (MolProbity has been run to
         compare values before and after refinement). MolProbity and
         ValCryoEM after RSRefine should show identical values.
@@ -648,21 +418,21 @@ class TestValCryoEM(TestImportData):
               "should show identical values.")
 
         # Import Volume
-        volume_hemo_half1_hal2 = self._importHemoHalf1Half2()
+        volume_hemo_org = self._importVolHemoOrg()
 
         # import PDB
-        structure_hemo_pdb = self._importStructHemoPDB()
+        structure_hemo_cif = self._importStructHemoCIF()
 
         # MolProbity
         args = {
-                'inputVolume': volume_hemo_half1_hal2,
+                'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_pdb,
+                'inputStructure': structure_hemo_cif,
                 'numberOfThreads': 4
-        }
+                }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
-                                   'full and half volumes\nand pdb\nhemoglobin')
+                                   'volume\nand cif\nhemoglobin')
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
@@ -675,16 +445,16 @@ class TestValCryoEM(TestImportData):
                             protMolProbity=protMolProbity)
 
         # real_space_refine
-        args = {'inputVolume': volume_hemo_half1_hal2,
+        args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_pdb,
+                'inputStructure': structure_hemo_cif,
                 'numberOfThreads': 4
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
-        protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map (full, half1, half2)\nand '
-                                 '5ni1.pdb\n')
+        protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map\nand '
+                                 '5ni1.cif\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
@@ -698,6 +468,8 @@ class TestValCryoEM(TestImportData):
                                       protRSRefine=protRSRefine)
 
         else:
+            # values obtained from phenix GUI v. 1.16
+            # (minimization_global + adp)
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=95.41,
                                       rotOutliers=3.47,
@@ -708,14 +480,14 @@ class TestValCryoEM(TestImportData):
 
         # MolProbity2
         args = {
-            'inputVolume': volume_hemo_half1_hal2,
+            'inputVolume': volume_hemo_org,
             'resolution': 3.2,
             'inputStructure': protRSRefine.outputPdb,
             'numberOfThreads': 4
         }
         protMolProbity2 = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity2.setObjLabel('MolProbity validation\n'
-                                   'full and half volumes\nand pdb\nhemoglobin')
+                                   'volume\nand cif\nhemoglobin')
         self.launchProtocol(protMolProbity2)
 
         # check MolProbity results
@@ -737,7 +509,7 @@ class TestValCryoEM(TestImportData):
                                 protMolProbity=protMolProbity2)
 
         # validation_cryoEM
-        args = {'inputVolume': volume_hemo_half1_hal2,
+        args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': protRSRefine.outputPdb
                 }
@@ -768,3 +540,259 @@ class TestValCryoEM(TestImportData):
                                   clashScore=4.75,
                                   overallScore=1.98,
                                   protValCryoEM=protValCryoEM)
+
+    def testValCryoEMFFromVolumeAndCIFFromPDB(self):
+        """ This test checks that phenix real_space_refine protocol runs
+        with a volume provided directly as inputVol (with half1 and half2)
+        and the input CIF from data banks; default refine strategy;
+        (MolProbity has been run to
+        compare values before and after refinement). MolProbity and
+        ValCryoEM after RSRefine should show identical values.
+        """
+        print("Run phenix real_space_refine from imported volume and pdb file "
+              "from data banks (vol origin 0.0, 0.0, 0.0); default refine "
+              "strategy; (MolProbity has been run to compare values before "
+              "and after refinement). MolProbity and ValCryoEM after RSRefine "
+              "should show identical values.")
+
+        # Import Volume
+        volume_hemo_org = self._importVolHemoOrg()
+
+        # import cif
+        structure_hemo_cif_PDB = self._importStructHemoFromDB()
+
+        # MolProbity
+        args = {
+                'inputVolume': volume_hemo_org,
+                'resolution': 3.2,
+                'inputStructure': structure_hemo_cif_PDB,
+                'numberOfThreads': 4
+                }
+        protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
+        protMolProbity.setObjLabel('MolProbity validation\n'
+                                   'volume\nand cif from PDB\nhemoglobin')
+        self.launchProtocol(protMolProbity)
+
+        # check MolProbity results
+        self.checkMPResults(ramOutliers=0.00,
+                            ramFavored=95.23,
+                            rotOutliers=0.43,
+                            cbetaOutliers=0,
+                            clashScore=3.53,
+                            overallScore=1.48,
+                            protMolProbity=protMolProbity)
+
+        # real_space_refine
+        args = {'inputVolume': volume_hemo_org,
+                'resolution': 3.2,
+                'inputStructure': structure_hemo_cif_PDB,
+                'numberOfThreads': 4
+                }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
+        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
+        protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map\nand '
+                                 '5ni1.cif from PDB\n')
+        self.launchProtocol(protRSRefine)
+
+        # check real_space_refine results
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=97.53,
+                                      rotOutliers=0.00,
+                                      cbetaOutliers=0,
+                                      clashScore=2.43,
+                                      overallScore=1.12,
+                                      protRSRefine=protRSRefine)
+
+        else:
+            # values obtained from phenix GUI v. 1.16
+            # (minimization_global + adp)
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.41,
+                                      rotOutliers=3.47,
+                                      cbetaOutliers=0,
+                                      clashScore=4.75,
+                                      overallScore=1.98,
+                                      protRSRefine=protRSRefine)
+
+        # MolProbity2
+        args = {
+            'inputVolume': volume_hemo_org,
+            'resolution': 3.2,
+            'inputStructure': protRSRefine.outputPdb,
+            'numberOfThreads': 4
+        }
+        protMolProbity2 = self.newProtocol(PhenixProtRunMolprobity, **args)
+        protMolProbity2.setObjLabel('MolProbity validation\n'
+                                   'volume\nand cif\nhemoglobin')
+        self.launchProtocol(protMolProbity2)
+
+        # check MolProbity results
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=97.53,
+                                rotOutliers=0.00,
+                                cbetaOutliers=0,
+                                clashScore=2.43,
+                                overallScore=1.12,
+                                protMolProbity=protMolProbity2)
+        else:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=95.41,
+                                rotOutliers=3.47,
+                                cbetaOutliers=0,
+                                clashScore=4.86,
+                                overallScore=1.98,
+                                protMolProbity=protMolProbity2)
+
+        # validation_cryoEM
+        args = {'inputVolume': volume_hemo_org,
+                'resolution': 3.2,
+                'inputStructure': protRSRefine.outputPdb
+                }
+        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
+        protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nvolume_hemo_org and '
+                                  'protRSRefine.outputPdb\n')
+        try:
+            self.launchProtocol(protValCryoEM)
+        except Exception as e:
+            self.assertTrue(True, "This test should return a error message as '"
+                            " Protocol has validation errors:\n"
+                            "Binary '/usr/local/phenix-1.13-2998/modules/phenix/phenix/"
+                            "command_line/validation_cryoem.py' does not exists.\n"
+                            "Check if you need to upgrade your PHENIX version to run "
+                            "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
+                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                            "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
+                            "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
+
+            return
+        # self.assertTrue(False)
+
+        # check validation cryoem results
+        self.checkValCryoEMResults(ramOutliers=0.00,
+                                  ramFavored=95.41,
+                                  rotOutliers=3.47,
+                                  cbetaOutliers=0,
+                                  clashScore=4.75,
+                                  overallScore=1.98,
+                                  protValCryoEM=protValCryoEM)
+
+    def testSuperposePdbsFromPDBAndCIF(self):
+        """ This test checks that phenix superpose_pdbs protocol runs with
+        two atomic structures (pdb and cif)"""
+        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
+              "and an imported cif file without volumes associated"
+
+        # Import Volume
+        volume_hemo_org = self._importVolHemoOrg()
+
+        # import PDBs
+        structure_PDB = self._importStructHemoPDB()
+        self.assertTrue(structure_PDB.getFileName())
+        self.assertFalse(structure_PDB.getVolume())
+
+        structure_CIF = self._importStructHemoCIF()
+        self.assertTrue(structure_CIF.getFileName())
+        self.assertFalse(structure_CIF.getVolume())
+
+        args = {
+            'inputStructureFixed': structure_PDB,
+            'inputStructureMoving': structure_CIF
+        }
+
+        protSuperposePdbs = self.newProtocol(PhenixProtRunSuperposePDBs, **args)
+        protSuperposePdbs.setObjLabel('SuperposePDBs\n'
+                                      'pdb fixed\n')
+        self.launchProtocol(protSuperposePdbs)
+        self.assertTrue(os.path.exists(
+            protSuperposePdbs.outputPdb.getFileName()))
+
+        # check RMSD results
+        self.checkSuperposeResults(startRMSD=0.000,
+                                   finalRMSD=0.000,
+                                   protSuperposePdbs=protSuperposePdbs)
+
+        # validation_cryoEM
+        args = {'inputVolume': volume_hemo_org,
+                'resolution': 3.2,
+                'inputStructure': protSuperposePdbs.outputPdb
+                }
+        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
+        protValCryoEM.setObjLabel('ValCryoEM\nafter Superpose\nvolume_hemo_org and\n'
+                                  'protSuperposePdbs.outputPdb\n')
+        try:
+            self.launchProtocol(protValCryoEM)
+        except Exception as e:
+            self.assertTrue(True, "This test should return a error message as '"
+                                  " Protocol has validation errors:\n"
+                                  "Binary '/usr/local/phenix-1.13-2998/modules/phenix/phenix/"
+                                  "command_line/validation_cryoem.py' does not exists.\n"
+                                  "Check if you need to upgrade your PHENIX version to run "
+                                  "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
+                                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                                  "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
+                                  "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
+
+            return
+        # self.assertTrue(False)
+
+        # check validation cryoem results
+        self.checkValCryoEMResults(ramOutliers=0.00,
+                                   ramFavored=95.23,
+                                   rotOutliers=0.43,
+                                   cbetaOutliers=0,
+                                   clashScore=3.53,
+                                   overallScore=1.48,
+                                   protValCryoEM=protValCryoEM)
+        args = {
+            'inputStructureFixed': structure_CIF,
+            'inputStructureMoving': structure_PDB
+        }
+
+        protSuperposePdbs = self.newProtocol(PhenixProtRunSuperposePDBs, **args)
+        protSuperposePdbs.setObjLabel('SuperposePDBs\n'
+                                      'cif fixed\n')
+        self.launchProtocol(protSuperposePdbs)
+        self.assertTrue(os.path.exists(
+            protSuperposePdbs.outputPdb.getFileName()))
+
+        # check RMSD results
+        self.checkSuperposeResults(startRMSD=0.000,
+                                   finalRMSD=0.000,
+                                   protSuperposePdbs=protSuperposePdbs)
+
+        # validation_cryoEM
+        args = {'inputVolume': volume_hemo_org,
+                'resolution': 3.2,
+                'inputStructure': protSuperposePdbs.outputPdb
+                }
+        protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
+        protValCryoEM.setObjLabel('ValCryoEM\nafter Superpose\nvolume_hemo_org and\n'
+                                  'protSuperposePdbs.outputPdb\n')
+        try:
+            self.launchProtocol(protValCryoEM)
+        except Exception as e:
+            self.assertTrue(True, "This test should return a error message as '"
+                                  " Protocol has validation errors:\n"
+                                  "Binary '/usr/local/phenix-1.13-2998/modules/phenix/phenix/"
+                                  "command_line/validation_cryoem.py' does not exists.\n"
+                                  "Check if you need to upgrade your PHENIX version to run "
+                                  "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
+                                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                                  "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
+                                  "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
+
+            return
+        # self.assertTrue(False)
+
+        # check validation cryoem results
+        self.checkValCryoEMResults(ramOutliers=0.00,
+                                   ramFavored=95.23,
+                                   rotOutliers=0.43,
+                                   cbetaOutliers=0,
+                                   clashScore=3.53,
+                                   overallScore=1.48,
+                                   protValCryoEM=protValCryoEM)
+

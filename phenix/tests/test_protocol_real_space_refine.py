@@ -364,11 +364,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
+                                      ramFavored=95.41,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
+                                      clashScore=4.75,
+                                      overallScore=1.98,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF5(self):
@@ -432,12 +432,19 @@ class TestPhenixRSRefine(TestImportData):
                                       overallScore=1.12,
                                       protRSRefine=protRSRefine)
         else:
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.11,
+            #                           rotOutliers=3.04,
+            #                           cbetaOutliers=0,
+            #                           clashScore=5.30,
+            #                           overallScore=1.92,
+            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
+                                      ramFavored=95.41,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
+                                      clashScore=4.75,
+                                      overallScore=1.98,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB6(self):
@@ -506,11 +513,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
+                                      ramFavored=96.47,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
+                                      clashScore=4.20,
+                                      overallScore=1.43,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF7(self):
@@ -577,12 +584,19 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
 
         else:
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.29,
+            #                           rotOutliers=0.00,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.86,
+            #                           overallScore=1.50,
+            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
+                                      ramFavored=96.47,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
+                                      clashScore=4.20,
+                                      overallScore=1.43,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF8(self):
@@ -646,12 +660,19 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
 
         else:
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.11,
+            #                           rotOutliers=3.04,
+            #                           cbetaOutliers=0,
+            #                           clashScore=5.30,
+            #                           overallScore=1.92,
+            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
+                                      ramFavored=95.41,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
+                                      clashScore=4.75,
+                                      overallScore=1.98,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF9(self):
@@ -719,10 +740,17 @@ class TestPhenixRSRefine(TestImportData):
                                       overallScore=1.11,
                                       protRSRefine=protRSRefine)
         else:
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.29,
+            #                           rotOutliers=0.00,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.86,
+            #                           overallScore=1.50,
+            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
+                                      ramFavored=96.47,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
+                                      clashScore=4.20,
+                                      overallScore=1.43,
                                       protRSRefine=protRSRefine)
