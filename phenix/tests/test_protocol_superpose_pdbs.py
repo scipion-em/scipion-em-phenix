@@ -227,6 +227,46 @@ class TestProtSuperposePdbs(TestImportData):
         self.checkResults(startRMSD=0.464,
                           finalRMSD=0.462,
                           protSuperposePdbs=protSuperposePdbs)
+        ##################################################################
+        # superpose cif and pdb
+        args = {
+            'inputStructureFixed': structure6_PDB,
+            'inputStructureMoving': protSuperposePdbs.outputPdb
+        }
+
+        protSuperposePdbs2 = self.newProtocol(PhenixProtRunSuperposePDBs,
+                                             **args)
+        protSuperposePdbs2.setObjLabel('SuperposePDBs\n'
+                                      'no volumes associated to pdbs\n'
+                                       'cif and pdb')
+        self.launchProtocol(protSuperposePdbs2)
+        self.assertTrue(os.path.exists(
+            protSuperposePdbs2.outputPdb.getFileName()))
+
+        # check RMSD results
+        self.checkResults(startRMSD=0.462,
+                          finalRMSD=0.462,
+                          protSuperposePdbs=protSuperposePdbs2)
+        ##################################################################
+        # superpose pdb and cif
+        args = {
+            'inputStructureFixed': protSuperposePdbs.outputPdb,
+            'inputStructureMoving': structure7_PDB
+        }
+
+        protSuperposePdbs3 = self.newProtocol(PhenixProtRunSuperposePDBs,
+                                              **args)
+        protSuperposePdbs3.setObjLabel('SuperposePDBs\n'
+                                       'no volumes associated to pdbs\n'
+                                       'pdb and cif')
+        self.launchProtocol(protSuperposePdbs3)
+        self.assertTrue(os.path.exists(
+            protSuperposePdbs3.outputPdb.getFileName()))
+
+        # check RMSD results
+        self.checkResults(startRMSD=0.038,
+                          finalRMSD=0.0,
+                          protSuperposePdbs=protSuperposePdbs3)
 
     def testSuperposePdbsFromPDBAndCIFWithVol(self):
         """ This test checks that phenix superpose_pdbs protocol runs with

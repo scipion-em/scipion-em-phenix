@@ -26,22 +26,19 @@
 # **************************************************************************
 
 import os
+
+from pyworkflow.em import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
-                              MOLPROBITY,
+                              MOLPROBITY2,
                               VALIDATION_CRYOEM,
                               PHENIXVERSION)
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
-try:
-    from pyworkflow.em.data import AtomStruct
-except:
-    from pyworkflow.em.data import PdbFile as AtomStruct
-
+from phenix.protocols import retry, fromCIFTommCIF
 from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
-from pyworkflow.em.convert.atom_struct import AtomicStructHandler
 
 
 PDB = 0
@@ -161,37 +158,14 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     # --------------------------- STEPS functions --------------------------
     def runRSrefineStep(self, tmpMapFile):
-        pdb = os.path.abspath(self.inputStructure.get().getFileName())
-        args = "model_file=%s" % pdb
+        atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        args += " map_file=%s" % vol
-        args += " resolution=%f" % self.resolution
-        args += " secondary_structure.enabled=%s" % self.doSecondary
-        args += " run="
-        if self.minimizationGlobal == True:
-            args += "minimization_global+"
-        if self.rigidBody == True:
-            args += "rigid_body+"
-        if self.localGridSearch == True:
-            args += "local_grid_search+"
-        if self.morphing == True:
-            args += "morphing+"
-        if self.simulatedAnnealing == True:
-            args += "simulated_annealing+"
-        if self.adp == True:
-            args += "adp+"
-        args = args[:-1]
-        # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
-        args += " macro_cycles=%d" % self.macroCycles
-        args += " model_format=pdb+mmcif"
-        # args += " write_pkl_stats=True"
-        args += " %s " % self.extraParams.get()
-        numberOfThreads = self.numberOfThreads.get()
-        if numberOfThreads > 1:
-            args += " nproc=%d" % numberOfThreads
+        args = self._writeArgsRSR(atomStruct, vol)
         try:
-            Plugin.runPhenixProgram(Plugin.getProgram(REALSPACEREFINE), args,
-                         cwd=self._getExtraPath())
+            retry(Plugin.runPhenixProgram,
+                  Plugin.getProgram(REALSPACEREFINE), args,
+                  cwd=os.path.abspath(self._getExtraPath()),
+                  listAtomStruct=[atomStruct], log=self._log)
         except:
             print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
                   " failure: High number of nonbonded interaction distances " \
@@ -202,52 +176,27 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
-            Plugin.runPhenixProgram(Plugin.getProgram(REALSPACEREFINE), args,
-                             cwd=self._getExtraPath())
+            retry(Plugin.runPhenixProgram,
+                  Plugin.getProgram(REALSPACEREFINE), args,
+                  cwd=os.path.abspath(self._getExtraPath()),
+                  listAtomStruct=[atomStruct], log=self._log)
 
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
         self._getRSRefineOutput()
-        args = ""
-        args += os.path.abspath(self.outAtomStructName)
+        print "self.outAtomStructName: ", self.outAtomStructName
+        atomStruct = os.path.abspath(self.outAtomStructName)
+        print "atomStruct: ", atomStruct
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args += " "
-            args += " map_file_name=%s" % vol
-            args += " pickle=True"
-            args += " "
-            args += " d_min=%f" % self.resolution.get()
-        args += " "
-        numberOfThreads = self.numberOfThreads.get()
-        if numberOfThreads > 1:
-            args += " nproc=%d" % numberOfThreads
-
-        print "args: ", args
-        Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-                                cwd=self._getExtraPath())
-
-        # try:
-        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-        #                     cwd=self._getExtraPath())
-        # except:
-        #     aSH = AtomicStructHandler()
-        #     aSH.read(self.outAtomStructName)
-        #     aSH.write(self.outAtomStructName)
-        #     args = ""
-        #     args += os.path.abspath(aSH)
-        #     if numberOfThreads > 1:
-        #         args += " nproc=%d" % numberOfThreads
-        #
-        #     Plugin.runPhenixProgram(Plugin.getProgram(MOLPROBITY), args,
-        #                             cwd=self._getExtraPath())
+        args = self._writeArgsMolProbity(atomStruct, vol)
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
+              args, cwd=os.path.abspath(self._getExtraPath()),
+              listAtomStruct=[atomStruct], log=self._log)
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
-        self._getRSRefineOutput()
-        args = ""
-        pdb = os.path.abspath(self.outAtomStructName)
-        args += pdb
+        atomStruct = os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
         volume = os.path.abspath(self._getExtraPath(tmpMapFile))
         if self.inputVolume.get() is not None:
@@ -255,41 +204,16 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         else:
             vol = self.inputStructure.get().getVolume()
 
-        if vol.getHalfMaps():
-            halves = []
-            for halfMap in vol.getHalfMaps().split(','):
-                if not os.path.abspath(halfMap).endswith(".mrc"):
-                    half = os.path.abspath(halfMap).split(".")[0] + ".mrc"
-                else:
-                    half = os.path.abspath(halfMap)
-                halves.append(half)
-            args = " " + pdb + (" " + volume) + (" " + halves[0]) + (" " + halves[1]) \
-                    + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
-                    " slim=False" + \
-                    " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
-                    + (" %s " % self.extraParams.get())
-        else:
-            args = " " + pdb + (" " + volume) \
-                    + " " + ("resolution=%f" % self.resolution.get()) + " pickle=True" + \
-                    " slim=False" + \
-                    " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None" \
-                    + (" %s " % self.extraParams.get())
-        Plugin.runPhenixProgram(Plugin.getProgram(VALIDATION_CRYOEM), args,
-                                    cwd=self._getExtraPath())
+        args = self._writeArgsValCryoEM(atomStruct, volume, vol)
+
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
+              args, cwd=os.path.abspath(self._getExtraPath()),
+              listAtomStruct=[atomStruct], log=self._log)
 
     def createOutputStep(self):
         # self._getRSRefineOutput()
         pdb = AtomStruct()
         pdb.setFileName(self.outAtomStructName)
-
-        # rewrite cif file so user and label names match
-        aSH = AtomicStructHandler()
-        try:
-            aSH.read(self.outAtomStructName)
-            aSH.write(self.outAtomStructName)
-        except:
-            print("CIF file standarization with biopython failed. "
-                  "I will continue using the file created by real_space_refine. ")
 
         if self.inputVolume.get() is not None:
             pdb.setVolume(self.inputVolume.get())
@@ -333,7 +257,41 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     def _getRSRefineOutput(self):
         inPdbName = os.path.basename(self.inputStructure.get().getFileName())
-        self.outAtomStructName = self._getExtraPath(
+        outAtomStructName = self._getExtraPath(
             inPdbName.replace("." + inPdbName.split(".")[1],
-                          "_real_space_refined.cif"))
+                              "_real_space_refined.cif"))
+        print "outAtomStructName: ", outAtomStructName
+        # convert cif to mmcif by using maxit program
+        # to get the right number and name of chains
+        log = self._log
+        self.outAtomStructName = outAtomStructName
+        fromCIFTommCIF(outAtomStructName, self.outAtomStructName, log)
 
+    def _writeArgsRSR(self, atomStruct, vol):
+        args = "model_file=%s" % atomStruct
+        args += " map_file=%s" % vol
+        args += " resolution=%f" % self.resolution
+        args += " secondary_structure.enabled=%s" % self.doSecondary
+        args += " run="
+        if self.minimizationGlobal == True:
+            args += "minimization_global+"
+        if self.rigidBody == True:
+            args += "rigid_body+"
+        if self.localGridSearch == True:
+            args += "local_grid_search+"
+        if self.morphing == True:
+            args += "morphing+"
+        if self.simulatedAnnealing == True:
+            args += "simulated_annealing+"
+        if self.adp == True:
+            args += "adp+"
+        args = args[:-1]
+        # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
+        args += " macro_cycles=%d" % self.macroCycles
+        args += " model_format=pdb+mmcif"
+        # args += " write_pkl_stats=True"
+        args += " %s " % self.extraParams.get()
+        numberOfThreads = self.numberOfThreads.get()
+        if numberOfThreads > 1:
+            args += " nproc=%d" % numberOfThreads
+        return args

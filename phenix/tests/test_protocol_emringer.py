@@ -278,6 +278,7 @@ class TestEMRingerValidation2(TestImportData):
             protEMRinger.EMRINGERTRANSFERFILENAME.replace('py', 'txt'))
         with open(textFileName, "r") as f:
             self.resultsDict = json.loads(str(f.read()))
+        try:
             self.assertAlmostEqual(self.resultsDict[
                                 'Optimal Threshold'], optThresh, places)
             self.assertAlmostEqual(self.resultsDict[
@@ -288,6 +289,10 @@ class TestEMRingerValidation2(TestImportData):
                                 'Model Length'], modLength, places)
             self.assertAlmostEqual(self.resultsDict[
                                 'EMRinger Score'], EMScore, places)
+        except Exception as e:
+            # print error since test does not print it
+            print("Exception error:", str(e))
+            raise self.failureException(str(e))
 
     def testEMRingerValidationFromPDB(self):
         """ This test checks that EMRinger validation protocol runs with an

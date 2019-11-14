@@ -23,6 +23,20 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
+# Horrible hack to release this plugin before scipion next version.
+# TODO: remove when possible
+from pyworkflow import LAST_VERSION, VERSION_2_0
+if LAST_VERSION == VERSION_2_0 :
+    from pyworkflow.utils import importFromPlugin
+    retry = importFromPlugin('chimera.atom_struct', 'retry')
+    fromCIFTommCIF = importFromPlugin('chimera.atom_struct', 'fromCIFTommCIF')
+    fromCIFToPDB = importFromPlugin('chimera.atom_struct', 'fromCIFToPDB')
+    fromPDBToCIF = importFromPlugin('chimera.atom_struct', 'fromPDBToCIF')
+    AtomicStructHandler = importFromPlugin('chimera.atom_struct', 'AtomicStructHandler')
+else:
+    from pyworkflow.em.convert.atom_struct import retry
+    from pyworkflow.em.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
+    from pyworkflow.em.convert.atom_struct import AtomicStructHandler
 
 from protocol_emringer import PhenixProtRunEMRinger
 from protocol_molprobity import PhenixProtRunMolprobity

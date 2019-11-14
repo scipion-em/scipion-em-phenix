@@ -34,5 +34,6 @@ from test_protocol_validation_cryoem import (TestImportBase, TestImportData,
                                              TestValCryoEM)
 from test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs,
                                           TestProtSuperposePdbs)
-
 from test_phenix import (TestVersion)
+from test_phenix_pdb_cif import (TestImportBase, TestImportData,
+                                 TestPhenixPdbCif)
