@@ -168,36 +168,46 @@ class TestPhenixRSRefine(TestImportData):
                        protMolProbity, places=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
-        self.assertAlmostEqual(protMolProbity.ramachandranOutliers,
-                               ramOutliers, places)
-        self.assertAlmostEqual(protMolProbity.ramachandranFavored,
-                               ramFavored, places)
-        self.assertAlmostEqual(protMolProbity.rotamerOutliers,
-                               rotOutliers, places)
-        self.assertAlmostEqual(protMolProbity.cbetaOutliers,
-                               cbetaOutliers, places)
-        self.assertAlmostEqual(protMolProbity.clashscore,
-                               clashScore, places)
-        self.assertAlmostEqual(protMolProbity.overallScore,
-                               overallScore, places)
+        try:
+            self.assertAlmostEqual(protMolProbity.ramachandranOutliers.get(),
+                                   ramOutliers, places)
+            self.assertAlmostEqual(protMolProbity.ramachandranFavored.get(),
+                                   ramFavored, places)
+            self.assertAlmostEqual(protMolProbity.rotamerOutliers.get(),
+                                   rotOutliers, places)
+            self.assertAlmostEqual(protMolProbity.cbetaOutliers.get(),
+                                   cbetaOutliers, places)
+            self.assertAlmostEqual(protMolProbity.clashscore.get(),
+                                   clashScore, places)
+            self.assertAlmostEqual(protMolProbity.overallScore.get(),
+                                   overallScore, places)
+        except Exception as e:
+            # print error since test does not print it
+            print("Exception error:", str(e))
+            raise self.failureException(str(e))
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
                              protRSRefine, places=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
-        self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
-                               ramOutliers, places)
-        self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                               ramFavored, delta=1)
-        self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                               rotOutliers, delta=3)
-        self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
-                               cbetaOutliers, places)
-        self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                               clashScore, delta=0.5)
-        self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                               overallScore, delta=0.5)
+        try:
+            self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
+                                   ramOutliers, places)
+            self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
+                                   ramFavored, delta=1)
+            self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
+                                   rotOutliers, delta=3)
+            self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
+                                   cbetaOutliers, places)
+            self.assertAlmostEqual(protRSRefine.clashscore.get(),
+                                   clashScore, delta=0.75)
+            self.assertAlmostEqual(protRSRefine.overallScore.get(),
+                                   overallScore, delta=0.75)
+        except Exception as e:
+            # print error since test does not print it
+            print("Exception error:", str(e))
+            raise self.failureException(str(e))
 
     def testPhenixRSRefineFromPDB(self):
         """ This test checks that phenix real space refine protocol runs
@@ -364,11 +374,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.41,
-                                      rotOutliers=3.47,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.75,
-                                      overallScore=1.98,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF5(self):
@@ -432,20 +442,20 @@ class TestPhenixRSRefine(TestImportData):
                                       overallScore=1.12,
                                       protRSRefine=protRSRefine)
         else:
-            # self.checkRSRefineResults(ramOutliers=0.00,
-            #                           ramFavored=96.11,
-            #                           rotOutliers=3.04,
-            #                           cbetaOutliers=0,
-            #                           clashScore=5.30,
-            #                           overallScore=1.92,
-            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.41,
-                                      rotOutliers=3.47,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.75,
-                                      overallScore=1.98,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=95.41,
+            #                           rotOutliers=3.47,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.75,
+            #                           overallScore=1.98,
+            #                           protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB6(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -513,11 +523,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.47,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.20,
-                                      overallScore=1.43,
+                                      clashScore=4.86,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF7(self):
@@ -584,20 +594,20 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
 
         else:
-            # self.checkRSRefineResults(ramOutliers=0.00,
-            #                           ramFavored=96.29,
-            #                           rotOutliers=0.00,
-            #                           cbetaOutliers=0,
-            #                           clashScore=4.86,
-            #                           overallScore=1.50,
-            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.47,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.20,
-                                      overallScore=1.43,
+                                      clashScore=4.86,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.47,
+            #                           rotOutliers=0.00,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.20,
+            #                           overallScore=1.43,
+            #                           protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF8(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -660,20 +670,20 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
 
         else:
-            # self.checkRSRefineResults(ramOutliers=0.00,
-            #                           ramFavored=96.11,
-            #                           rotOutliers=3.04,
-            #                           cbetaOutliers=0,
-            #                           clashScore=5.30,
-            #                           overallScore=1.92,
-            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.41,
-                                      rotOutliers=3.47,
+                                      ramFavored=96.11,
+                                      rotOutliers=3.04,
                                       cbetaOutliers=0,
-                                      clashScore=4.75,
-                                      overallScore=1.98,
+                                      clashScore=5.30,
+                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=95.41,
+            #                           rotOutliers=3.47,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.75,
+            #                           overallScore=1.98,
+            #                           protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF9(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -740,17 +750,17 @@ class TestPhenixRSRefine(TestImportData):
                                       overallScore=1.11,
                                       protRSRefine=protRSRefine)
         else:
-            # self.checkRSRefineResults(ramOutliers=0.00,
-            #                           ramFavored=96.29,
-            #                           rotOutliers=0.00,
-            #                           cbetaOutliers=0,
-            #                           clashScore=4.86,
-            #                           overallScore=1.50,
-            #                           protRSRefine=protRSRefine)
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.47,
+                                      ramFavored=96.29,
                                       rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=4.20,
-                                      overallScore=1.43,
+                                      clashScore=4.86,
+                                      overallScore=1.50,
                                       protRSRefine=protRSRefine)
+            # self.checkRSRefineResults(ramOutliers=0.00,
+            #                           ramFavored=96.47,
+            #                           rotOutliers=0.00,
+            #                           cbetaOutliers=0,
+            #                           clashScore=4.20,
+            #                           overallScore=1.43,
+            #                           protRSRefine=protRSRefine)

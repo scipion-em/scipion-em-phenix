@@ -272,19 +272,24 @@ class TestMolprobityValidation2(TestImportData):
                      clashScore, overallScore, protMolProbity, places=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
-        self.assertAlmostEqual(protMolProbity.ramachandranOutliers,
-                               ramOutliers, places)
-        self.assertAlmostEqual(protMolProbity.ramachandranFavored,
-                               ramFavored, places)
-        self.assertAlmostEqual(protMolProbity.rotamerOutliers,
-                               rotOutliers, places)
-        self.assertAlmostEqual(protMolProbity.cbetaOutliers,
-                               cbetaOutliers, places)
-        self.assertAlmostEqual(protMolProbity.clashscore,
-                               clashScore, places)
-        self.assertAlmostEqual(protMolProbity.overallScore,
-                               overallScore, places)
-
+        try:
+            self.assertAlmostEqual(protMolProbity.ramachandranOutliers.get(),
+                                   ramOutliers, places)
+            self.assertAlmostEqual(protMolProbity.ramachandranFavored.get(),
+                                   ramFavored, places)
+            self.assertAlmostEqual(protMolProbity.rotamerOutliers.get(),
+                                   rotOutliers, places)
+            self.assertAlmostEqual(protMolProbity.cbetaOutliers.get(),
+                                   cbetaOutliers, places)
+            self.assertAlmostEqual(protMolProbity.clashscore.get(),
+                                   clashScore, places)
+            self.assertAlmostEqual(protMolProbity.overallScore.get(),
+                                   overallScore, places)
+        except Exception as e:
+            # print error since test does not print it
+            print("Exception error:", str(e))
+            raise self.failureException(str(e))
+        
     def testMolProbityValidationFromPDB(self):
         """ This test checks that MolProbity validation protocol runs with an
         atomic structure; No Volume was provided and no error message is
