@@ -29,7 +29,7 @@ from pyworkflow.object import String, Float, Integer
 from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
-from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF
+from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
 
 try:
     from pyworkflow.em.data import AtomStruct
