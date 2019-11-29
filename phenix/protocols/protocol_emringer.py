@@ -27,9 +27,12 @@
 import glob
 import json
 import os
+
+from pyworkflow import Config
+
 from phenix.constants import EMRINGER, DISPLAY
-from pyworkflow.em.convert.headers import Ccp4Header
-from pyworkflow.em.protocol import EMProtocol
+from pwem.convert.headers import Ccp4Header
+from pwem.protocols import EMProtocol
 from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
@@ -238,8 +241,8 @@ dataDict['_residues_dict'] = dictResidue
 
         # If there is any error at this point it is related to config variables
         if errors:
-            errors.append("Check configuration file: "
-                          "~/.config/scipion/scipion.conf")
+            errors.append("Check configuration file: " +
+                          Config.SCIPION_LOCAL_CONFIG)
             errors.append("and set EMRINGER and PHENIX_HOME variables "
                           "properly.")
             if program is not None:

@@ -24,7 +24,7 @@
 
 # protocol to test the phenix protocol superpose_pdbs
 import os
-from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from pyworkflow.tests import *
@@ -166,8 +166,8 @@ class TestProtSuperposePdbs(TestImportData):
     def testSuperposePdbsFromPDBAndCIF(self):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb and cif)"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
-              "and an imported cif file without volumes associated"
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
+              "and an imported cif file without volumes associated")
 
         # import PDBs
         structure1_PDB = self._importStructurePDBWoVol()
@@ -198,8 +198,8 @@ class TestProtSuperposePdbs(TestImportData):
     def testSuperposePdbsFromPDBAndPDB(self):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdbs)"""
-        print "Run phenix superpose_pdbs protocol from two imported pdb" \
-              "files without volumes associated"
+        print("Run phenix superpose_pdbs protocol from two imported pdb" \
+              "files without volumes associated")
 
         # import PDBs
         structure6_PDB = self._importStructureMolProbity1()
@@ -271,8 +271,8 @@ class TestProtSuperposePdbs(TestImportData):
     def testSuperposePdbsFromPDBAndCIFWithVol(self):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb and cif) with associated volumes"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
-              "and a imported cif file with volumes associated"
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
+              "and a imported cif file with volumes associated")
 
         # import PDBs
         structure2_PDB = self._importStructurePDBWithVol2()
@@ -307,9 +307,9 @@ class TestProtSuperposePdbs(TestImportData):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb with associated volumes and pdb without
         associated volume"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
               "with associated volume and an imported pdb without volume " \
-              "associated"
+              "associated")
 
         # import PDBs
         structure2_PDB = self._importStructurePDBWithVol2()
@@ -344,9 +344,9 @@ class TestProtSuperposePdbs(TestImportData):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb with associated volumes and pdb without
         associated volume"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
               "with associated volume and an imported pdb without volume " \
-              "associated"
+              "associated")
 
         # import PDBs
         structure2_PDB = self._importStructurePDBWithVol2()
@@ -381,9 +381,9 @@ class TestProtSuperposePdbs(TestImportData):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb with associated volumes and pdb without
         associated volume"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
               "with associated volume and an imported pdb without volume " \
-              "associated"
+              "associated")
 
         # import PDBs
         structure2_PDB = self._importStructurePDBWithVol2()

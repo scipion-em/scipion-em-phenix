@@ -24,7 +24,7 @@
 
 # protocol to test the validation method MolProbity
 
-from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
@@ -287,15 +287,15 @@ class TestMolprobityValidation2(TestImportData):
                                    overallScore, places)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
         
     def testMolProbityValidationFromPDB(self):
         """ This test checks that MolProbity validation protocol runs with an
         atomic structure; No Volume was provided and no error message is
         expected"""
-        print "Run MolProbity validation protocol from imported pdb file " \
-              "without imported or pdb-associated volume"
+        print("Run MolProbity validation protocol from imported pdb file " \
+              "without imported or pdb-associated volume")
 
         # import PDB
         structure_PDB = self._importStructurePDBWoVol()
@@ -324,8 +324,8 @@ class TestMolprobityValidation2(TestImportData):
         density volume; No atomic structure was provided and a error message is
         expected"""
 
-        print "Run MolProbity validation protocol from imported volume file " \
-          "without imported pdb"
+        print("Run MolProbity validation protocol from imported volume file " \
+              "without imported pdb")
 
         # import volume
         volume = self._importVolume()
@@ -344,8 +344,8 @@ class TestMolprobityValidation2(TestImportData):
             self.launchProtocol(protMolProbity)
         except Exception as e:
             self.assertTrue(True)
-            print "This test should return a error message as '" \
-                  " Input atomic structure cannot be EMPTY.\n"
+            print("This test should return a error message as '" \
+                  " Input atomic structure cannot be EMPTY.\n")
 
             return
         self.assertTrue(False)
@@ -354,8 +354,8 @@ class TestMolprobityValidation2(TestImportData):
         """ This test checks that MolProbity validation protocol runs with an
         atomic structure associated to volume
         """
-        print "Run MolProbity validation protocol from imported pdb file " \
-              "with pdb-associated volume"
+        print("Run MolProbity validation protocol from imported pdb file " \
+              "with pdb-associated volume")
 
         # import PDB
         structure2_PDB = self._importStructurePDBWithVol()
@@ -387,8 +387,8 @@ class TestMolprobityValidation2(TestImportData):
         """ This test checks that MolProbity validation protocol runs with an
         atomic structure associated to volume
         """
-        print "Run MolProbity validation protocol from imported cif file " \
-              "with cif-associated volume"
+        print("Run MolProbity validation protocol from imported cif file " \
+              "with cif-associated volume")
 
         # import PDB
         structure_6 = self._importStructuremmCIFWithVol2()
@@ -421,8 +421,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot")
 
         # Import Volume
         volume_coot1 = self._importVolCoot1()
@@ -455,8 +455,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot")
 
         # Import Volume
         volume_coot2 = self._importVolCoot2()
@@ -489,8 +489,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac withouth mask
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask")
 
         # Import Volume
         volume_refmac1 = self._importVolRefmac1()
@@ -523,8 +523,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac withouth mask
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask")
 
         # Import Volume
         volume_refmac2 = self._importVolRefmac2()
@@ -557,8 +557,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac withouth mask
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask")
 
         # Import Volume
         volume_refmac3 = self._importVolRefmac3()
@@ -591,8 +591,8 @@ class TestMolprobityValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac in another project
          """
-        print "Run MolProbity validation from imported volume and pdb file " \
-              "already refined by Coot and Refmac in another project"
+        print("Run MolProbity validation from imported volume and pdb file " \
+              "already refined by Coot and Refmac in another project")
 
         # Import Volume
         volume3 = self._importVolume3()
@@ -624,8 +624,8 @@ class TestMolprobityValidation2(TestImportData):
         two independent pdbs provided directly without inputVol associated and
         allows the comparison of results
          """
-        print "Run MolProbity validation to compare an imported pdb " \
-              "files obtained in another project"
+        print("Run MolProbity validation to compare an imported pdb " \
+              "files obtained in another project")
 
         # import first PDB
         structure6_PDB = self._importStructureMolProbity1()
@@ -653,8 +653,8 @@ class TestMolprobityValidation2(TestImportData):
         two independent pdbs provided directly without inputVol associated and
         allows the comparison of results
             """
-        print "Run MolProbity validation to compare an imported pdb " \
-                  "files obtained in another project"
+        print("Run MolProbity validation to compare an imported pdb " \
+                  "files obtained in another project")
 
         # import second PDB (with higher number of Outliers)
         structure7_PDB = self._importStructureMolProbity2()

@@ -29,8 +29,8 @@ import os
 
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer
-from pyworkflow.em.viewers import Chimera
-from pyworkflow.utils import importFromPlugin
+from pwem.viewers import Chimera
+from phenix import Plugin
 
 class PhenixProtRunSuperposePDBsViewer(Viewer):
     """ Visualize the output of protocols  superpose pdb """
@@ -75,7 +75,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
                 f.write("open %s\n" % os.path.abspath(filename))
 
         # run in the background
-        chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd+"&")
         return []
 

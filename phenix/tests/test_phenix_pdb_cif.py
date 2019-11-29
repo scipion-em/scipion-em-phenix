@@ -24,8 +24,10 @@
 
 # protocol to test the different phenix methods with .pdb and .cif files
 
-from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
+from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
+from pyworkflow import Config
+
 from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
@@ -118,7 +120,7 @@ class TestPhenixPdbCif(TestImportData):
                                 'EMRinger Score'], EMScore, delta=0.5)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
 
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -141,7 +143,7 @@ class TestPhenixPdbCif(TestImportData):
                                    overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -164,7 +166,7 @@ class TestPhenixPdbCif(TestImportData):
                                    overallScore, delta=0.75)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
 
     def checkValCryoEMResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -193,7 +195,7 @@ class TestPhenixPdbCif(TestImportData):
                                    overallScore, delta=0.75)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
 
     def checkSuperposeResults(self, startRMSD, finalRMSD, protSuperposePdbs, places=2):
@@ -208,7 +210,7 @@ class TestPhenixPdbCif(TestImportData):
                                    finalRMSD, places)
         except Exception as e:
             # print error since test does not print it
-            print("Exception error:", str(e))
+            print(("Exception error:", str(e)))
             raise self.failureException(str(e))
 
     def testEMRingerValidationFromVolumeAndPDB(self):
@@ -216,7 +218,7 @@ class TestPhenixPdbCif(TestImportData):
         volume provided directly as inputVol and the input PDB fitted to
         the volume
          """
-        print "Run EMRinger validation from imported volume and pdb file"
+        print("Run EMRinger validation from imported volume and pdb file")
 
         # Import Volume
         volume_hemo_orig = self._importVolHemoOrg()
@@ -246,7 +248,7 @@ class TestPhenixPdbCif(TestImportData):
         """ This test checks that EMRinger validation protocol runs with a
         volume provided directly as inputVol and input PDB
          """
-        print "Run EMRinger validation from imported volume and cif file"
+        print("Run EMRinger validation from imported volume and cif file")
 
         # Import Volume
         volume_hemo_orig = self._importVolHemoOrg()
@@ -276,7 +278,7 @@ class TestPhenixPdbCif(TestImportData):
         """ This test checks that EMRinger validation protocol runs with a
         volume provided directly as inputVol and input PDB
          """
-        print "Run EMRinger validation from imported volume and cif file from PDB"
+        print("Run EMRinger validation from imported volume and cif file from PDB")
 
         # Import Volume
         volume_hemo_orig = self._importVolHemoOrg()
@@ -420,7 +422,8 @@ class TestPhenixPdbCif(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                            "Check configuration file: " +
+                            Config.SCIPION_LOCAL_CONFIG + "\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -557,7 +560,8 @@ class TestPhenixPdbCif(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                            "Check configuration file: " +
+                            Config.SCIPION_LOCAL_CONFIG + "\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -695,7 +699,8 @@ class TestPhenixPdbCif(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                            "Check configuration file: " +
+                            Config.SCIPION_LOCAL_CONFIG + "\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -714,8 +719,8 @@ class TestPhenixPdbCif(TestImportData):
     def testSuperposePdbsFromPDBAndCIF(self):
         """ This test checks that phenix superpose_pdbs protocol runs with
         two atomic structures (pdb and cif)"""
-        print "Run phenix superpose_pdbs protocol from an imported pdb file " \
-              "and an imported cif file without volumes associated"
+        print("Run phenix superpose_pdbs protocol from an imported pdb file " \
+              "and an imported cif file without volumes associated")
 
         # Import Volume
         volume_hemo_org = self._importVolHemoOrg()
@@ -763,7 +768,8 @@ class TestPhenixPdbCif(TestImportData):
                                   "command_line/validation_cryoem.py' does not exists.\n"
                                   "Check if you need to upgrade your PHENIX version to run "
                                   "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                                  "Check configuration file: " +
+                                  Config.SCIPION_LOCAL_CONFIG + "\n"
                                   "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                                   "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -812,7 +818,8 @@ class TestPhenixPdbCif(TestImportData):
                                   "command_line/validation_cryoem.py' does not exists.\n"
                                   "Check if you need to upgrade your PHENIX version to run "
                                   "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
+                                  "Check configuration file: " +
+                                  Config.SCIPION_LOCAL_CONFIG + "\n"
                                   "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                                   "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 

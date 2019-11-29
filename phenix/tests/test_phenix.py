@@ -34,5 +34,5 @@ class TestVersion(BaseTest):
         if version == PHENIXVERSION:
             self.assertEqual(version, PHENIXVERSION)
         else:
-            print "Your version is not " + PHENIXVERSION + " anymore"
-            print "Your current version is " + version
+            print(("Your version is not " + PHENIXVERSION + " anymore"))
+            print(("Your current version is " + version))

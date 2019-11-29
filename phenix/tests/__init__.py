@@ -24,16 +24,16 @@
 # *
 # **************************************************************************
 
-from test_protocol_emringer import (TestImportBase, TestImportData,
+from .test_protocol_emringer import (TestImportBase, TestImportData,
                                     TestEMRingerValidation2)
-from test_protocol_molprobity import (TestImportBase, TestImportData,
+from .test_protocol_molprobity import (TestImportBase, TestImportData,
                                       TestMolprobityValidation2)
-from test_protocol_real_space_refine import (TestImportBase, TestImportData,
+from .test_protocol_real_space_refine import (TestImportBase, TestImportData,
                                              TestPhenixRSRefine)
-from test_protocol_validation_cryoem import (TestImportBase, TestImportData,
+from .test_protocol_validation_cryoem import (TestImportBase, TestImportData,
                                              TestValCryoEM)
-from test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs,
+from .test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs,
                                           TestProtSuperposePdbs)
-from test_phenix import (TestVersion)
-from test_phenix_pdb_cif import (TestImportBase, TestImportData,
+from .test_phenix import (TestVersion)
+from .test_phenix_pdb_cif import (TestImportBase, TestImportData,
                                  TestPhenixPdbCif)

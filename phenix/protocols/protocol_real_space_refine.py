@@ -27,7 +27,7 @@
 
 import os
 
-from pyworkflow.em import AtomStruct
+from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
@@ -37,7 +37,7 @@ from phenix.constants import (REALSPACEREFINE,
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
 from phenix.protocols import retry, fromCIFTommCIF
-from protocol_refinement_base import PhenixProtRunRefinementBase
+from .protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
 
 
@@ -167,12 +167,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                   cwd=os.path.abspath(self._getExtraPath()),
                   listAtomStruct=[atomStruct], log=self._log)
         except:
-            print "WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
+            print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
                   " failure: High number of nonbonded interaction distances " \
                   "< 0.5. This error has been disable by running the same " \
                   "command with the same following additional " \
                   "argument:\npdb_interpretation.clash_guard." \
-                  "nonbonded_distance_threshold=None "
+                  "nonbonded_distance_threshold=None ")
             args += " "
             args += "pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
@@ -184,9 +184,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
         self._getRSRefineOutput()
-        print "self.outAtomStructName: ", self.outAtomStructName
         atomStruct = os.path.abspath(self.outAtomStructName)
-        print "atomStruct: ", atomStruct
         # starting volume (.mrc)
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args = self._writeArgsMolProbity(atomStruct, vol)
@@ -260,7 +258,6 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         outAtomStructName = self._getExtraPath(
             inPdbName.replace("." + inPdbName.split(".")[1],
                               "_real_space_refined.cif"))
-        print "outAtomStructName: ", outAtomStructName
         # convert cif to mmcif by using maxit program
         # to get the right number and name of chains
         log = self._log

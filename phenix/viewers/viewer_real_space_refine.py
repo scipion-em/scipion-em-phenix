@@ -25,7 +25,7 @@
 # **************************************************************************
 
 from phenix.protocols.protocol_real_space_refine import PhenixProtRunRSRefine
-from viewer_validation_cryoem import PhenixProtRunValidationCryoEMViewer
+from .viewer_validation_cryoem import PhenixProtRunValidationCryoEMViewer
 
 class PhenixProtRunRSRefineViewer(PhenixProtRunValidationCryoEMViewer):
     """ Viewer for Phenix program real space refine

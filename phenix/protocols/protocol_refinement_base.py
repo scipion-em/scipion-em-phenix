@@ -1,11 +1,13 @@
 
 import os
+
+from pyworkflow import Config
 from pyworkflow.object import Float, Integer
-from pyworkflow.em.protocol import EMProtocol
+from pwem.protocols import EMProtocol
 from pyworkflow.protocol.params import (PointerParam, FloatParam, \
     StringParam)
 from phenix.constants import (PHENIXVERSION)
-from pyworkflow.em.convert.headers import Ccp4Header
+from pwem.convert.headers import Ccp4Header
 from phenix import Plugin
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 import collections
@@ -111,8 +113,8 @@ atomic structure derived from a cryo-EM density map.
 
         # If there is any error at this point it is related to config variables
         if errors:
-            errors.append("Check configuration file: "
-                          "~/.config/scipion/scipion.conf")
+            errors.append("Check configuration file: "+
+                          Config.SCIPION_LOCAL_CONFIG)
             errors.append("and set %s and PHENIX_HOME variables "
                           "properly."% label)
             if program is not None:

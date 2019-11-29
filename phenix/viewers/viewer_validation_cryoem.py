@@ -25,7 +25,7 @@
 # **************************************************************************
 
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
-from viewer_refinement_base import PhenixProtRefinementBaseViewer
+from .viewer_refinement_base import PhenixProtRefinementBaseViewer
 from pyworkflow.protocol.params import LabelParam, EnumParam
 from phenix import PHENIXVERSION
 import matplotlib.pyplot as plt
@@ -33,7 +33,6 @@ import matplotlib.font_manager
 from phenix import Plugin
 import collections
 import json
-import os
 
 
 class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
@@ -1144,13 +1143,13 @@ if data.model_vs_data.cc is not None:
         ax1.set_xticks(xticks)
         ax2.set_xticks(xticks)
 
-        ax1.set_xlabel(u'1/resolution (1/$\AA$)',
+        ax1.set_xlabel('1/resolution (1/$\AA$)',
                        fontproperties=matplotlib.font_manager.FontProperties(
                            family=['Helvetica', 'sans-serif'],
                            weight='bold',
                            size=12))
         labels1 = []
-        for i in xrange(len(xticks)):
+        for i in range(len(xticks)):
             labels1.append('%.2f' % xticks[i])
         ax1.set_xticklabels(labels1,
                             fontproperties=matplotlib.font_manager.FontProperties(
@@ -1171,19 +1170,19 @@ if data.model_vs_data.cc is not None:
         if idx is not None:
             ax1.axvline(x=idx, color='k', linestyle='dashed')
 
-        ax2.set_xlabel(u'resolution ($\AA$)',
+        ax2.set_xlabel('resolution ($\AA$)',
                        fontproperties=matplotlib.font_manager.FontProperties(
                            family=['Helvetica', 'sans-serif'],
                            weight='bold',
                            size=12))
 
         labels2 = []
-        for i in xrange(len(xticks)):
+        for i in range(len(xticks)):
             if (xticks[i] > 0.0):
                 x = 1.0 / xticks[i]
                 labels2.append('%.1f' % x)
             else:
-                labels2.append(u'\u221E')
+                labels2.append('\\u221E')
         ax2.set_xticklabels(labels2,
                             fontproperties=matplotlib.font_manager.FontProperties(
                                 family=['Courier', 'Monaco', 'monospace'],
