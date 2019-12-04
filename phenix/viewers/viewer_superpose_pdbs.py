@@ -30,6 +30,7 @@ import os
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer
 from pwem.viewers import Chimera
+from pwem import Domain
 from phenix import Plugin
 
 class PhenixProtRunSuperposePDBsViewer(Viewer):
@@ -75,8 +76,8 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
                 f.write("open %s\n" % os.path.abspath(filename))
 
         # run in the background
-        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
-        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd+"&")
+        chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
         return []
 
     def _getVols(self):
