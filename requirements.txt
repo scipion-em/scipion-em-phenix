@@ -1,1 +1,3 @@
+
 scipion-em-chimera==3.0.0
+scipion-em-ccp4==3.0.0
