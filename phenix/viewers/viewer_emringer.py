@@ -29,6 +29,8 @@ import json
 import os
 import collections
 import glob
+
+import PIL
 from PIL import Image
 from tkinter import *
 from tkinter import messagebox
@@ -37,6 +39,7 @@ from pyworkflow.protocol.params import LabelParam, EnumParam
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
 from pwem.viewers import TableView, Chimera
 from phenix import Plugin
+from pwem import Domain
 
 def errorWindow(tkParent, msg):
     try:
@@ -197,7 +200,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
 
         f.close()
         # run in the background
-        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
 
         return []
@@ -233,7 +236,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
 
     def showImage(self, fileName):
         fileName = os.path.join(self.plots, fileName)
-        img = Image.open(fileName)
+        img = PIL.Image.open(fileName)
         img.show()
 
     def _showThresholdScan(self, e=None):
