@@ -134,7 +134,7 @@ atomic structure derived from a cryo-EM density map.
         return fnVol
 
     def _parseFile(self, fileName):
-        with open(fileName) as f:
+        with open(fileName, encoding = "ISO-8859-1") as f:
             line = f.readline()
             while line:
                 words = line.strip().split()
