@@ -37,6 +37,7 @@ from pyworkflow.protocol.params import LabelParam, EnumParam
 from phenix import Plugin
 from pyworkflow.tests import *
 from pwem.objects import String
+from pwem import Domain
 
 def errorWindow(tkParent, msg):
     try:
@@ -652,7 +653,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
         f.close()
         # run in the background
-        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
         return []
 
@@ -676,7 +677,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         else:
             pdb = self.protocol.inputStructure.get()
 
-        CootRefine = Plugin.importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
+        CootRefine = Domain.importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
         project = self.protocol.getProject()
 
         args = {
