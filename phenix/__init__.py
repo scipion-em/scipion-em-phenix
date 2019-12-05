@@ -33,6 +33,7 @@ import subprocess
 import pyworkflow.utils as pwutils
 from phenix.constants import *
 from .bibtex import _bibtexStr  # Load bibtex dict with references
+from pwem.constants import MAXIT
 
 _logo = "phenix.png"
 _references = ['Adams_2010']
@@ -118,7 +119,7 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def defineBinaries(cls, env):
-        pass
-
+        pwem.Plugin.defineBinaries(env)
+        env.getTarget(MAXIT).setDefault(True)
 
 pwem.Domain.registerPlugin(__name__)
