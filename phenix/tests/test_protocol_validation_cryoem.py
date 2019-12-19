@@ -24,10 +24,8 @@
 
 # protocol to test the phenix method real_spacerefine
 
-from pwem.protocols.protocol_import import (ProtImportPdb,
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
-from pyworkflow import Config
-
 from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
@@ -180,7 +178,7 @@ class TestValCryoEM(TestImportData):
                                    overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -203,7 +201,7 @@ class TestValCryoEM(TestImportData):
                                    overallScore, delta=1.5)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def checkValCryoEMResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -226,7 +224,7 @@ class TestValCryoEM(TestImportData):
                                    overallScore, delta=1.5)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def testValCryoEMFromPDB(self):
@@ -378,8 +376,7 @@ class TestValCryoEM(TestImportData):
                   "command_line/validation_cryoem.py' does not exists.\n"
                   "Check if you need to upgrade your PHENIX version to run "
                   "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                  "Check configuration file: " +
-                  Config.SCIPION_LOCAL_CONFIG + "\n"
+                  "Check configuration file: ~/.config/scipion/scipion.conf\n"
                   "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                   "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -514,8 +511,7 @@ class TestValCryoEM(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: " +
-                            Config.SCIPION_LOCAL_CONFIG + "\n"
+                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -642,8 +638,7 @@ class TestValCryoEM(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: " +
-                            Config.SCIPION_LOCAL_CONFIG + "\n"
+                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 
@@ -779,8 +774,7 @@ class TestValCryoEM(TestImportData):
                             "command_line/validation_cryoem.py' does not exists.\n"
                             "Check if you need to upgrade your PHENIX version to run "
                             "VALIDATION_CRYOEM.\nYour current PHENIX version is 1.13.\n"
-                            "Check configuration file: " +
-                            Config.SCIPION_LOCAL_CONFIG + "\n"
+                            "Check configuration file: ~/.config/scipion/scipion.conf\n"
                             "and set VALIDATION_CRYOEM and PHENIX_HOME variables properly.\n"
                             "Current values:\nPHENIX_HOME = /usr/local/phenix-1.13-2998\n")
 

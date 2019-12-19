@@ -25,18 +25,16 @@
 # **************************************************************************
 
 import os
-
-from pyworkflow import Config
 from pyworkflow.object import String, Float, Integer
-from pwem.protocols import EMProtocol
+from pyworkflow.em.protocol import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
 from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
 
 try:
-    from pwem.objects import AtomStruct
+    from pyworkflow.em.data import AtomStruct
 except:
-    from pwem.objects import PdbFile as AtomStruct
+    from pyworkflow.em.data import PdbFile as AtomStruct
 from phenix import Plugin
 
 
@@ -108,8 +106,8 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
             errors.append("Cannot find " + program)
 
             # If there is any error at this point it is related to config variables
-            errors.append("Check configuration file: " +
-                          Config.SCIPION_LOCAL_CONFIG)
+            errors.append("Check configuration file: "
+                          "~/.config/scipion/scipion.conf")
             errors.append("and set PHENIX_HOME variables properly.")
             if program is not None:
                 errors.append("Current values:")

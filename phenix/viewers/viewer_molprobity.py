@@ -26,7 +26,7 @@
 # **************************************************************************
 
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
-from .viewer_refinement_base import PhenixProtRefinementBaseViewer
+from viewer_refinement_base import PhenixProtRefinementBaseViewer
 
 class PhenixProtRunMolprobityViewer(PhenixProtRefinementBaseViewer):
     """ Viewer for Phenix program Molprobity

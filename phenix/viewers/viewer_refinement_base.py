@@ -27,26 +27,28 @@
 
 import collections
 import json
+import os
+import glob
 from phenix import PHENIXVERSION
 import matplotlib.pyplot as plt
-from tkinter import *
-from tkinter import messagebox
+from tkMessageBox import showerror
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
-from pwem.viewers import TableView, Chimera
+from pyworkflow.em.viewers import TableView, Chimera
 from pyworkflow.protocol.params import LabelParam, EnumParam
+from pyworkflow.utils import importFromPlugin
 from phenix import Plugin
 from pyworkflow.tests import *
-from pwem.objects import String
+from pyworkflow.em.data import String
 
 def errorWindow(tkParent, msg):
     try:
         # if tkRoot is null the error message may be behind
         # other windows
-        messagebox.showerror("Error",  # bar title
-                              msg,  # message
-                              parent=tkParent)
+        showerror("Error",  # bar title
+                  msg,  # message
+                  parent=tkParent)
     except:
-        print(("Error:", msg))
+        print("Error:", msg)
 
 
 class PhenixProtRefinementBaseViewer(ProtocolViewer):
@@ -230,7 +232,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                 '(sorted by deviation)')
             if (self.dictOverall['_protein'] == True):
                 group = form.addGroup('Protein')
-                self.plotList = ['Ramachandran plot', 'Chi1-Chi2 plot']
+                self.plotList = [u'Ramachandran plot', u'Chi1-Chi2 plot']
                 group.addParam('plotType', EnumParam,
                                 choices=self.plotList, default=0,
                                 label="Select plot:",
@@ -441,15 +443,15 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                  "the N highest peaks in the model-calculated "
                                  "map and the N highest peaks in the "
                                  "experimental map.\n")
-                self.residueTypeList = ['Protein', 'Other', 'Water',
-                                        'Everything']
+                self.residueTypeList = [u'Protein', u'Other', u'Water',
+                                        u'Everything']
                 group.addParam('residueType', EnumParam,
                                 choices=self.residueTypeList, default=0,
                                 label="Residue Type:",
                                 help="Select a residue Type. Protein is chosen by "
                                  "default.\n")
-                self.ccBelowList = ['0.1', '0.2', '0.3', '0.4', '0.5', '0.6',
-                                    '0.7', '0.8', '0.9', '1.0']
+                self.ccBelowList = [u'0.1', u'0.2', u'0.3', u'0.4', u'0.5', u'0.6',
+                                    u'0.7', u'0.8', u'0.9', u'1.0']
                 group.addParam('ccIndex', EnumParam,
                                 choices=self.ccBelowList, default=7,
                                 label="Show CC below:",
@@ -652,7 +654,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
         f.close()
         # run in the background
-        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
         return []
 
@@ -676,7 +678,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         else:
             pdb = self.protocol.inputStructure.get()
 
-        CootRefine = Plugin.importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
+        CootRefine = importFromPlugin('ccp4.protocols', 'CootRefine', doRaise=True)
         project = self.protocol.getProject()
 
         args = {
@@ -930,7 +932,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
     def _showResults(self, headerList, dictX, val, mesg, title):
         dataList = []
-        for k, v in list(dictX.items()):
+        for k, v in dictX.iteritems():
             if k[0] == "_":
                 continue
             if isinstance(v, int):
@@ -1040,10 +1042,10 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                             self._parseFileAtom1Atom2(words, f)
                             self.dictBLRestraints['Number of outliers '\
                                                   '> 4sigma'] = len(self.Atom1)
-                            self.blDataList = list(zip(self.Atom1, self.Atom2,
-                                                       self.IdealValue,
-                                                       self.ModelValue,
-                                                       self.Deviation))
+                            self.blDataList = zip(self.Atom1, self.Atom2,
+                                                  self.IdealValue,
+                                                  self.ModelValue,
+                                                  self.Deviation)
 
                     elif (words[0] == 'angle' or words[0] == 'Angle' and words[1] == ':'):
                         self.dictBARestraints['Number of restraints'] = int(
@@ -1589,12 +1591,12 @@ if data.ramalyze is not None:
         else:
             for i in range(len(listL)):
                 if listL[i][5] <= float(self.ccBelowList[decimal_index]):
-                    self.RSCCList.append((str(listL[i][0]),
-                                          str(listL[i][1]),
-                                          str(listL[i][2]),
-                                          str(listL[i][3]),
-                                          str(listL[i][4]),
-                                          str(listL[i][5])))
+                    self.RSCCList.append((unicode(listL[i][0]),
+                                          unicode(listL[i][1]),
+                                          unicode(listL[i][2]),
+                                          unicode(listL[i][3]),
+                                          unicode(listL[i][4]),
+                                          unicode(listL[i][5])))
 
 
 

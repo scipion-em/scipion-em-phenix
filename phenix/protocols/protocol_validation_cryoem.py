@@ -28,7 +28,7 @@ import os
 from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, PHENIXVERSION
 from phenix import Plugin
 from phenix.protocols import retry
-from .protocol_refinement_base import PhenixProtRunRefinementBase
+from protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunValidationCryoEM(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
@@ -67,9 +67,9 @@ atomic structure inferred from an electron density map.
     def runValidationCryoEMStep(self):
         version = Plugin.getPhenixVersion()
         if version == '1.13':
-            print("PHENIX version: 1.13")
+            print "PHENIX version: 1.13"
         else:
-            print("PHENIX version: ", version)
+            print "PHENIX version: ", version
 
         fileName = self.inputStructure.get().getFileName()
         atomStruct = os.path.abspath(fileName)

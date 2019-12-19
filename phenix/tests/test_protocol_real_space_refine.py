@@ -24,7 +24,7 @@
 
 # protocol to test the phenix method real_spacerefine
 
-from pwem.protocols.protocol_import import (ProtImportPdb,
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
@@ -183,7 +183,7 @@ class TestPhenixRSRefine(TestImportData):
                                    overallScore, places)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
@@ -206,7 +206,7 @@ class TestPhenixRSRefine(TestImportData):
                                    overallScore, delta=0.75)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def testPhenixRSRefineFromPDB(self):
@@ -236,7 +236,7 @@ class TestPhenixRSRefine(TestImportData):
             self.launchProtocol(protRSRefine)
         except Exception as e:
             self.assertTrue(True, "This test should return a error message as '"
-                            " Input volume cannot be EMPTY.'\n")
+                  " Input volume cannot be EMPTY.'\n")
 
             return
         self.assertTrue(False)

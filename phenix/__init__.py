@@ -27,18 +27,18 @@
 
 
 import os
-import pwem
+import pyworkflow.em
 import subprocess
 
 import pyworkflow.utils as pwutils
 from phenix.constants import *
-from .bibtex import _bibtexStr  # Load bibtex dict with references
+from bibtex import _bibtex  # Load bibtex dict with references
 
 _logo = "phenix.png"
 _references = ['Adams_2010']
 
 
-class Plugin(pwem.Plugin):
+class Plugin(pyworkflow.em.Plugin):
     _homeVar = PHENIX_HOME
     _pathVars = [PHENIX_HOME]
     _supportedVersions = PHENIXVERSION
@@ -48,7 +48,7 @@ class Plugin(pwem.Plugin):
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
         else:
-            cls._defineEmVar(PHENIX_HOME, ('phenix-' + (Plugin.getPhenixVersion())))
+            cls._defineEmVar(PHENIX_HOME, ('phenix-' + Plugin.getPhenixVersion()))
 
     @classmethod
     def getEnviron(cls, first=True):
@@ -108,7 +108,6 @@ class Plugin(pwem.Plugin):
                            stderr=subprocess.PIPE)
         stdout, stderr = pid.communicate()
         searchKey = "Version: "
-        stdout = stdout.decode("utf-8")
         place = stdout.find(searchKey)
         return stdout[place + len(searchKey):place + len(searchKey)+4]
 
@@ -121,4 +120,4 @@ class Plugin(pwem.Plugin):
         pass
 
 
-pwem.Domain.registerPlugin(__name__)
+pyworkflow.em.Domain.registerPlugin(__name__)

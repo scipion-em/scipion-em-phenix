@@ -30,23 +30,25 @@ import os
 import collections
 import glob
 from PIL import Image
-from tkinter import *
-from tkinter import messagebox
+from tkMessageBox import showerror
 from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from pyworkflow.protocol.params import LabelParam, EnumParam
+from pyworkflow.utils import importFromPlugin
 from pyworkflow.viewer import DESKTOP_TKINTER, WEB_DJANGO, ProtocolViewer
-from pwem.viewers import TableView, Chimera
+from pyworkflow.em.viewers import TableView, Chimera
 from phenix import Plugin
+
+
 
 def errorWindow(tkParent, msg):
     try:
         # if tkRoot is null the error message may be behind
         # other windows
-        messagebox.showerror("Error",  # bar title
-                              msg,  # message
-                              parent=tkParent)
+        showerror("Error",  # bar title
+                  msg,  # message
+                  parent=tkParent)
     except:
-        print(("Error:", msg))
+        print("Error:", msg)
 
 
 class PhenixProtRunEMRingerViewer(ProtocolViewer):
@@ -197,7 +199,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
 
         f.close()
         # run in the background
-        chimeraPlugin = Plugin.importFromPlugin('chimera', 'Plugin', doRaise=True)
+        chimeraPlugin = importFromPlugin('chimera', 'Plugin', doRaise=True)
         chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
 
         return []
@@ -213,7 +215,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
 
         headerList = ['statistic', 'value']
         dataList = []
-        for k, v in list(self.dataDict.items()):
+        for k, v in self.dataDict.iteritems():
             if k[0] == "_":
                 continue
             elif isinstance(v, int):

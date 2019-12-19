@@ -27,7 +27,7 @@
 import os
 from phenix.constants import MOLPROBITY, PHENIXVERSION
 from phenix import Plugin
-from .protocol_refinement_base import PhenixProtRunRefinementBase
+from protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix.protocols import retry
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
@@ -65,9 +65,9 @@ atomic structure inferred from an electron density map.
     def runMolprobityStep(self):
         version = Plugin.getPhenixVersion()
         if version == '1.13':
-            print("PHENIX version: 1.13")
+            print "PHENIX version: 1.13"
         else:
-            print(("PHENIX version: ", version))
+            print "PHENIX version: ", version
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
         self.atomStruct = os.path.abspath(fileName)

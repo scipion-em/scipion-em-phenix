@@ -24,7 +24,7 @@
 
 # protocol to test the validation method EMRinger
 
-from pwem.protocols.protocol_import import (ProtImportPdb,
+from pyworkflow.em.protocol.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from pyworkflow.tests import *
@@ -291,15 +291,15 @@ class TestEMRingerValidation2(TestImportData):
                                 'EMRinger Score'], EMScore, places)
         except Exception as e:
             # print error since test does not print it
-            print(("Exception error:", str(e)))
+            print("Exception error:", str(e))
             raise self.failureException(str(e))
 
     def testEMRingerValidationFromPDB(self):
         """ This test checks that EMRinger validation protocol runs with an
         atomic structure; No Volume was provided and an error message is
         expected"""
-        print("Run EMRinger validation protocol from imported pdb file " \
-              "without imported or pdb-associated volume")
+        print "Run EMRinger validation protocol from imported pdb file " \
+              "without imported or pdb-associated volume"
 
         # import PDB
         structure_PDB = self._importStructurePDBWoVol()
@@ -317,8 +317,8 @@ class TestEMRingerValidation2(TestImportData):
             self.launchProtocol(protEMRinger)
         except Exception as e:
             self.assertTrue(True)
-            print("This test should return a error message as '" \
-                  " Error: You should provide a volume.\n")
+            print "This test should return a error message as '" \
+                  " Error: You should provide a volume.\n"
 
             return
         self.assertTrue(False)
@@ -327,8 +327,8 @@ class TestEMRingerValidation2(TestImportData):
         """ This test checks that EMRinger validation protocol runs with an
         atomic structure; No Volume was provided and an error message is
         expected"""
-        print("Run EMRinger validation protocol from imported pdb file " \
-              "with pdb-associated volume")
+        print "Run EMRinger validation protocol from imported pdb file " \
+              "with pdb-associated volume"
 
         # import PDB
         structure2_PDB = self._importStructurePDBWithVol()
@@ -356,8 +356,8 @@ class TestEMRingerValidation2(TestImportData):
         """ This test checks that EMRinger validation protocol runs with an
         atomic structureand associated
         """
-        print("Run EMRinger validation protocol from imported cif file " \
-              "with cif-associated volume")
+        print "Run EMRinger validation protocol from imported cif file " \
+              "with cif-associated volume"
 
         # import PDB
         structure2_mmCIF = self._importStructuremmCIFWithVol()
@@ -386,8 +386,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot"
 
         # Import Volume
         volume_coot1 = self._importVolCoot1()
@@ -417,8 +417,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot"
 
         # Import Volume
         volume_coot2 = self._importVolCoot2()
@@ -448,8 +448,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac without mask
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask"
 
         # Import Volume
         volume_refmac1 = self._importVolRefmac1()
@@ -480,8 +480,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac without mask
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask"
 
         # Import Volume
         volume_refmac2 = self._importVolRefmac2()
@@ -512,8 +512,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac without mask
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "previously fitted and refined by Coot and Refmac without mask")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "previously fitted and refined by Coot and Refmac without mask"
 
         # Import Volume
         volume_refmac3 = self._importVolRefmac3()
@@ -544,8 +544,8 @@ class TestEMRingerValidation2(TestImportData):
         volume provided directly as inputVol, the input PDB was fitted to
         the volume and refined previously by coot and refmac in another project
          """
-        print("Run EMRinger validation from imported volume and pdb file " \
-              "already refined by Coot and Refmac in another project")
+        print "Run EMRinger validation from imported volume and pdb file " \
+              "already refined by Coot and Refmac in another project"
 
         # Import Volume
         volume3 = self._importVolume3()
@@ -574,8 +574,8 @@ class TestEMRingerValidation2(TestImportData):
         """ This test checks that EMRinger validation protocol runs with
         a pdb and inputVol associated
          """
-        print("Run EMRinger validation to compare an imported pdb " \
-              "file obtained in another project and volume")
+        print "Run EMRinger validation to compare an imported pdb " \
+              "file obtained in another project and volume"
 
         # Import Volume
         volume_emringer1 = self._importVolEMRinger1()
@@ -605,8 +605,8 @@ class TestEMRingerValidation2(TestImportData):
         """ This test checks that EMRinger validation protocol runs with
         a pdb and inputVol associated
          """
-        print("Run EMRinger validation to compare an imported pdb " \
-              "file obtained in another project and volume")
+        print "Run EMRinger validation to compare an imported pdb " \
+              "file obtained in another project and volume"
 
         # Import Volume
         volume_emringer1 = self._importVolEMRinger1()
