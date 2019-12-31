@@ -26,14 +26,12 @@
 import os
 
 from pwem.convert import Ccp4Header
-from pwem.convert.atom_struct import retry
+from pwem.convert.atom_struct import retry, fromPDBToCIF, fromCIFTommCIF
 
 from pyworkflow import Config
-from pyworkflow.object import String, Float, Integer
 from pwem.protocols import EMProtocol
-from pyworkflow.protocol.params import PointerParam, FloatParam, IntParam
-from phenix.constants import SUPERPOSE, PHENIX_HOME, DOCKINMAP, DISPLAY
-from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
+from pyworkflow.protocol.params import PointerParam, FloatParam, IntParam, LEVEL_ADVANCED
+from phenix.constants import  PHENIX_HOME, DOCKINMAP, DISPLAY
 
 try:
     from pwem.objects import AtomStruct
@@ -43,7 +41,7 @@ from phenix import Plugin
 
 
 class PhenixProtRunDockInMap(EMProtocol):
-    """Superpose two PDBs so that they optimally match """
+    """Docking of a PDB (one or several copies) into a map """
     _label = 'dock in map'
     _program = ""
     # _version = VERSION_1_2
@@ -65,8 +63,14 @@ class PhenixProtRunDockInMap(EMProtocol):
                       label='Input atom structure',
                       help="PDBx/mmCIF to be fitted against the volume. ")
         form.addParam('modelCopies', IntParam,
+                      default=1,
                       label='Atom structure number of copies',
                       help="Write here the number of copies of your atom structure. ")
+        form.addParam('numberOfThreads', IntParam,
+                      expertLevel=LEVEL_ADVANCED,
+                      default=1,
+                      label='Number of threads',
+                      help="Write here the number of threads to run the protocol. ")
 
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
@@ -89,18 +93,30 @@ class PhenixProtRunDockInMap(EMProtocol):
     def runDockInMapStep(self):
         # starting structure
         atomStructFileName = self.inputStructure.get().getFileName()
-        self.atomStruct = os.getcwd() + "/" + atomStructFileName
+        atomStruct = os.getcwd() + "/" + atomStructFileName
         # starting map (.mrc)
         mapFile = self.DOCKINMAPFILE
-        self.vol = os.getcwd() + "/" + self._getExtraPath(mapFile)
-
-        args = self._writeArgsDocKInMap(
-            self.atomStruct, self.modelCopies.get(), self.vol, self.resolution.get())
-
+        vol = os.getcwd() + "/" + self._getExtraPath(mapFile)
+        args = self._writeArgsDocKInMap(vol, atomStruct)
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(DOCKINMAP),
             # args, cwd=os.path.abspath(self._getExtraPath()),
-            args, cwd=self._getExtraPath(),
-            listAtomStruct=[self.atomStruct], log=self._log)
+            args, cwd=cwd,
+            listAtomStruct=[atomStruct], log=self._log)
+
+    def createOutputStep(self):
+        self._getDockInMapOutput()
+        pdb = AtomStruct()
+        pdb.setFileName(self.outAtomStructName)
+
+        if self.inputVolume1.get() is not None:
+            pdb.setVolume(self.inputVolume1.get())
+        else:
+            pdb.setVolume(self.inputStructure.get().getVolume())
+        self._defineOutputs(outputPdb=pdb)
+        self._defineSourceRelation(self.inputStructure.get(), pdb)
+        if self.inputVolume1.get() is not None:
+            self._defineSourceRelation(self.inputVolume1.get(), pdb)
 
         # --------------------------- INFO functions ---------------------------
 
@@ -130,7 +146,7 @@ class PhenixProtRunDockInMap(EMProtocol):
         # Check that the input volume exist
         if self._getInputVolume() is None:
             errors.append("Error: You should provide a map.\n")
-        if self.atomStruct is None:
+        if self.inputStructure is None:
             errors.append("Error: You should provide an atomic structure to fit.\n")
 
         return errors
@@ -176,14 +192,25 @@ class PhenixProtRunDockInMap(EMProtocol):
         from distutils.spawn import find_executable
         return find_executable(name) is not None
 
-    def _writeArgsDocKInMap(self, atomStruct, modelCopies, vol, resolution):
-        args = " search_model="
-        args += atomStruct
-        args += " search_model_copies="
-        args += modelCopies
-        args += " search_map_file="
-        args += vol
-        args += " resolution="
-        args += resolution
+    def _getDockInMapOutput(self):
+        outAtomStructName = os.getcwd() + "/" +\
+                            self._getExtraPath("placed_model.pdb")
+        # convert cif to mmcif by using maxit program
+        # to get the right number and name of chains
+        log = self._log
+        self.outAtomStructName = outAtomStructName.replace("pdb", "cif")
+        fromPDBToCIF(outAtomStructName, self.outAtomStructName, log)
+        fromCIFTommCIF(self.outAtomStructName, self.outAtomStructName, log)
+
+    def _writeArgsDocKInMap(self, vol, atomStruct):
+        args = ""
+        args += " map_file=%s" % vol
+        args += " resolution=%f" % self.resolution
+        args += " search_model=%s" % atomStruct
+        if self.modelCopies > 1:
+            args += " search_model_copies=%d" % self.modelCopies
+            args += " use_symmetry=False"
+        if self.numberOfThreads > 1:
+            args += " nproc=%d" % self.numberOfThreads
         return args
 
