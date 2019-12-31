@@ -158,8 +158,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         }
 
     def _displayMapModel(self, e=None):
-        bildFileName = os.path.abspath(self.protocol._getTmpPath(
-            "axis_output.bild"))
+        bildFileName = self.protocol._getTmpPath("axis_output.bild")
 
         _inputVol = self.protocol.inputVolume.get()
         if _inputVol is None:
@@ -175,6 +174,10 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         counter = 0
         fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
         f = open(fnCmd, 'w')
+        # change to workingDir
+        # If we do not use cd and the project name has an space
+        # the protocol fails even if we pass absolute paths
+        f.write('cd %s\n' % os.getcwd())
         # reference axis model = 0
         f.write("open %s\n" % bildFileName)
         f.write("cofr 0,0,0\n")  # set center of coordinates
@@ -183,8 +186,8 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         counter += 1  # 1
         fnVol = self._getInputVolume()
         if fnVol is not None:
-            EMRINGERFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                    self.protocol.EMRINGERFILE))
+            EMRINGERFILENAME = self.protocol._getExtraPath(
+                               self.protocol.EMRINGERFILE)
             f.write("open %s\n" % EMRINGERFILENAME)
             x, y, z = fnVol.getOrigin(force=True).getShifts()
             sampling = fnVol.getSamplingRate()
@@ -194,14 +197,14 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
 
         # input PDB (usually from coot)
         counter += 1  # 2
-        pdbFileName = os.path.abspath(
-            self.protocol.inputStructure.get().getFileName())
+        pdbFileName = self.protocol.inputStructure.get().getFileName()
         f.write("open %s\n" % pdbFileName)
 
         f.close()
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
-        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&",
+                                        cwd=os.getcwd())
 
         return []
 
