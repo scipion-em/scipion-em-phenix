@@ -28,7 +28,7 @@ import os
 from phenix.constants import MOLPROBITY, PHENIXVERSION
 from phenix import Plugin
 from .protocol_refinement_base import PhenixProtRunRefinementBase
-from phenix.protocols import retry
+from pwem.convert.atom_struct import retry
 
 class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
@@ -70,18 +70,21 @@ atomic structure inferred from an electron density map.
             print(("PHENIX version: ", version))
         # PDBx/mmCIF
         fileName = self.inputStructure.get().getFileName()
-        self.atomStruct = os.path.abspath(fileName)
+        # self.atomStruct = os.path.abspath(fileName)
+        self.atomStruct = os.getcwd() + "/" + fileName
         # starting volume (.mrc)
         if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
                 is not None:
             tmpMapFile = self.MOLPROBITYFILE
-            self.vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+            # self.vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+            self.vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
             args = self._writeArgsMolProbityExpand(self.atomStruct, self.vol)
         else:
             args = self._writeArgsMolProbityExpand(self.atomStruct, vol=None)
         # script with auxiliary files
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
-              args, cwd=os.path.abspath(self._getExtraPath()),
+              # args, cwd=os.path.abspath(self._getExtraPath()),
+              args, cwd=self._getExtraPath(),
               listAtomStruct=[self.atomStruct], log=self._log)
 
     def createOutputStep(self):
@@ -91,13 +94,15 @@ atomic structure inferred from an electron density map.
             self._parseFile(MOLPROBITYOUTFILENAME)
         except:
             if self.MOLPROBITYFILE is not None:
-                self.vol = os.path.abspath(self._getExtraPath(self.MOLPROBITYFILE))
+                # self.vol = os.path.abspath(self._getExtraPath(self.MOLPROBITYFILE))
+                self.vol = self._getExtraPath(self.MOLPROBITYFILE)
                 args = self._writeArgsMolProbityExpand(self.atomStruct, self.vol)
             else:
                 args = self._writeArgsMolProbityExpand(self.atomStruct, vol=None)
             args += " allow_polymer_cross_special_position=True "
             retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
-                  args, cwd=os.path.abspath(self._getExtraPath()),
+                  # args, cwd=os.path.abspath(self._getExtraPath()),
+                  args, cwd=self._getExtraPath(),
                   listAtomStruct=[self.atomStruct], log=self._log)
             self._parseFile(MOLPROBITYOUTFILENAME)
         self._store()
