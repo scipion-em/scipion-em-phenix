@@ -38,6 +38,7 @@ from phenix import Plugin
 from pyworkflow.tests import *
 from pwem.objects import String
 from pwem import Domain
+from collections.abc import ValuesView
 
 def errorWindow(tkParent, msg):
     try:
@@ -578,8 +579,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         }
 
     def _displayMapModel(self, e=None):
-        bildFileName = os.path.abspath(self.protocol._getTmpPath(
-            "axis_output.bild"))
+        bildFileName = self.protocol._getTmpPath("axis_output.bild")
         try:
             _inputVol = self.protocol.inputVolume.get()
         except:
@@ -600,6 +600,10 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         counter = 0
         fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
         f = open(fnCmd, 'w')
+        # change to workingDir
+        # If we do not use cd and the project name has an space
+        # the protocol fails even if we pass absolute paths
+        f.write('cd %s\n' % os.getcwd())
         # reference axis model = 0
         f.write("open %s\n" % bildFileName)
         f.write("cofr 0,0,0\n")  # set center of coordinates
@@ -609,15 +613,15 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         if self._getInputVolume() is not None:
             fnVol = self._getInputVolume()
             try:
-                VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                    self.protocol.MOLPROBITYFILE))
+                VOLUMEFILENAME = self.protocol._getExtraPath(
+                    self.protocol.MOLPROBITYFILE)
             except:
                 if self.protocol.hasAttribute('REALSPACEFILE'):
-                    VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                        self.protocol.REALSPACEFILE))
+                    VOLUMEFILENAME = self.protocol._getExtraPath(
+                        self.protocol.REALSPACEFILE)
                 elif self.protocol.hasAttribute('VALIDATIONCRYOEMFILE'):
-                    VOLUMEFILENAME = os.path.abspath(self.protocol._getExtraPath(
-                        self.protocol.VALIDATIONCRYOEMFILE))
+                    VOLUMEFILENAME = self.protocol._getExtraPath(
+                        self.protocol.VALIDATIONCRYOEMFILE)
 
             f.write("open %s\n" % VOLUMEFILENAME)
             x, y, z = fnVol.getOrigin(force=True).getShifts()
@@ -628,10 +632,10 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             if len(fnVol.getHalfMaps()) > 0:
                 for halfMap in fnVol.getHalfMaps().split(','):
                     counter += 1
-                    if not os.path.abspath(halfMap).endswith(".mrc"):
-                        f.write("open %s\n" % (os.path.abspath(halfMap).split(".")[0] + ".mrc"))
+                    if not halfMap.endswith(".mrc"):
+                        f.write("open %s\n" % halfMap.split(".")[0] + ".mrc")
                     else:
-                        f.write("open %s\n" % os.path.abspath(halfMap))
+                        f.write("open %s\n" % halfMap)
                     f.write("volume#%d style surface voxelSize %f\n" %
                             (counter, sampling))
                     f.write("volume#%d origin %0.2f,%0.2f,%0.2f\n" %
@@ -639,22 +643,21 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
         # input PDB (usually from coot)
         counter += 1  # 2
-        pdbFileName = os.path.abspath(
-            self.protocol.inputStructure.get().getFileName())
+        pdbFileName = self.protocol.inputStructure.get().getFileName()
         f.write("open %s\n" % pdbFileName)
 
         # refined PDB
         if self.protocol.hasAttribute('outputPdb') and \
                 (len(os.listdir(self.protocol._getExtraPath())) > 5):
             counter += 1  # 3
-            pdbFileName = os.path.abspath(
-                self.protocol.outputPdb.getFileName())
+            pdbFileName = self.protocol.outputPdb.getFileName()
             f.write("open %s\n" % pdbFileName)
 
         f.close()
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
-        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&",
+                                        cwd=os.getcwd())
         return []
 
     def _visualizeMolProbityResults(self, e=None):
