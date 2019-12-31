@@ -31,7 +31,7 @@ from pyworkflow.object import String, Float, Integer
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
-from phenix.protocols import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
+from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
 
 try:
     from pwem.objects import AtomStruct
@@ -69,9 +69,10 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
         args = os.path.abspath(self.inputStructureFixed.get().getFileName())
         args += " "
         args += os.path.abspath(self.inputStructureMoving.get().getFileName())
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         try:
             Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args,
-                                    cwd=self._getExtraPath())
+                                    extraEnvDict=None, cwd=cwd)
         except:
             # This exception will run when using phenix v. 1.16 after running
             # real space refine the .cif file generated can not be recognized by
@@ -150,6 +151,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                 line = f.readline()
 
     def _runChangingCifFormatSuperpose(self, list_args):
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         try:
             if list_args[0].endswith(".cif") and list_args[1].endswith(".cif"):
                 try:
@@ -159,7 +161,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
                     args1 = list_args1[0] + " " + list_args1[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
-                                            cwd=self._getExtraPath())
+                                            extraEnvDict=None, cwd=cwd)
                 except:
                     # convert cifs to pdbs
                     list_args2 = []
@@ -168,7 +170,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                             list_args[i], list_args[i].replace('.cif', '.pdb')))
                     args2 = list_args2[0] + " " + list_args2[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
-                                            cwd=self._getExtraPath())
+                                            extraEnvDict=None, cwd=cwd)
             elif list_args[0].endswith(".cif") and list_args[1].endswith(".pdb"):
                 try:
                     # pdbs: convert cif to pdb
@@ -177,7 +179,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args[0], list_args[0].replace('.cif', '.pdb')))
                     args1 = list_args1[0] + " " + list_args[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
-                                            cwd=self._getExtraPath())
+                                            extraEnvDict=None, cwd=cwd)
                 except:
                     try:
                         # cifs: convert pdb to cif
@@ -186,7 +188,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                             list_args[1], list_args[1].replace('.pdb', '.cif')))
                         args2 = list_args[0] + " " + list_args2[0]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
-                                                cwd=self._getExtraPath())
+                                                extraEnvDict=None, cwd=cwd)
                     except:
                         # upgrade cif
                         list_args3 = []
@@ -196,7 +198,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                                 list_args0[i], list_args0[i]))
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
-                                                args3, cwd=self._getExtraPath())
+                                                args3, extraEnvDict=None, cwd=cwd)
             elif list_args[0].endswith(".pdb") and list_args[1].endswith(".cif"):
                 try:
                     # pdbs: convert cif to pdb
@@ -205,7 +207,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args[1], list_args[1].replace('.cif', '.pdb')))
                     args1 = list_args[0] + " " + list_args1[0]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
-                                            cwd=self._getExtraPath())
+                                            extraEnvDict=None, cwd=cwd)
                 except:
                     try:
                         # cifs: convert pdb to cif
@@ -214,7 +216,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                             list_args[0], list_args[0].replace('.pdb', '.cif')))
                         args2 = list_args2[0] + " " + list_args[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
-                                                cwd=self._getExtraPath())
+                                                extraEnvDict=None, cwd=cwd)
                     except:
                         # upgrade cifs
                         list_args3 = []
@@ -224,7 +226,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                                 list_args0[i], list_args0[i]))
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
-                                                args3, cwd=self._getExtraPath())
+                                                args3, extraEnvDict=None, cwd=cwd)
         except:
             # biopython conversion
             aSH = AtomicStructHandler()
@@ -234,7 +236,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     aSH.write(list_args[i])
                     args = list_args[0] + " " + list_args[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
-                                            args, cwd=self._getExtraPath())
+                                            args, extraEnvDict=None, cwd=cwd)
             except:
                 print("CIF file standarization failed.")
 
