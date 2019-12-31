@@ -37,7 +37,7 @@ from pyworkflow.object import String
 from pyworkflow.protocol.params import BooleanParam, PointerParam
 from phenix import Plugin
 from phenix.constants import PHENIX_HOME
-from phenix.protocols import retry
+from pwem.convert.atom_struct import retry
 
 class PhenixProtRunEMRinger(EMProtocol):
     """EMRinger is a Phenix application to validate the agreement between
@@ -95,8 +95,10 @@ the atomic structure backbone has been perfectly fitted to the map.
 
     def runEMRingerStep(self):
         inPDBAtomStructFile = self.inputStructure.get().getFileName()
-        atomStruct = os.path.abspath(inPDBAtomStructFile)
-        vol = os.path.abspath(self._getExtraPath(self.EMRINGERFILE))
+        # atomStruct = os.path.abspath(inPDBAtomStructFile)
+        atomStruct = os.getcwd() + "/" + inPDBAtomStructFile
+        # vol = os.path.abspath(self._getExtraPath(self.EMRINGERFILE))
+        vol = os.getcwd() + "/" + self._getExtraPath(self.EMRINGERFILE)
         args = self._writeArgsEMRinger(atomStruct, vol)
         # script with auxiliary files
         import sys
@@ -104,7 +106,8 @@ the atomic structure backbone has been perfectly fitted to the map.
         # import time
         # time.sleep(30)
         retry(Plugin.runPhenixProgram, Plugin.getProgram(EMRINGER),
-              args, cwd=os.path.abspath(self._getExtraPath()),
+              # args, cwd=os.path.abspath(self._getExtraPath()),
+              args, cwd=self._getExtraPath(),
               listAtomStruct=[atomStruct], log=self._log)
               # clean_dir=glob.glob(self._getExtraPath() + ("/*_plots"))[-1]
 
