@@ -27,7 +27,7 @@
 import os
 from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, PHENIXVERSION
 from phenix import Plugin
-from phenix.protocols import retry
+from pwem.convert.atom_struct import retry
 from .protocol_refinement_base import PhenixProtRunRefinementBase
 
 class PhenixProtRunValidationCryoEM(PhenixProtRunRefinementBase):
@@ -86,18 +86,16 @@ atomic structure inferred from an electron density map.
         numberOfThreads = self.numberOfThreads.get()
 
         args = self._writeArgsMolProbity(atomStruct, vol=volume)
-
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         # script with auxiliary files
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
-              args, cwd=os.path.abspath(self._getExtraPath()),
-              listAtomStruct=[atomStruct], log=self._log)
+              args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log)
 
         args = self._writeArgsValCryoEM(atomStruct, volume, self.vol)
 
         if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
             retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
-                  args, cwd=os.path.abspath(self._getExtraPath()),
-                  listAtomStruct=[atomStruct], log=self._log)
+                  args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log)
 
     def createOutputStep(self):
         VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
