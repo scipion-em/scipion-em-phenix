@@ -23,9 +23,6 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-from pwem.convert.atom_struct import retry
-from pwem.convert.atom_struct import fromCIFTommCIF, fromCIFToPDB, fromPDBToCIF
-from pwem.convert.atom_struct import AtomicStructHandler
 
 from .protocol_emringer import PhenixProtRunEMRinger
 from .protocol_molprobity import PhenixProtRunMolprobity
@@ -33,3 +30,4 @@ from .protocol_real_space_refine import PhenixProtRunRSRefine
 from .protocol_refinement_base import PhenixProtRunRefinementBase
 from .protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
 from .protocol_validation_cryoem import PhenixProtRunValidationCryoEM
+from .protocol_dock_in_map import PhenixProtRunDockInMap
