@@ -36,7 +36,7 @@ from phenix.constants import (REALSPACEREFINE,
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
-from phenix.protocols import retry, fromCIFTommCIF
+from pwem.convert.atom_struct import retry, fromCIFTommCIF
 from .protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
 
@@ -158,13 +158,17 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     # --------------------------- STEPS functions --------------------------
     def runRSrefineStep(self, tmpMapFile):
-        atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
-        vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+        # atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
+        atomStruct = os.getcwd() + "/" + self.inputStructure.get().getFileName()
+        # vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+        vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
         args = self._writeArgsRSR(atomStruct, vol)
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         try:
             retry(Plugin.runPhenixProgram,
                   Plugin.getProgram(REALSPACEREFINE), args,
-                  cwd=os.path.abspath(self._getExtraPath()),
+                  # cwd=os.path.abspath(self._getExtraPath()),
+                  cwd=cwd,
                   listAtomStruct=[atomStruct], log=self._log)
         except:
             print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
@@ -178,34 +182,43 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                     "nonbonded_distance_threshold=None"
             retry(Plugin.runPhenixProgram,
                   Plugin.getProgram(REALSPACEREFINE), args,
-                  cwd=os.path.abspath(self._getExtraPath()),
+                  # cwd=os.path.abspath(self._getExtraPath()),
+                  cwd=cwd,
                   listAtomStruct=[atomStruct], log=self._log)
 
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
         self._getRSRefineOutput()
-        atomStruct = os.path.abspath(self.outAtomStructName)
+        # atomStruct = os.path.abspath(self.outAtomStructName)
+        atomStruct = os.getcwd() + "/" + self.outAtomStructName
         # starting volume (.mrc)
-        vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+        # vol = os.path.abspath(self._getExtraPath(tmpMapFile))
+        vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
         args = self._writeArgsMolProbity(atomStruct, vol)
+        cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
-              args, cwd=os.path.abspath(self._getExtraPath()),
+              # args, cwd=os.path.abspath(self._getExtraPath()),
+              args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log)
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
-        atomStruct = os.path.abspath(self.outAtomStructName)
+        # atomStruct = os.path.abspath(self.outAtomStructName)
+        atomStruct = os.getcwd() + "/" + self.outAtomStructName
         # starting volume (.mrc)
-        volume = os.path.abspath(self._getExtraPath(tmpMapFile))
+        # volume = os.path.abspath(self._getExtraPath(tmpMapFile))
+        volume = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
         if self.inputVolume.get() is not None:
             vol = self.inputVolume.get()
         else:
             vol = self.inputStructure.get().getVolume()
 
         args = self._writeArgsValCryoEM(atomStruct, volume, vol)
+        cwd = os.getcwd() + "/" + self._getExtraPath()
 
         retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
-              args, cwd=os.path.abspath(self._getExtraPath()),
+              # args, cwd=os.path.abspath(self._getExtraPath()),
+              args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log)
 
     def createOutputStep(self):
