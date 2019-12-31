@@ -56,28 +56,32 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
             dim = 150.
             sampling = 1.
 
-        bildFileName = os.path.abspath(self.protocol._getTmpPath(
-            "axis_output.bild"))
+        bildFileName = self.protocol._getTmpPath("axis_output.bild")
         Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
 
         with open(fnCmd, 'w') as f:
+            # change to workingDir
+            # If we do not use cd and the project name has an space
+            # the protocol fails even if we pass absolute paths
+            f.write('cd %s\n' % os.getcwd())
             f.write("open %s\n" % bildFileName)
             f.write("cofr 0,0,0\n")  # set center of coordinates
             if len(self.vols) > 0:
                 for vol in self.vols:
                     sampling, volFileName, x, y, z = self._getXYZFromVol(vol)
-                    f.write("open %s\n" % os.path.abspath(volFileName))
+                    f.write("open %s\n" % volFileName)
                     f.write("volume #1 style surface voxelSize %f\n"
                             "volume #1 origin %0.2f,%0.2f,%0.2f\n"
                             % (sampling, x, y, z))
             for filename in self.pdbList:
-                f.write("open %s\n" % os.path.abspath(filename))
+                f.write("open %s\n" % filename)
 
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
-        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&")
+        chimeraPlugin.runChimeraProgram(chimeraPlugin.getProgram(), fnCmd + "&",
+                                        cwd=os.getcwd())
         return []
 
     def _getVols(self):
