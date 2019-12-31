@@ -37,3 +37,4 @@ from .test_protocol_superpose_pdbs import (TestImportBase, TestProtSuperposePdbs
 from .test_phenix import (TestVersion)
 from .test_phenix_pdb_cif import (TestImportBase, TestImportData,
                                  TestPhenixPdbCif)
+from .test_protocol_dock_in_map import TestProtDockInMap
