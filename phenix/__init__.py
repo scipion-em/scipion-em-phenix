@@ -121,5 +121,3 @@ class Plugin(pwem.Plugin):
     def defineBinaries(cls, env):
         pwem.Plugin.defineBinaries(env)
         env.getTarget(MAXIT).setDefault(True)
-
-pwem.Domain.registerPlugin(__name__)
