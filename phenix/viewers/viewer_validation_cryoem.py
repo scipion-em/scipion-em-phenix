@@ -1182,7 +1182,7 @@ if data.model_vs_data.cc is not None:
                 x = 1.0 / xticks[i]
                 labels2.append('%.1f' % x)
             else:
-                labels2.append('\\u221E')
+                labels2.append('\u221E')
         ax2.set_xticklabels(labels2,
                             fontproperties=matplotlib.font_manager.FontProperties(
                                 family=['Courier', 'Monaco', 'monospace'],
