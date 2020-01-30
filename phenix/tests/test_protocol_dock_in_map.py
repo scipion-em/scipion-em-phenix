@@ -24,11 +24,12 @@
 
 # protocol to test the phenix protocol superpose_pdbs
 import os
-
 from phenix.protocols import PhenixProtRunDockInMap
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                             ProtImportVolumes)
 from pyworkflow.tests import *
+from chimera.protocols import ChimeraProtOperate
+from xmipp3.protocols import XmippProtExtractUnit
 
 
 class TestImportBase(BaseTest):
@@ -53,17 +54,6 @@ class TestImportData(TestImportBase):
         volume1 = protImportVol.outputVolume
         return volume1
 
-    def _importUnitCell(self):
-        args = {'filesPath': self.dsModBuild.getFile(
-                'volumes/hemoglobin_unit_cell.mrc'),
-                'samplingRate': 1.05,
-                }
-        protImportVol = self.newProtocol(ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume emd_3488 unit cell\n')
-        self.launchProtocol(protImportVol)
-        volume2 = protImportVol.outputVolume
-        return volume2
-
     def _importStructure(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID
@@ -71,19 +61,7 @@ class TestImportData(TestImportBase):
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
         protImportPDB.setObjLabel('import pdb\n 5ni1')
         self.launchProtocol(protImportPDB)
-        structure1_PDB = protImportPDB.outputPdb
-        return structure1_PDB
-
-    def _importStructureChainA(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/hemoglobin_chainA.pdb'),
-                }
-        protImportPDB = self.newProtocol(ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 5ni1 chainA')
-        self.launchProtocol(protImportPDB)
-        chainA = protImportPDB.outputPdb
-        return chainA
+        return protImportPDB
 
 
 class TestProtDockInMap(TestImportData):
@@ -97,7 +75,8 @@ class TestProtDockInMap(TestImportData):
               "structure file and an imported map")
 
         # import PDB
-        structure1 = self._importStructure()
+        protImportPDB = self._importStructure()
+        structure1 = protImportPDB.outputPdb
         self.assertTrue(structure1.getFileName())
         self.assertFalse(structure1.getVolume())
 
@@ -123,15 +102,50 @@ class TestProtDockInMap(TestImportData):
         the unit cell of a map and a chain of the atomic structure"""
         print("Run phenix dock_in_map protocol from the unit cell "
               "of a map and a chain of the atomic structure")
-        # import PDB
-        chainA = self._importStructureChainA
-        self.assertTrue(chainA.getFileName())
-        self.assertFalse(chainA.getVolume())
+        # import PDB from Database
+        protImportPDB = self._importStructure()
+        structure1 = protImportPDB.outputPdb
+        self.assertTrue(structure1.getFileName())
+        self.assertFalse(structure1.getVolume())
 
         # import map
-        unit_cell = self._importUnitCell
+        map = self._importVolume()
+        self.assertTrue(map.getFileName())
+
+        # extract chain using chimera
+        # create auxiliary CMD file for chimera operate
+        extraCommands = ""
+        extraCommands += "runCommand('split')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('stop')\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure1
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate,
+                                       **args)
+        protChimera.setObjLabel('chimera operate\n extract chain A')
+        self.launchProtocol(protChimera)
+        chainA = protChimera.outputPdb_01
+        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+                             "There was a problem with the alignment")
+
+
+        # extract unit cell from map
+        args = {'inputVolumes': map,
+                'symmetryGroup': 0,
+                'symmetryOrder': 2,
+                'offset': -45.0,
+                'outerRadius': 44,
+                'expandFactor': .2
+               }
+        protExtractUnitCell = self.newProtocol(XmippProtExtractUnit,
+                                               **args)
+        self.launchProtocol(protExtractUnitCell)
+        unit_cell = protExtractUnitCell.outputVolume
         self.assertTrue(unit_cell.getFileName())
 
+        #dock chainA in map unit cell
         args = {
                 'inputVolume1': unit_cell,
                 'resolution': 3.2,
@@ -151,15 +165,35 @@ class TestProtDockInMap(TestImportData):
         print("Run phenix dock_in_map protocol with a chain of the "
               "imported atomic structure file and an imported whole map")
 
-        # import PDB
-        chainA = self._importStructureChainA
-        self.assertTrue(chainA.getFileName())
-        self.assertFalse(chainA.getVolume())
+        # import PDB from Database
+        protImportPDB = self._importStructure()
+        structure1 = protImportPDB.outputPdb
+        self.assertTrue(structure1.getFileName())
+        self.assertFalse(structure1.getVolume())
 
         # import map
         map = self._importVolume()
         self.assertTrue(map.getFileName())
 
+        # extract chain using chimera
+        # create auxiliary CMD file for chimera operate
+        extraCommands = ""
+        extraCommands += "runCommand('split')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('stop')\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure1
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate,
+                                       **args)
+        protChimera.setObjLabel('chimera operate\n extract chain A')
+        self.launchProtocol(protChimera)
+        chainA = protChimera.outputPdb_01
+        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+                             "There was a problem with the alignment")
+
+        # dock chainA in the full map
         args = {
                 'inputVolume1': map,
                 'resolution': 3.2,
@@ -180,15 +214,34 @@ class TestProtDockInMap(TestImportData):
         print("Run phenix dock_in_map protocol with two identical chains of the "
               "imported atomic structure file and an imported whole map")
 
-        # import PDB
-        chainA = self._importStructureChainA
-        self.assertTrue(chainA.getFileName())
-        self.assertFalse(chainA.getVolume())
+        # import PDB from Database
+        protImportPDB = self._importStructure()
+        structure1 = protImportPDB.outputPdb
+        self.assertTrue(structure1.getFileName())
+        self.assertFalse(structure1.getVolume())
 
         # import map
         map = self._importVolume()
         self.assertTrue(map.getFileName())
 
+        # extract chain using chimera
+        # create auxiliary CMD file for chimera operate
+        extraCommands = ""
+        extraCommands += "runCommand('split')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('stop')\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure1
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate,
+                                       **args)
+        protChimera.setObjLabel('chimera operate\n extract chain A')
+        self.launchProtocol(protChimera)
+        chainA = protChimera.outputPdb_01
+        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+                             "There was a problem with the alignment")
+        # dock two chainA in the full map
         args = {
                 'inputVolume1': map,
                 'resolution': 3.2,
