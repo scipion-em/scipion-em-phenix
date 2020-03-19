@@ -524,11 +524,13 @@ class TestPhenixRSRefine(TestImportData):
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.29,
-                                      rotOutliers=0.00,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
                                       overallScore=1.50,
                                       protRSRefine=protRSRefine)
+
+    # TODO: Talk to Roberto if we have to continue testing these values (rotOutliers)
 
     def testPhenixRSRefineFromVolumeAndCIF7(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -596,7 +598,7 @@ class TestPhenixRSRefine(TestImportData):
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.29,
-                                      rotOutliers=0.00,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
                                       overallScore=1.50,
@@ -608,6 +610,7 @@ class TestPhenixRSRefine(TestImportData):
             #                           clashScore=4.20,
             #                           overallScore=1.43,
             #                           protRSRefine=protRSRefine)
+    # TODO: Talk to Roberto if we have to continue testing these values (rotOutliers)
 
     def testPhenixRSRefineFromVolumeAndCIF8(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -752,7 +755,7 @@ class TestPhenixRSRefine(TestImportData):
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.29,
-                                      rotOutliers=0.00,
+                                      rotOutliers=3.47,
                                       cbetaOutliers=0,
                                       clashScore=4.86,
                                       overallScore=1.50,
@@ -764,3 +767,5 @@ class TestPhenixRSRefine(TestImportData):
             #                           clashScore=4.20,
             #                           overallScore=1.43,
             #                           protRSRefine=protRSRefine)
+
+    # TODO: Talk to Roberto if we have to continue testing these values (rotOutliers)
