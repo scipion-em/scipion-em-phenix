@@ -116,7 +116,8 @@ class TestProtDockInMap(TestImportData):
         # create auxiliary CMD file for chimera operate
         extraCommands = ""
         extraCommands += "runCommand('split')\n"
-        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3 refmodel #0 " \
+                         "prefix DONOTSAVESESSION_')\n"
         extraCommands += "runCommand('stop')\n"
 
         args = {'extraCommands': extraCommands,
@@ -126,8 +127,8 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.outputPdb_01
-        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+        chainA = protChimera.DONOTSAVESESSION_Atom_struct__1_3
+        self.assertIsNotNone(protChimera.DONOTSAVESESSION_Atom_struct__1_3.getFileName(),
                              "There was a problem with the alignment")
 
 
@@ -179,7 +180,8 @@ class TestProtDockInMap(TestImportData):
         # create auxiliary CMD file for chimera operate
         extraCommands = ""
         extraCommands += "runCommand('split')\n"
-        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3 refmodel #0 " \
+                         "prefix DONOTSAVESESSION_')\n"
         extraCommands += "runCommand('stop')\n"
 
         args = {'extraCommands': extraCommands,
@@ -189,8 +191,8 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.outputPdb_01
-        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+        chainA = protChimera.DONOTSAVESESSION_Atom_struct__1_3
+        self.assertIsNotNone(protChimera.DONOTSAVESESSION_Atom_struct__1_3.getFileName(),
                              "There was a problem with the alignment")
 
         # dock chainA in the full map
@@ -228,7 +230,8 @@ class TestProtDockInMap(TestImportData):
         # create auxiliary CMD file for chimera operate
         extraCommands = ""
         extraCommands += "runCommand('split')\n"
-        extraCommands += "runCommand('scipionwrite model #1.3')\n"
+        extraCommands += "runCommand('scipionwrite model #1.3 refmodel #0 " \
+                         "prefix DONOTSAVESESSION_')\n"
         extraCommands += "runCommand('stop')\n"
 
         args = {'extraCommands': extraCommands,
@@ -238,8 +241,8 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.outputPdb_01
-        self.assertIsNotNone(protChimera.outputPdb_01.getFileName(),
+        chainA = protChimera.DONOTSAVESESSION_Atom_struct__1_3
+        self.assertIsNotNone(protChimera.DONOTSAVESESSION_Atom_struct__1_3.getFileName(),
                              "There was a problem with the alignment")
         # dock two chainA in the full map
         args = {
