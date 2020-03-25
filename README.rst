@@ -2,7 +2,7 @@
 Phenix scipion plugin
 =====================
 
-This plugin allows to use programs from the *PHENIX* software suite within the Scipion framework. **You need to install the CCP4 suite before installing the plugin**, see section "Binary Files" for details.
+This plugin allows to use programs from the *PHENIX* software suite within the Scipion framework. **You need to install the Phenix suite before installing the plugin**, see section "Binary Files" for details.
 
 Phenix is a software suite that allows model building of macromolecule structures obtained by X-ray crystallography, and that has been extended to other techniques like cryo-EM (see `Phenix home page <https://www.phenix-online.org/>`_ for details).
 
