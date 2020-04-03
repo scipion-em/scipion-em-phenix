@@ -96,7 +96,10 @@ the atomic structure backbone has been perfectly fitted to the map.
     def runEMRingerStep(self):
         inPDBAtomStructFile = self.inputStructure.get().getFileName()
         # atomStruct = os.path.abspath(inPDBAtomStructFile)
-        atomStruct = os.getcwd() + "/" + inPDBAtomStructFile
+        if not inPDBAtomStructFile == os.path.abspath(inPDBAtomStructFile):
+            atomStruct = os.getcwd() + "/" + inPDBAtomStructFile
+        else:
+            atomStruct = inPDBAtomStructFile
         # vol = os.path.abspath(self._getExtraPath(self.EMRINGERFILE))
         vol = os.getcwd() + "/" + self._getExtraPath(self.EMRINGERFILE)
         args = self._writeArgsEMRinger(atomStruct, vol)
