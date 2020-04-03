@@ -2,7 +2,11 @@
 Phenix scipion plugin
 =====================
 
-This plugin allows to use programs from the *PHENIX* software suite within the Scipion framework. Current programs implemented:
+This plugin allows to use programs from the *PHENIX* software suite within the Scipion framework. **You need to install the Phenix suite before installing the plugin**, see section "Binary Files" for details.
+
+Phenix is a software suite that allows model building of macromolecule structures obtained by X-ray crystallography, and that has been extended to other techniques like cryo-EM (see `Phenix home page <https://www.phenix-online.org/>`_ for details).
+
+Current programs implemented:
 
   * emringer
   * real space refine
@@ -63,8 +67,7 @@ To check the installation, simply run the following Scipion tests:
 
 - **Supported versions of PHENIX**
 
-Tested with  `Phenix-1.13-2998 <https://www.phenix-online.org/download/nightly_builds.cgi>`_
-  and Phenix-1.16-3549
+Tested with  `Phenix-1.13-2998, Phenix-1.16-3549 and Phenix- 1.17.1
 
 
 
