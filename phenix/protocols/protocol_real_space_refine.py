@@ -158,10 +158,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     # --------------------------- STEPS functions --------------------------
     def runRSrefineStep(self, tmpMapFile):
-        # atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
-        atomStruct = os.getcwd() + "/" + self.inputStructure.get().getFileName()
-        # vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
+        atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
+        vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args = self._writeArgsRSR(atomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         try:
@@ -189,11 +187,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
         self._getRSRefineOutput()
-        # atomStruct = os.path.abspath(self.outAtomStructName)
-        atomStruct = os.getcwd() + "/" + self.outAtomStructName
+        atomStruct = os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
-        # vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-        vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
+        vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args = self._writeArgsMolProbity(atomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
@@ -203,11 +199,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
-        # atomStruct = os.path.abspath(self.outAtomStructName)
-        atomStruct = os.getcwd() + "/" + self.outAtomStructName
+        atomStruct = os.path.abspath(self.outAtomStructName)
         # starting volume (.mrc)
-        # volume = os.path.abspath(self._getExtraPath(tmpMapFile))
-        volume = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
+        volume = os.path.abspath(self._getExtraPath(tmpMapFile))
         if self.inputVolume.get() is not None:
             vol = self.inputVolume.get()
         else:
@@ -215,7 +209,6 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
         args = self._writeArgsValCryoEM(atomStruct, volume, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
-
         retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
               # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=cwd,
@@ -269,7 +262,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     def _getRSRefineOutput(self):
         inPdbName = os.path.basename(self.inputStructure.get().getFileName())
         outAtomStructName = self._getExtraPath(
-            inPdbName.replace("." + inPdbName.split(".")[1],
+            inPdbName.replace("." + inPdbName.split(".")[-1],
                               "_real_space_refined.cif"))
         # convert cif to mmcif by using maxit program
         # to get the right number and name of chains
