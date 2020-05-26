@@ -162,13 +162,17 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args = self._writeArgsRSR(atomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
-        try:
-            retry(Plugin.runPhenixProgram,
-                  Plugin.getProgram(REALSPACEREFINE), args,
-                  # cwd=os.path.abspath(self._getExtraPath()),
-                  cwd=cwd,
-                  listAtomStruct=[atomStruct], log=self._log)
-        except:
+
+        retry(Plugin.runPhenixProgram,
+              Plugin.getProgram(REALSPACEREFINE), args,
+              # cwd=os.path.abspath(self._getExtraPath()),
+              cwd=cwd,
+              listAtomStruct=[atomStruct], log=self._log)
+        refinedFile = False
+        for item in os.listdir(self._getExtraPath()):
+            if item.endswith("_real_space_refined.cif"):
+                refinedFile = True
+        if refinedFile == False:
             print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
                   " failure: High number of nonbonded interaction distances " \
                   "< 0.5. This error has been disable by running the same " \
