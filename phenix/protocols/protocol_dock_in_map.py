@@ -32,6 +32,7 @@ from pyworkflow import Config
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.params import PointerParam, FloatParam, IntParam, LEVEL_ADVANCED
 from phenix.constants import  PHENIX_HOME, DOCKINMAP, DISPLAY
+from os.path import relpath
 
 try:
     from pwem.objects import AtomStruct
@@ -107,7 +108,7 @@ class PhenixProtRunDockInMap(EMProtocol):
     def createOutputStep(self):
         self._getDockInMapOutput()
         pdb = AtomStruct()
-        pdb.setFileName(self.outAtomStructName)
+        pdb.setFileName(relpath(self.outAtomStructName))
 
         if self.inputVolume1.get() is not None:
             pdb.setVolume(self.inputVolume1.get())
