@@ -104,9 +104,9 @@ class TestImportData(TestImportBase):
                 'z': 0.0,
                 'setHalfMaps': True,
                 'half1map': self.dsModBuild.getFile(
-                            'volumes/emd_3488_Noisy_half1.map'),
+                            'volumes/emd_3488_Noisy_half1.vol'),
                 'half2map': self.dsModBuild.getFile(
-                            'volumes/emd_3488_Noisy_half2.map'),
+                            'volumes/emd_3488_Noisy_half2.vol'),
         }
         protImportVol = self.newProtocol(ProtImportVolumes, **args)
         protImportVol.setObjLabel('import volume hemoglobin\nset '
