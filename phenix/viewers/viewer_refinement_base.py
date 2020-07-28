@@ -64,9 +64,11 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
 
     def __init__(self,  **kwargs):
         ProtocolViewer.__init__(self,  **kwargs)
-        MOLPROBITYOUTFILENAME = self.protocol._getExtraPath(
-            self.protocol.MOLPROBITYOUTFILENAME)
-        self._parseFile(MOLPROBITYOUTFILENAME)
+        if os.path.exists(self.protocol._getExtraPath(
+                self.protocol.MOLPROBITYOUTFILENAME)):
+            MOLPROBITYOUTFILENAME = self.protocol._getExtraPath(
+                self.protocol.MOLPROBITYOUTFILENAME)
+            self._parseFile(MOLPROBITYOUTFILENAME)
         if Plugin.getPhenixVersion() == PHENIXVERSION or \
                 os.path.exists(self.protocol._getExtraPath(
                 self.protocol.MOLPROBITYPKLFILENAME)):
