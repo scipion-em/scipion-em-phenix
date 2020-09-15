@@ -8,18 +8,18 @@ Phenix is a software suite that allows model building of macromolecule structure
 
 Current programs implemented:
 
+  * dock in map
   * emringer
   * real space refine
   * molprobity
   * superpose pdbs
   * validation cryoem
 
-
 ===================
 Install this plugin
 ===================
 
-You will need to use `2.0.0 <https://github.com/I2PC/scipion/releases/tag/v2.0>`_ version of Scipion to run these protocols. To install the plugin, you have two options:
+You will need to use `3.0.0 <https://github.com/I2PC/scipion/releases/tag/v3.0>`_ version of Scipion to run these protocols. To install the plugin, you have two options:
 
 - **Stable version**  
 
@@ -58,6 +58,7 @@ Tested with PHENIX version: 1.13-2998.
 
 To check the installation, simply run the following Scipion tests: 
 
+  * scipion test phenix.tests.test_protocol_dock_in_map
   * scipion test phenix.tests.test_protocol_emringer
   * scipion test phenix.tests.test_protocol_real_space_refine
   * scipion test phenix.tests.test_protocol_molprobity
