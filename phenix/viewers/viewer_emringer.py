@@ -171,8 +171,8 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
-        counter = 0
-        fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
+        counter = 1
+        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
         f = open(fnCmd, 'w')
         # change to workingDir
         # If we do not use cd and the project name has an space
