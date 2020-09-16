@@ -38,6 +38,7 @@ from phenix import Plugin
 from pyworkflow.tests import *
 from pwem.objects import String
 from pwem import Domain
+import os
 from collections.abc import ValuesView
 
 def errorWindow(tkParent, msg):
@@ -81,7 +82,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('displayMapModel', LabelParam,
-                      label="Volume and models in Chimera",
+                      label="Volume and models in ChimeraX",
                       help="Display of input volume(s) and atomic structure(s).")
         if Plugin.getPhenixVersion() == PHENIXVERSION or \
                 os.path.exists(self.protocol._getExtraPath(
