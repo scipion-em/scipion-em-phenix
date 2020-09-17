@@ -172,6 +172,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         for item in os.listdir(self._getExtraPath()):
             if item.endswith("_real_space_refined.cif"):
                 refinedFile = True
+                break
         if refinedFile == False:
             print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
                   " failure: High number of nonbonded interaction distances " \
