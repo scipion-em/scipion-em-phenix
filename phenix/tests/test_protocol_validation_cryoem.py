@@ -166,9 +166,10 @@ class TestValCryoEM(TestImportData):
             print("Checking ramFavored")
             self.assertAlmostEqual(protMolProbity.ramachandranFavored.get(),
                                    ramFavored, delta=delta)
+            # root outliers seems to vary a lot from one version to other
             print("Checking rotOutliers")
             self.assertAlmostEqual(protMolProbity.rotamerOutliers.get(),
-                                   rotOutliers, delta=delta)
+                                   rotOutliers, delta=5)
             print("Checking cbetaOutliers")
             self.assertAlmostEqual(protMolProbity.cbetaOutliers.get(),
                                    cbetaOutliers, delta=delta)
@@ -185,22 +186,22 @@ class TestValCryoEM(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2, delta=1):
+                             protRSRefine, places=2, delta=3):
         # method to check Real Space Refine statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=5)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=1.5)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=1.5)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
@@ -208,22 +209,22 @@ class TestValCryoEM(TestImportData):
 
     def checkValCryoEMResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protValCryoEM, places=2):
+                             protValCryoEM, places=2, delta=3):
         # method to check Validation CryoEM statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protValCryoEM.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protValCryoEM.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protValCryoEM.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=5)
             self.assertAlmostEqual(protValCryoEM.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protValCryoEM.clashscore.get(),
-                                   clashScore, delta=1.5)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protValCryoEM.overallScore.get(),
-                                   overallScore, delta=1.5)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
