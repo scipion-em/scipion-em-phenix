@@ -23,7 +23,7 @@
 # ***************************************************************************/
 
 # protocol to test the different phenix methods with .pdb and .cif files
-
+from chimera.protocols import ChimeraProtOperate
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from pyworkflow import Config
@@ -256,9 +256,23 @@ class TestPhenixPdbCif(TestImportData):
         # import CIF
         structure_hemo_cif = self._importStructHemoCIF()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000090
+
         # EMRinger
         args = {'inputVolume': volume_hemo_orig,
-                'inputStructure': structure_hemo_cif,
+                'inputStructure': result,
                 'doTest': True
                 }
         protEMRinger = self.newProtocol(PhenixProtRunEMRinger, **args)
@@ -458,11 +472,25 @@ class TestPhenixPdbCif(TestImportData):
         # import PDB
         structure_hemo_cif = self._importStructHemoCIF()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000772
+
         # MolProbity
         args = {
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif,
+                'inputStructure': result,
                 'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
@@ -597,11 +625,25 @@ class TestPhenixPdbCif(TestImportData):
         # import cif
         structure_hemo_cif_PDB = self._importStructHemoFromDB()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif_PDB
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_001077
+
         # MolProbity
         args = {
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif_PDB,
+                'inputStructure': result,
                 'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)

@@ -23,7 +23,7 @@
 # ***************************************************************************/
 
 # protocol to test the phenix method real_spacerefine
-
+from chimera.protocols import ChimeraProtOperate
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
@@ -136,9 +136,8 @@ class TestImportData(TestImportBase):
         return structure_hemo_pdb
 
     def _importStructHemoCIF(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.cif'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1'
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
         protImportPDB.setObjLabel('import cif\n 5ni1.cif')
@@ -147,9 +146,8 @@ class TestImportData(TestImportBase):
         return structure_hemo_cif
 
     def _importStructHemoCIF2(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.cif'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1',
                 'inputVolume': self._importVolHemoOrg()
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
@@ -188,22 +186,22 @@ class TestPhenixRSRefine(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2):
+                             protRSRefine, places=3):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=5)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=0.75)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=0.75)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
@@ -398,11 +396,25 @@ class TestPhenixRSRefine(TestImportData):
         # import PDB
         structure_hemo_cif = self._importStructHemoCIF()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000168
+
         # MolProbity
         args = {
             'inputVolume': volume_hemo_org,
             'resolution': 3.2,
-            'inputStructure': structure_hemo_cif,
+            'inputStructure': result,
             'numberOfThreads': 4
         }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
@@ -549,11 +561,25 @@ class TestPhenixRSRefine(TestImportData):
         # import PDB
         structure_hemo_cif = self._importStructHemoCIF()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000393
+
         # MolProbity
         args = {
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif,
+                'inputStructure': result,
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -629,11 +655,25 @@ class TestPhenixRSRefine(TestImportData):
         # import PDB
         structure_hemo_cif = self._importStructHemoCIF()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #2 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000618
+
         # MolProbity
         args = {
                 'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif,
+                'inputStructure': result,
                }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'
@@ -705,10 +745,24 @@ class TestPhenixRSRefine(TestImportData):
         # import PDB
         structure_hemo_cif2 = self._importStructHemoCIF2()
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #3 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_hemo_cif2
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__3_000851
+
         # MolProbity
         args = {
                 'resolution': 3.2,
-                'inputStructure': structure_hemo_cif2,
+                'inputStructure': result,
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)
         protMolProbity.setObjLabel('MolProbity validation\n'

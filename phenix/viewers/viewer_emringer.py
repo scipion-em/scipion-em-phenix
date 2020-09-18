@@ -72,7 +72,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('displayMapModel', LabelParam,
-                      label="Volume and model in Chimera",
+                      label="Volume and model in ChimeraX",
                       help="Display of input volume, input pdb that has to be"
                            "refined and final refined model of the structure.")
         form.addSection(label='EM Ringer results')
@@ -171,8 +171,8 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
-        counter = 0
-        fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
+        counter = 1
+        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
         f = open(fnCmd, 'w')
         # change to workingDir
         # If we do not use cd and the project name has an space

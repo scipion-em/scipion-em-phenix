@@ -40,7 +40,7 @@ class PhenixProtRunDockInMapViewer(Viewer):
     _targets = [PhenixProtRunDockInMap]
 
     def _visualize(self, obj, **args):
-        fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
+        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
 
         self._getVols()
         self._getPdbs()
@@ -63,14 +63,14 @@ class PhenixProtRunDockInMapViewer(Viewer):
             # If we do not use cd and the project name has an space
             # the protocol fails even if we pass absolute paths
             f.write('cd %s\n' % os.getcwd())
-            f.write("open %s\n" % bildFileName)
+            f.write("open %s\n" % bildFileName) #1
             f.write("cofr 0,0,0\n")  # set center of coordinates
             if len(self.vols) > 0:
                 for vol in self.vols:
                     sampling, volFileName, x, y, z = self._getXYZFromVol(vol)
                     f.write("open %s\n" % volFileName)
-                    f.write("volume #1 style surface voxelSize %f\n"
-                            "volume #1 origin %0.2f,%0.2f,%0.2f\n"
+                    f.write("volume #2 style surface voxelSize %f\n"
+                            "volume #2 origin %0.2f,%0.2f,%0.2f\n"
                             % (sampling, x, y, z))
             for filename in self.pdbList:
                 f.write("open %s\n" % filename)

@@ -38,6 +38,7 @@ from phenix import Plugin
 from pyworkflow.tests import *
 from pwem.objects import String
 from pwem import Domain
+import os
 from collections.abc import ValuesView
 
 def errorWindow(tkParent, msg):
@@ -81,7 +82,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('displayMapModel', LabelParam,
-                      label="Volume and models in Chimera",
+                      label="Volume and models in ChimeraX",
                       help="Display of input volume(s) and atomic structure(s).")
         if Plugin.getPhenixVersion() == PHENIXVERSION or \
                 os.path.exists(self.protocol._getExtraPath(
@@ -599,14 +600,14 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
-        counter = 0
-        fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
+        counter = 1
+        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
         f = open(fnCmd, 'w')
         # change to workingDir
         # If we do not use cd and the project name has an space
         # the protocol fails even if we pass absolute paths
         f.write('cd %s\n' % os.getcwd())
-        # reference axis model = 0
+        # reference axis model = 1
         f.write("open %s\n" % bildFileName)
         f.write("cofr 0,0,0\n")  # set center of coordinates
 
@@ -638,15 +639,16 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                         f.write("open %s\n" % halfMap.split(".")[0] + ".mrc")
                     else:
                         f.write("open %s\n" % halfMap)
-                    f.write("volume#%d style surface voxelSize %f\n" %
+                    f.write("volume #%d style surface voxelSize %f\n" %
                             (counter, sampling))
-                    f.write("volume#%d origin %0.2f,%0.2f,%0.2f\n" %
+                    f.write("volume #%d origin %0.2f,%0.2f,%0.2f\n" %
                             (counter, x, y, z))
 
         # input PDB (usually from coot)
         counter += 1  # 2
         pdbFileName = self.protocol.inputStructure.get().getFileName()
         f.write("open %s\n" % pdbFileName)
+        f.write("style stick\n")
 
         # refined PDB
         if self.protocol.hasAttribute('outputPdb') and \

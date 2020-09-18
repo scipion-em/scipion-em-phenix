@@ -23,7 +23,7 @@
 # ***************************************************************************/
 
 # protocol to test the validation method MolProbity
-
+from chimera.protocols import ChimeraProtOperate
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
@@ -165,9 +165,8 @@ class TestImportData(TestImportBase):
         return structure2_PDB
 
     def _importStructuremmCIFWithVol2(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.cif'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1',
                 'inputVolume': self._importVolume3()
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
@@ -269,7 +268,7 @@ class TestMolprobityValidation2(TestImportData):
     """ Test the protocol of MolProbity validation
     """
     def checkResults(self, ramOutliers, ramFavored, rotOutliers, cbetaOutliers,
-                     clashScore, overallScore, protMolProbity, places=2):
+                     clashScore, overallScore, protMolProbity, places=1):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -395,10 +394,24 @@ class TestMolprobityValidation2(TestImportData):
         self.assertTrue(structure_6.getFileName())
         self.assertTrue(structure_6.getVolume())
 
+        # chimera operate to repair cif file
+        extraCommands = ""
+        extraCommands += "scipionwrite #3 " \
+                         "prefix repaired_CIF_ChimeraX_\n"
+        extraCommands += "exit\n"
+
+        args = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure_6
+                }
+        protChimera = self.newProtocol(ChimeraProtOperate, **args)
+        protChimera.setObjLabel('chimera operate\n repairing CIF\n')
+        self.launchProtocol(protChimera)
+        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__3_000174
+
         # MolProbity
         args = {
                 'resolution': 2.2,
-                'inputStructure': structure_6,
+                'inputStructure': result,
                 'numberOfThreads': 4
                 }
         protMolProbity = self.newProtocol(PhenixProtRunMolprobity, **args)

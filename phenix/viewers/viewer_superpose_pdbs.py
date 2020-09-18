@@ -40,7 +40,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
     _targets = [PhenixProtRunSuperposePDBs]
 
     def _visualize(self, obj, **args):
-        fnCmd = self.protocol._getTmpPath("chimera_output.cmd")
+        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
 
         self._getVols()
         self._getPdbs()
@@ -72,8 +72,8 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
                 for vol in self.vols:
                     sampling, volFileName, x, y, z = self._getXYZFromVol(vol)
                     f.write("open %s\n" % volFileName)
-                    f.write("volume #1 style surface voxelSize %f\n"
-                            "volume #1 origin %0.2f,%0.2f,%0.2f\n"
+                    f.write("volume #2 style surface voxelSize %f\n"
+                            "volume #2 origin %0.2f,%0.2f,%0.2f\n"
                             % (sampling, x, y, z))
             for filename in self.pdbList:
                 f.write("open %s\n" % filename)
