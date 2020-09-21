@@ -28,6 +28,7 @@ from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
+from phenix import PHENIXVERSION18, Plugin
 
 
 class TestImportBase(BaseTest):
@@ -624,13 +625,22 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        self.checkResults(ramOutliers=0.12,
-                          ramFavored=95.86,
-                          rotOutliers=0.52,
-                          cbetaOutliers=0,
-                          clashScore=9.74,
-                          overallScore=1.80,
-                          protMolProbity=protMolProbity)
+        if Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkResults(ramOutliers=0.12,
+                              ramFavored=95.86,
+                              rotOutliers=0.52,
+                              cbetaOutliers=0,
+                              clashScore=9.70,
+                              overallScore=1.80,
+                              protMolProbity=protMolProbity)
+        else:
+            self.checkResults(ramOutliers=0.12,
+                              ramFavored=95.86,
+                              rotOutliers=0.52,
+                              cbetaOutliers=0,
+                              clashScore=9.74,
+                              overallScore=1.80,
+                              protMolProbity=protMolProbity)
 
     def testMolProbityValidationManyOutliers1(self):
         """ This test checks that MolProbity validation protocol runs with

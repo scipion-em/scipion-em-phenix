@@ -33,7 +33,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION
+from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18
 import json
 from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
@@ -379,7 +379,14 @@ class TestPhenixPdbCif(TestImportData):
                                       clashScore=2.43,
                                       overallScore=1.12,
                                       protRSRefine=protRSRefine)
-
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=96.64,
+                                      rotOutliers=4.77,
+                                      cbetaOutliers=0,
+                                      clashScore=6.07,
+                                      overallScore=2.06,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.11,
@@ -409,6 +416,14 @@ class TestPhenixPdbCif(TestImportData):
                                 cbetaOutliers=0,
                                 clashScore=2.43,
                                 overallScore=1.12,
+                                protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=96.64,
+                                rotOutliers=4.77,
+                                cbetaOutliers=0,
+                                clashScore=6.07,
+                                overallScore=2.06,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -529,7 +544,14 @@ class TestPhenixPdbCif(TestImportData):
                                       clashScore=2.43,
                                       overallScore=1.12,
                                       protRSRefine=protRSRefine)
-
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=96.64,
+                                      rotOutliers=4.77,
+                                      cbetaOutliers=0,
+                                      clashScore=6.07,
+                                      overallScore=2.06,
+                                      protRSRefine=protRSRefine)
         else:
             # values obtained from phenix GUI v. 1.16
             # (minimization_global + adp)
@@ -561,6 +583,14 @@ class TestPhenixPdbCif(TestImportData):
                                 cbetaOutliers=0,
                                 clashScore=2.43,
                                 overallScore=1.12,
+                                protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=96.64,
+                                rotOutliers=4.77,
+                                cbetaOutliers=0,
+                                clashScore=6.07,
+                                overallScore=2.06,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -683,6 +713,15 @@ class TestPhenixPdbCif(TestImportData):
                                       overallScore=1.12,
                                       protRSRefine=protRSRefine)
 
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=96.64,
+                                      rotOutliers=4.77,
+                                      cbetaOutliers=0,
+                                      clashScore=6.07,
+                                      overallScore=2.06,
+                                      protRSRefine=protRSRefine)
+
         else:
             # values obtained from phenix GUI v. 1.16
             # (minimization_global + adp)
@@ -714,6 +753,14 @@ class TestPhenixPdbCif(TestImportData):
                                 cbetaOutliers=0,
                                 clashScore=2.43,
                                 overallScore=1.12,
+                                protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=96.64,
+                                rotOutliers=4.77,
+                                cbetaOutliers=0,
+                                clashScore=6.07,
+                                overallScore=2.06,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
