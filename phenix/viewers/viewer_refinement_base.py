@@ -648,6 +648,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         counter += 1  # 2
         pdbFileName = self.protocol.inputStructure.get().getFileName()
         f.write("open %s\n" % pdbFileName)
+        f.write("style stick\n")
 
         # refined PDB
         if self.protocol.hasAttribute('outputPdb') and \

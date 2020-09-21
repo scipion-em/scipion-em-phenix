@@ -269,7 +269,7 @@ class TestMolprobityValidation2(TestImportData):
     """ Test the protocol of MolProbity validation
     """
     def checkResults(self, ramOutliers, ramFavored, rotOutliers, cbetaOutliers,
-                     clashScore, overallScore, protMolProbity, places=2):
+                     clashScore, overallScore, protMolProbity, places=1):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:

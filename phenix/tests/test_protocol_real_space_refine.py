@@ -186,22 +186,22 @@ class TestPhenixRSRefine(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2):
+                             protRSRefine, places=3):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=5)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=0.75)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=0.75)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
