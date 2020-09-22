@@ -186,14 +186,14 @@ class TestPhenixRSRefine(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=3):
+                             protRSRefine, places=3, delta=1):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=delta)
+                                   ramFavored, delta=3)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
                                    rotOutliers, delta=5)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
