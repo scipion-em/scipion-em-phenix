@@ -61,7 +61,9 @@ _bibtexStr = """
    Volume="74",
    Number="Pt 9",
    Pages="814--840",
-   Month="Sep"
+   Month="Sep",
+   doi = "https://doi.org/10.1107/S2059798318009324",
+   url = "http://scripts.iucr.org/cgi-bin/paper?S2059798318009324"
 }
 
 @Article{Chen_2010,
