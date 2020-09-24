@@ -10,6 +10,7 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+from phenix import __version__
 
 here = path.abspath(path.dirname(__file__))
 
@@ -42,13 +43,13 @@ setup(
     #
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
-    # https://packaging.python.org/en/latest/single_source_version.html
-    version='3.0.0',  # Required
+    # https:deve//packaging.python.org/en/latest/single_source_version.html
+    version=__version__,  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='PHENIX programs in Scipion. Warning: Install PHENIX v. 1-13-2998 or 1-16-3549',  # Required
+    description='PHENIX programs in Scipion. Warning: Install PHENIX v. 1-17',  # Required
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
