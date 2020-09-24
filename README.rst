@@ -1,5 +1,5 @@
 =====================
-PPhenix scipion plugin
+Phenix scipion plugin
 =====================
 
 This plugin allows to use programs from the *PHENIX* software suite within the Scipion framework. **You need to install the Phenix suite before installing the plugin**, see section "Binary Files" for details.
