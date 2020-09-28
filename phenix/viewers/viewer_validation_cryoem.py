@@ -27,7 +27,7 @@
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from .viewer_refinement_base import PhenixProtRefinementBaseViewer
 from pyworkflow.protocol.params import LabelParam, EnumParam
-from phenix import PHENIXVERSION
+from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
 from phenix import Plugin
@@ -477,19 +477,31 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
 
     def _showModelSummary(self, e = None):
         headerList = ['Item', 'Value']
-        dataList1 = ['Composition (#)', '     Chains', '     Atoms', '     Residues',
-                     '     Water', '     Ligands', 'Bonds (RMSD)',
-                     '     Length (Angstroms) (# > 4sigma)',
-                     '     Angles (degrees) (# > 4sigma)', 'MolProbity score',
-                     'Clash score', 'Ramachandran plot (%)', '     Outliers',
-                     '     Allowed', '     Favored', 'Rotamer outliers (%)',
-                     'Cbeta outliers (%)', 'Peptide plane (%)', '     Cis proline/general',
-                     '     Twisted proline/general', 'CaBLAM outliers (%)', 'ADP (B-factors)',
-                     '     Iso/Aniso (#)', '     min/max/mean', '           Protein',
-                     '           Nucleotide', '           Ligand', '           Water',
-                     'Occupancy', '     Mean', '     occ = 1 (%)', '     0 < occ < 1 (%)',
-                     '     occ > 1 (%)']
-        dataList2 = ["", self.dictOverall2['Chains'],
+        dataList1_1 = ['Composition (#)', '     Chains', '     Atoms', '     Residues',
+                       '     Water', '     Ligands', 'Bonds (RMSD)',
+                       '     Length (Angstroms) (# > 4sigma)',
+                       '     Angles (degrees) (# > 4sigma)', 'MolProbity score',
+                       'Clash score', 'Ramachandran plot (%)', '     Outliers',
+                       '     Allowed', '     Favored']
+        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+            dataList1_2 = ['Rama-Z (Ramachandran plot Z-score, RMSD)',
+                           '     whole (N = ' + str(self.dictOverall2['Rama_Z_whole_n']) + ')',
+                           '     helix (N = ' + str(self.dictOverall2['Rama_Z_helix_n']) + ')',
+                           '     sheet (N = ' + str(self.dictOverall2['Rama_Z_sheet_n']) + ')',
+                           '     loop (N = ' + str(self.dictOverall2['Rama_Z_loop_n']) + ')']
+        dataList1_3 = ['Rotamer outliers (%)',
+                       'Cbeta outliers (%)', 'Peptide plane (%)', '     Cis proline/general',
+                       '     Twisted proline/general', 'CaBLAM outliers (%)', 'ADP (B-factors)',
+                       '     Iso/Aniso (#)', '     min/max/mean', '           Protein',
+                       '           Nucleotide', '           Ligand', '           Water',
+                       'Occupancy', '     Mean', '     occ = 1 (%)', '     0 < occ < 1 (%)',
+                       '     occ > 1 (%)']
+        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+            dataList1 = dataList1_1 + dataList1_2 + dataList1_3
+        else:
+            dataList1 = dataList1_1 + dataList1_3
+
+        dataList2_1 = ["", self.dictOverall2['Chains'],
                      str(self.dictOverall2["Atoms"])+ " " + "(Hydrogens: " +
                      str(self.dictOverall2["Hydrogens"]) + ")",
                      "Protein: " + str(self.dictOverall2['Protein_residues']) + " " +
@@ -503,8 +515,17 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                      self.dictOverall2['Clash_score'],
                      "", self.dictOverall2['Rhama_Outliers'],
                      self.dictOverall2['Rhama_Allowed'],
-                     self.dictOverall2['Rhama_Favored'],
-                     self.dictOverall2['Rota_Outliers'],
+                     self.dictOverall2['Rhama_Favored']]
+        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+            dataList2_2 = ["", self.dictOverall2['Rama_Z_whole_value'] + " (" +
+                         self.dictOverall2['Rama_Z_whole_std'] + ")",
+                         self.dictOverall2['Rama_Z_helix_value'] + " (" +
+                         self.dictOverall2['Rama_Z_helix_std'] + ")",
+                         self.dictOverall2['Rama_Z_sheet_value'] + " (" +
+                         self.dictOverall2['Rama_Z_sheet_std'] + ")",
+                         self.dictOverall2['Rama_Z_loop_value'] + " (" +
+                         self.dictOverall2['Rama_Z_loop_std'] + ")"]
+        dataList2_3 = [ self.dictOverall2['Rota_Outliers'],
                      self.dictOverall2['Cbeta_Outliers'],
                      "", self.dictOverall2['Cis_proline'] + "/" +
                      self.dictOverall2['Cis_general'],
@@ -530,6 +551,11 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                      self.dictOverall2['occupancy_occ_1'],
                      self.dictOverall2['occupancy_0_occ_1'],
                      self.dictOverall2['occupancy_occ_higher_1']]
+
+        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+            dataList2 = dataList2_1 + dataList2_2 + dataList2_3
+        else:
+            dataList2 = dataList2_1 + dataList2_3
 
         dataList = []
         for a1, a2 in zip(dataList1, dataList2):
@@ -1239,7 +1265,8 @@ if data.model_vs_data.cc is not None:
     def _writePickleData2(self):
         VALIDATIONTMPFILENAME = self.protocol._getTmpPath(
             self.VALIDATIONTMPFILE)
-        command = """import pickle
+        command = """
+import pickle
 import collections
 import json
 
@@ -1636,7 +1663,39 @@ if len(Ligand_CC) > 0:
 else:
     dictOverall2['Ligand_CC'] = "---"
 """.format(VALIDATIONCRYOEMPKLFILENAME=self.VALIDATIONCRYOEMPKLFILENAME)
-
+        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+            command += """
+# Rama-Z (Ramachandran plot Z-score, RMSD))
+if data.model.geometry.rama_z is not None:
+    dictOverall2['Rama_Z_whole_n'] = "%d" % (data.model.geometry.rama_z.whole.n)
+    if data.model.geometry.rama_z.whole.n != 0:
+        dictOverall2['Rama_Z_whole_value'] = "%.2f" % abs(round(data.model.geometry.rama_z.whole.value, 2))
+        dictOverall2['Rama_Z_whole_std'] = "%.2f" % (round(data.model.geometry.rama_z.whole.std, 2))
+    else:
+        dictOverall2['Rama_Z_whole_value'] = '---'
+        dictOverall2['Rama_Z_whole_std'] = '---'
+    dictOverall2['Rama_Z_helix_n'] = "%d" % (data.model.geometry.rama_z.helix.n)
+    if data.model.geometry.rama_z.helix.n != 0:
+        dictOverall2['Rama_Z_helix_value'] = "%.2f" % abs(round(data.model.geometry.rama_z.helix.value, 2))
+        dictOverall2['Rama_Z_helix_std'] = "%.2f" % (round(data.model.geometry.rama_z.helix.std, 2))
+    else:
+        dictOverall2['Rama_Z_sheet_n'] = '---'
+        dictOverall2['Rama_Z_sheet_value'] = '---'
+    dictOverall2['Rama_Z_sheet_n'] = "%d" % (data.model.geometry.rama_z.sheet.n)
+    if data.model.geometry.rama_z.sheet.n != 0:
+        dictOverall2['Rama_Z_sheet_value'] = "%.2f" % abs(round(data.model.geometry.rama_z.sheet.value, 2))
+        dictOverall2['Rama_Z_sheet_std'] = "%.2f" % (round(data.model.geometry.rama_z.sheet.std, 2))
+    else:
+        dictOverall2['Rama_Z_sheet_value'] = '---'
+        dictOverall2['Rama_Z_sheet_std'] = '---'
+    dictOverall2['Rama_Z_loop_n'] = "%d" % (data.model.geometry.rama_z.loop.n)
+    if data.model.geometry.rama_z.loop.n != 0:
+        dictOverall2['Rama_Z_loop_value'] = "%.2f" % abs(round(data.model.geometry.rama_z.loop.value, 2))
+        dictOverall2['Rama_Z_loop_std'] = "%.2f" % (round(data.model.geometry.rama_z.loop.std, 2))
+    else:
+        dictOverall2['Rama_Z_loop_value'] = '---'
+        dictOverall2['Rama_Z_loop_value'] = '---'
+"""
         command += """with open('%s',"w") as f:
     f.write(json.dumps(dictOverall2))
 """ % (VALIDATIONTMPFILENAME)
