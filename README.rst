@@ -68,7 +68,7 @@ To check the installation, simply run the following Scipion tests:
 
 - **Supported versions of PHENIX**
 
-Tested with  `Phenix-1.13-2998, Phenix-1.16-3549 and Phenix- 1.17.1
+Tested with  `Phenix-1.13-2998, Phenix-1.16-3549 and Phenix- 1.17.1`
 
 
 
