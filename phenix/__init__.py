@@ -32,7 +32,6 @@ import subprocess
 
 import pyworkflow.utils as pwutils
 from phenix.constants import *
-from .bibtex import _bibtexStr  # Load bibtex dict with references
 from pwem.constants import MAXIT
 
 _logo = "phenix.png"
