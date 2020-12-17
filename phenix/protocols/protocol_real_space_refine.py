@@ -180,8 +180,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                   "command with the same following additional " \
                   "argument:\npdb_interpretation.clash_guard." \
                   "nonbonded_distance_threshold=None ")
-            args += " "
-            args += "pdb_interpretation.clash_guard." \
+            args += " pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
             retry(Plugin.runPhenixProgram,
                   Plugin.getProgram(REALSPACEREFINE), args,
