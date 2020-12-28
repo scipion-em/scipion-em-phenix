@@ -40,7 +40,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
     _targets = [PhenixProtRunSuperposePDBs]
 
     def _visualize(self, obj, **args):
-        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
+        fnCmd = self.protocol._getExtraPath("chimera_output.cxc")
 
         self._getVols()
         self._getPdbs()
@@ -56,7 +56,7 @@ class PhenixProtRunSuperposePDBsViewer(Viewer):
             dim = 150.
             sampling = 1.
 
-        bildFileName = self.protocol._getTmpPath("axis_output.bild")
+        bildFileName = self.protocol._getExtraPath("axis_output.bild")
         Chimera.createCoordinateAxisFile(dim,
                                  bildFileName=bildFileName,
                                  sampling=sampling)
