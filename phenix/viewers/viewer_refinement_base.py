@@ -582,7 +582,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         }
 
     def _displayMapModel(self, e=None):
-        bildFileName = self.protocol._getTmpPath("axis_output.bild")
+        bildFileName = self.protocol._getExtraPath("axis_output.bild")
         try:
             _inputVol = self.protocol.inputVolume.get()
         except:
@@ -601,7 +601,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                                  bildFileName=bildFileName,
                                  sampling=sampling)
         counter = 1
-        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
+        fnCmd = self.protocol._getExtraPath("chimera_output.cxc")
         f = open(fnCmd, 'w')
         # change to workingDir
         # If we do not use cd and the project name has an space
@@ -815,9 +815,9 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         self.listName = self.plotList[plot_index]
         self._writeCommand(self.listName)
         if self.listName == self.plotList[1]:
-            self.TMPFILENAME = self.protocol._getTmpPath(self.ROTATMPFILE)
+            self.TMPFILENAME = self.protocol._getExtraPath(self.ROTATMPFILE)
         else:
-            self.TMPFILENAME = self.protocol._getTmpPath(self.RAMATMPFILE)
+            self.TMPFILENAME = self.protocol._getExtraPath(self.RAMATMPFILE)
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
@@ -869,7 +869,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
     def _showMultiCriterionPlot(self, e=None):
         self.listName = "Multi-criterion plot"
         self._writeCommand(self.listName)
-        self.TMPFILENAME = self.protocol._getTmpPath(self.MULTICPLOTTMPFILE)
+        self.TMPFILENAME = self.protocol._getExtraPath(self.MULTICPLOTTMPFILE)
         with open(self.TMPFILENAME, "w") as f:
             f.write(self.command)
         # execute file with phenix.python
@@ -1361,7 +1361,7 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
             words = line.strip().split()
 
     def _writePickleData(self):
-        ANALYSISTMPFILENAME = self.protocol._getTmpPath(
+        ANALYSISTMPFILENAME = self.protocol._getExtraPath(
             self.ANALYSISTMPFILE)
         command = """import pickle
 import collections
