@@ -66,7 +66,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         self.dataDict = json.loads(str(self.protocol.stringDataDict),
                                    object_pairs_hook=collections.OrderedDict)
         self.plots = glob.glob(self.protocol._getExtraPath("*_plots"))[0]
-        self.EMRINGERSUBPLOTSFILENAME = self.protocol._getTmpPath(
+        self.EMRINGERSUBPLOTSFILENAME = self.protocol._getExtraPath(
             self.EMRINGERSUBPLOTSFILENAME)
 
     def _defineParams(self, form):
@@ -158,7 +158,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
         }
 
     def _displayMapModel(self, e=None):
-        bildFileName = self.protocol._getTmpPath("axis_output.bild")
+        bildFileName = self.protocol._getExtraPath("axis_output.bild")
 
         _inputVol = self.protocol.inputVolume.get()
         if _inputVol is None:
@@ -172,7 +172,7 @@ class PhenixProtRunEMRingerViewer(ProtocolViewer):
                                  bildFileName=bildFileName,
                                  sampling=sampling)
         counter = 1
-        fnCmd = self.protocol._getTmpPath("chimera_output.cxc")
+        fnCmd = self.protocol._getExtraPath("chimera_output.cxc")
         f = open(fnCmd, 'w')
         # change to workingDir
         # If we do not use cd and the project name has an space
