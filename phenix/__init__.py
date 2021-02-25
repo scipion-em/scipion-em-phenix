@@ -36,7 +36,7 @@ from pwem.constants import MAXIT
 
 _logo = "phenix.png"
 _references = ['Adams_2010']
-__version__ = "3.0.3"
+__version__ = "3.0.4"
 
 
 class Plugin(pwem.Plugin):
