@@ -260,29 +260,28 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                                                                  )
             f.write('cur.execute("%s")\n' % command)
         # invert sequence
-        iMol = 1 # pdb id is  0 or 1 for inverse
-        f.write('reverse_direction_of_fragment(0, "%s", 1)\n'% chainName)
-        f.write('db_mainchain(0, "%s", %d, %d,"forwards")\n' % (chainName, startMut, endMut))
-        for start in range(numberOfSteps):
-            seq = self.inputSequence.get().getSequence()[firstaa + start : firstaa + start + atomStructSize]
-            f.write("mutate_residue_range(%d, '%s', %d, %d, '%s')\n" % (iMol,
-                                                                      chainName,
-                                                                      startMut,
-                                                                      endMut,
-                                                                      seq))
-            outFileName = self._getExtraPath(COOTPDBTEMPLATEFILENAMEINV% (0,0,start))
-            f.write("save_coordinates(1, '%s')\n" % outFileName)
-            command = "INSERT INTO %s(filename) VALUES('%s')" % (TABLE,
-                                                                 os.path.abspath(outFileName)
-                                                                 )
-            f.write('cur.execute("%s")\n' % command)
+        ##iMol = 1 # pdb id is  0 or 1 for inverse
+        ##f.write('reverse_direction_of_fragment(0, "%s", 1)\n'% chainName)
+        ##f.write('db_mainchain(0, "%s", %d, %d,"forwards")\n' % (chainName, startMut, endMut))
+        ##for start in range(numberOfSteps):
+        ##    seq = self.inputSequence.get().getSequence()[firstaa + start : firstaa + start + atomStructSize]
+        ##    f.write("mutate_residue_range(%d, '%s', %d, %d, '%s')\n" % (iMol,
+        ##                                                              chainName,
+        ##                                                              startMut,
+        ##                                                              endMut,
+        ##                                                              seq))
+        ##    outFileName = self._getExtraPath(COOTPDBTEMPLATEFILENAMEINV% (0,0,start))
+        ##    f.write("save_coordinates(1, '%s')\n" % outFileName)
+        ##    command = "INSERT INTO %s(filename) VALUES('%s')" % (TABLE,
+        ##                                                         os.path.abspath(outFileName)
+        ##                                                         )
+        ##    f.write('cur.execute("%s")\n' % command)
         if len(self.extraCommands.get()) > 0:
             f.write("\n#Extra Commands\n")
             f.write("%\n" % self.extraCommands.get())
         f.write("conn.commit()\n")
         f.write("cur.close()\n")
         f.write("conn.close()\n")
-        f.write("exit(0)\n")
         f.write("exit(0)\n")
         f.close()
 

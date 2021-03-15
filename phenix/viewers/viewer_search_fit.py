@@ -67,7 +67,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                            " plus 5 better atom struct candidates.")
         form.addParam("numAtomStruct", IntParam, label="Max. Number Atom Structs.",
                       default=1000,
-                      help="Number of atom structs to show\n")
+                      help="Number of atom structs to show ordered by model_to_map_fit\n")
         form.addParam("zone", FloatParam, label="Show Area arround input PDB (A)",
                       default=3,
                       help="Limit the display to a zone around the input PDB.\n"
@@ -127,7 +127,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         sqlCommand = """SELECT filename
                         FROM   %s
                         WHERE model_to_map_fit != -1
-                        ORDER BY filename
+                        ORDER BY model_to_map_fit DESC
                         LIMIT %d""" % (TABLE, self.numAtomStruct)
         c.execute(sqlCommand)
         rows = c.fetchall()
