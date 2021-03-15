@@ -632,7 +632,7 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
         self._showOutliers(headerList, dataList, mesg, title)
 
     def _exportFiles1(self, e=None):
-        CLASHESFILENAME = self.protocol._getTmpPath(self.CLASHESFILE)
+        CLASHESFILENAME = self.protocol._getExtraPath(self.CLASHESFILE)
 
         def onSelect(obj):
             dirName = obj.getPath()
@@ -729,7 +729,7 @@ data.model.geometry.clash.clashes.save_table_data("{dirName}/clashes.txt")
         self._displayPlotBase(self.ROTATMPFILE, 1)
 
     def _displayPlotBase(self, file, listNumber):
-        FILENAME = self.protocol._getTmpPath(file)
+        FILENAME = self.protocol._getExtraPath(file)
         self._writeCommand2(listNumber)
         with open(FILENAME, "w") as f:
             f.write(self.command)
@@ -1263,7 +1263,7 @@ if data.model_vs_data.cc is not None:
         self._openBrowser(onSelect)
 
     def _writePickleData2(self):
-        VALIDATIONTMPFILENAME = self.protocol._getTmpPath(
+        VALIDATIONTMPFILENAME = self.protocol._getExtraPath(
             self.VALIDATIONTMPFILE)
         command = """
 import pickle
