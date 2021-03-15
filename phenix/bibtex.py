@@ -24,7 +24,7 @@
 # *
 # **************************************************************************
 
-_bibtexStr = """
+"""
 @Article{Adams_2010,
    Author="Adams, P. D.  and Afonine, P. V.  and Bunkoczi, G.  and Chen, V. B.  and Davis, I. W.  and Echols, N.  and Headd, J. J.  and Hung, L. W.  and Kapral, G. J.  and Grosse-Kunstleve, R. W.  and McCoy, A. J.  and Moriarty, N. W.  and Oeffner, R.  and Read, R. J.  and Richardson, D. C.  and Richardson, J. S.  and Terwilliger, T. C.  and Zwart, P. H. ",
    Title="{{P}{H}{E}{N}{I}{X}: a comprehensive {P}ython-based system for macromolecular structure solution}",
@@ -80,6 +80,3 @@ _bibtexStr = """
 
 }
 """
-from pyworkflow.utils import parseBibTex
-
-_bibtex = parseBibTex(_bibtexStr)
