@@ -31,3 +31,4 @@ from .viewer_refinement_base import PhenixProtRefinementBaseViewer
 from .viewer_superpose_pdbs import PhenixProtRunSuperposePDBsViewer
 from .viewer_validation_cryoem import PhenixProtRunValidationCryoEMViewer
 from .viewer_dock_in_map import PhenixProtRunDockInMapViewer
+from .viewer_search_fit import PhenixProtRuSearchFitViewer
