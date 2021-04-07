@@ -443,3 +443,4 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
         return args
+
