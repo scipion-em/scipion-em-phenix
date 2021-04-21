@@ -176,12 +176,24 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                         ORDER BY id
                         LIMIT %d""" % (TABLE, self.numAtomStruct)
         c.execute(sqlCommand)
+        rows = c.fetchall()
+
+        for counter, row in enumerate(rows):
+            xList.append(counter)
+            yList.append(float(row[0]))
+        # compute avg
+        sqlCommand = """SELECT AVG(model_to_map_fit)
+                        FROM   %s
+                        WHERE model_to_map_fit != -1
+                        ORDER BY id
+                        LIMIT %d""" % (TABLE, self.numAtomStruct)
+        c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
         print("avg", avg)
-        sqlCommand = """SELECT AVG((%s.model_to_map_fit - sub.a) * (%s.model_to_map_fit - sub.a)) as var 
-                        FROM %s, 
-                        (SELECT AVG(model_to_map_fit) AS a 
-                         FROM %s 
+        sqlCommand = """SELECT AVG((%s.model_to_map_fit - sub.a) * (%s.model_to_map_fit - sub.a)) as var
+                        FROM %s,
+                        (SELECT AVG(model_to_map_fit) AS a
+                         FROM %s
                          WHERE model_to_map_fit != -1
                         ) AS sub
                         WHERE model_to_map_fit != -1
