@@ -47,7 +47,7 @@ class Plugin(pwem.Plugin):
     @classmethod
     def _defineVariables(cls):
         if Plugin.getPhenixVersion() == PHENIXVERSION:
-            cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
+            cls._defineEmVar(PHENIX_HOME, 'phenix-1.18.2')
         else:
             cls._defineEmVar(PHENIX_HOME, ('phenix-' + (Plugin.getPhenixVersion())))
 
