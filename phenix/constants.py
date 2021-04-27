@@ -59,3 +59,5 @@ mapBinarytoDirectory ={
     SYMMETRY: PHENIX_SCRIPT_PATH2
 }
 DISPLAY='display'
+
+kk = 'kk'
