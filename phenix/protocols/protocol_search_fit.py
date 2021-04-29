@@ -75,14 +75,20 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                          label='Test sequence', important=True,
                          help="Input the aminoacid sequence to fit with the "
                               "alanine chain")
-        form.addParam("firstaa", IntParam, important=True, default = -1,
-                      label='First aa',
-                      help='First aminoacid in the sequence to be considered,'
-                           ' -1 -> first aa (1-> first aminoacid also)')
-        form.addParam("lastaa", IntParam, important=True, default = -1,
-                      label='Last aa',
-                      help='Last aminoacid in the sequence to be considered,'
-                           ' -1 -> first aa (1-> first aminoacid also)')
+        # form.addParam("firstaa", IntParam, important=True, default = -1,
+        #               label='First residue',
+        #               help='First residue in the sequence to be considered,'
+        #                    ' -1 -> first aa (1-> first aminoacid also)')
+        # form.addParam("lastaa", IntParam, important=True, default = -1,
+        #               label='Last residue',
+        #               help='Last residue in the sequence to be considered,'
+        #                    ' -1 -> first aa (1-> first aminoacid also)')
+        form.addParam('firstaa', StringParam, important=True,
+                      label='First residue',
+                      help='First residue in the sequence to be considered,')
+        form.addParam('lastaa', StringParam, important=True,
+                      label='Last residue',
+                      help='Last residue in the sequence to be considered,')
         form.addParam('extraCommands', StringParam,
                        label="Extra Params ",
                        default="",
@@ -179,15 +185,15 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         firstAAinChain = next(atomStruct.getStructure().get_residues()).id[1]
 
         # starting and ending aa
-        firstaa = self.firstaa.get()
-        lastaa = self.lastaa.get()
+        firstaa = int(self.firstaa.get().split(":")[1].split(",")[0].strip())
+        lastaa = int(self.lastaa.get().split(":")[1].split(",")[0].strip())
 
         # compute sequence size
-        sequenceSize = len(self.inputSequence.get().getSequence())
-        if lastaa == -1:
-            lastaa = sequenceSize
-        if firstaa == -1:
-            firstaa = 1
+        # sequenceSize = len(self.inputSequence.get().getSequence())
+        # if lastaa == -1:
+        #     lastaa = sequenceSize
+        # if firstaa == -1:
+        #     firstaa = 1
         numberOfSteps = lastaa - firstaa + 1
 
         # steps
