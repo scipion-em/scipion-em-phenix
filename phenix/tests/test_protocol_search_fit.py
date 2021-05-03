@@ -23,7 +23,7 @@
 # ***************************************************************************/
 
 
-# protocol to test the phenix search fit between a sequence and a map density TODO
+# protocol to test the phenix search fit between a sequence and a map density
 from phenix.protocols import PhenixProtSearchFit
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
@@ -41,14 +41,25 @@ class TestImportBase(BaseTest):
 
 
 class TestImportData(TestImportBase):
-    """ Import map volumes and atomic structures(PDBx/mmCIF files)
+    """ Import map volumes, atomic structures(PDBx/mmCIF files)
+    and sequences of specific chains of the atomic structures.
     """
     pdbID1 = "5ni1"  # Haemoglobin atomic structure
-    NAME1 = '5ni1_A-seq'
     CHAIN1 = '{"model": 0, "chain": "A", "residues": 141}'
-    FirstResidue = '{"residue": 90, "K"}'
-    LastResidue = '{"residue": 120, "A"}'
-    def _importVolume(self):
+    pdbID2 = "6qi5"  # Atadenovirus atomic structure
+    CHAIN2 = '{"model": 0, "chain": "M", "residues": 451}'
+    NAME1 = '5ni1_A-seq' # Haemoglobin sequence (chain A)
+    NAME2 = '6qi5_M-seq' # Atadenovirus sequence (chain M)
+    FirstResidue1 = '{"residue": 90, "K"}' # Haemoglobin sequence (chain A)
+    LastResidue1 = '{"residue": 120, "A"}' # Haemoglobin sequence (chain A)
+    FirstResidue1_2 = '{"residue": 80, "L"}'  # Haemoglobin sequence (chain A)
+    LastResidue1_2 = '{"residue": 130, "A"}'  # Haemoglobin sequence (chain A)
+    FirstResidue2 = '{"residue": 42, "Y"}' # Haemoglobin sequence (chain A)
+    LastResidue2 = '{"residue": 55, "V"}' # Haemoglobin sequence (chain A)
+    FirstResidue3 = '{"residue": 128, "E"}' # Atadenovirus sequence (chain M)
+    LastResidue3 = '{"residue": 157, "G"}' # Atadenovirus sequence (chain M)
+
+    def _importVolumeHEMOGLOBINA(self):
         args = {'filesPath': self.dsModBuild.getFile('volumes/emd_3488.map'),
                 'samplingRate': 1.05,
                 'setOrigCoord': True,
@@ -63,7 +74,17 @@ class TestImportData(TestImportBase):
         volume = protImportVol.outputVolume
         return volume
 
-    def _importAtomStruct(self):
+    def _importVolumeATADENOVIRUS(self):
+        args = {'importFrom': ProtImportVolumes.IMPORT_FROM_EMDB,
+                'emdbId': 4551
+                }
+        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
+        protImportVol.setObjLabel('import volume 4551\natadenovirus\n')
+        self.launchProtocol(protImportVol)
+        volume = protImportVol.outputVolume
+        return volume
+
+    def _importAtomStructHEMOGLOBINA(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID1
                 }
@@ -73,7 +94,17 @@ class TestImportData(TestImportBase):
         structure = protImportPDB.outputPdb
         return structure
 
-    def _importSequence(self):
+    def _importAtomStructATADENOVIRUS(self):
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': self.pdbID2
+                }
+        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
+        protImportPDB.setObjLabel('import pdb\n 6qi5')
+        self.launchProtocol(protImportPDB)
+        structure = protImportPDB.outputPdb
+        return structure
+
+    def _importSequenceHEMOGLOBINA(self):
         args = {'inputSequenceName': self.NAME1,
                 'inputProteinSequence':
                     emprot.ProtImportSequence.IMPORT_FROM_STRUCTURE,
@@ -88,178 +119,329 @@ class TestImportData(TestImportBase):
         sequence = protImportSequence.outputSequence
         return sequence
 
+    def _importSequenceATADENOVIRUS(self):
+        args = {'inputSequenceName': self.NAME2,
+                'inputProteinSequence':
+                    emprot.ProtImportSequence.IMPORT_FROM_STRUCTURE,
+                'inputStructureSequence':
+                    emprot.ProtImportSequence.IMPORT_STRUCTURE_FROM_ID,
+                'pdbId': self.pdbID2,
+                'inputStructureChain': self.CHAIN2
+                }
+        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
+        protImportSequence.setObjLabel('import sequence\n 6qi5_M_seq')
+        self.launchProtocol(protImportSequence)
+        sequence = protImportSequence.outputSequence
+        return sequence
+
 
 class TestPhenixProtSearchFit(TestImportData):
     """ Test the chimera subtraction map protocol
     """
 
     def testPhenixSearchFit1(self):
-        """ This test checks  """
-        print("Run Chimera subtraction of a derived-model map "
-              "from the imported volume\n")
+        """ This test checks the fitting of the structure of a traced fragment (residues)
+          of the haemoglobin chain A in the whole density map"""
+        print("Run Phenix Search Fit to fit the alpha-helix structure "
+              "(traced fragment) of the haemoglobin chain A in"
+              " the whole density map\n")
 
         # Import Volume
-        volume = self._importVolume()
+        volume = self._importVolumeHEMOGLOBINA()
 
         # import PDB
-        structure = self._importAtomStruct()
+        structure = self._importAtomStructHEMOGLOBINA()
 
         # import sequence
-        sequence = self._importSequence()
+        sequence = self._importSequenceHEMOGLOBINA()
 
         # create auxiliary CMD file for chimera operate to select only
         # a small fragment of the structure (helix between residues 94 and 118)
         extraCommands = ""
-        extraCommands += "select all & ~ #3/A:94-118\n"
+        extraCommands += "select all & ~ #2/A:94-118\n"
         extraCommands += "del sel\n"
-        extraCommands += "scipionwrite #3 " \
+        extraCommands += "scipionwrite #2 " \
                          "prefix DONOTSAVESESSION_5ni1_chainA_94_118_\n"
         extraCommands += "exit\n"
 
-        args = {'extraCommands': extraCommands,
-                'inputVolume': volume,
-                'pdbFileToBeRefined': structure
+        args1 = {'extraCommands': extraCommands,
+                 'pdbFileToBeRefined': structure
                 }
-        protChimera1 = self.newProtocol(ChimeraProtOperate,
-                                       **args)
-        protChimera1.setObjLabel('chimera operate\n volume and pdb\n save '
-                                 'fitted model')
+        protChimera1 = self.newProtocol(ChimeraProtOperate, **args1)
+        protChimera1.setObjLabel('chimera operate\n fragment_5ni1_A')
         self.launchProtocol(protChimera1)
+
         # Dynamically defined name of the variable because it does depend on
         # the protocol ID
+        result = ""
         try:
             result = eval(
-                "protChimera1.DONOTSAVESESSION_5ni1_chainA_94_118_Atom_struct__3_%06d.getFileName()"
-                          % protChimera1.getObjId())
+                "protChimera1.DONOTSAVESESSION_5ni1_chainA_94_118_Atom_struct__2_%06d" %
+                protChimera1.getObjId())
         except:
             self.assertTrue(False, "There was a problem with the alignment")
 
-        self.assertTrue(os.path.exists(result))
+        self.assertTrue(os.path.exists(result.getFileName()))
 
-        args = {'inputVolume': volume,
-                'resolution' : 3.2,
-                'inputStructure': result,
-                'inputSequence': sequence,
-                'firstaa': self.FirstResidue,
-                'lastaa' : self.LastResidue
+        args2 = {'inputVolume': volume,
+                 'resolution': 3.2,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue1,
+                 'lastaa' : self.LastResidue1
                 }
-        protSearchFit1 = self.newProtocol(PhenixProtSearchFit,
-                                        **args)
-        protSearchFit1.setObjLabel('search fit\n volume 3844\npdb 5ni1_A_94_118\nseq 5ni1_A')
+        protSearchFit1 = self.newProtocol(PhenixProtSearchFit, **args2)
+        protSearchFit1.setObjLabel('search fit\n volume 3844\n5ni1_A_94_118')
         self.launchProtocol(protSearchFit1)
 
+        self.assertTrue(os.path.exists(protSearchFit1.outputAtomStruct_4.getFileName()))
+
     def testPhenixSearchFit2(self):
-        """ This test checks  """
-        print("Run Chimera subtraction of a derived-model map "
-              "from the imported volume\n")
+        """ This test checks the fitting of the structure of the traced fragment
+            carbon skeleton (ALA) of the haemoglobin chain A in the whole density map"""
+        print("Run Phenix Search Fit to fit the alpha-helix structure "
+              "(carbon skeleton fragment) of the haemoglobin chain A in "
+              "the whole density map to retrieve the residues\n")
 
         # Import Volume
-        volume = self._importVolume()
+        volume = self._importVolumeHEMOGLOBINA()
 
         # import PDB
-        structure = self._importAtomStruct()
+        structure = self._importAtomStructHEMOGLOBINA()
 
         # import sequence
-        sequence = self._importSequence()
+        sequence = self._importSequenceHEMOGLOBINA()
 
         # create auxiliary CMD file for chimera operate to select only
         # a small fragment of the structure (helix between residues 94 and 118)
+        # and mutate it to ALA
         extraCommands = ""
-        extraCommands += "select all & ~ #3/A:94-118\n"
+        extraCommands += "select all & ~ #2/A:94-118\n"
         extraCommands += "del sel\n"
-        extraCommands += "swapaa #3/A:94-118 ALA\n"
-        extraCommands += "scipionwrite #3 " \
-                         "prefix DONOTSAVESESSION_5ni1_chainA_94_118_\n"
+        extraCommands += "swapaa #2/A:94-118 ALA\n"
+        extraCommands += "scipionwrite #2 " \
+                         "prefix DONOTSAVESESSION_5ni1_chainA_94_118_MutALA_\n"
         extraCommands += "exit\n"
 
-        args = {'extraCommands': extraCommands,
-                'inputVolume': volume,
+        args1 = {'extraCommands': extraCommands,
                 'pdbFileToBeRefined': structure
                 }
-        protChimera2 = self.newProtocol(ChimeraProtOperate,
-                                        **args)
-        protChimera2.setObjLabel('chimera operate\n volume and pdb\n save '
-                                 'fitted model')
+        protChimera2 = self.newProtocol(ChimeraProtOperate, **args1)
+        protChimera2.setObjLabel('chimera operate\n fragment_5ni1_A_MutALA')
         self.launchProtocol(protChimera2)
+
         # Dynamically defined name of the variable because it does depend on
         # the protocol ID
+        result = ""
         try:
             result = eval(
-                "protChimera2.DONOTSAVESESSION_5ni1_chainA_94_118_MutALA_Atom_struct__3_%06d.getFileName()"
-                % protChimera2.getObjId())
+                "protChimera2.DONOTSAVESESSION_5ni1_chainA_94_118_MutALA_Atom_struct__2_%06d" %
+                protChimera2.getObjId())
         except:
             self.assertTrue(False, "There was a problem with the alignment")
 
-        self.assertTrue(os.path.exists(result))
+        self.assertTrue(os.path.exists(result.getFileName()))
 
-        args = {'inputVolume': volume,
-                'resolution': 3.2,
-                'inputStructure': result,
-                'inputSequence': sequence,
-                'firstaa': self.FirstResidue,
-                'lastaa': self.LastResidue
+        args2 = {'inputVolume': volume,
+                 'resolution': 3.2,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue1,
+                 'lastaa': self.LastResidue1
                 }
-        protSearchFit2 = self.newProtocol(PhenixProtSearchFit,
-                                          **args)
-        protSearchFit2.setObjLabel('search fit\n volume 3844\npdb 5ni1_A_94_118_MutALA\nseq 5ni1_A')
+        protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
+        protSearchFit2.setObjLabel('search fit\n volume 3844\nfragment_5ni1_A_94_118_MutALA\nseq 5ni1_A')
         self.launchProtocol(protSearchFit2)
 
+        self.assertTrue(os.path.exists(protSearchFit2.outputAtomStruct_4.getFileName()))
 
-        # # TODO: These steps of protChimera2 can not be performed in protChimera1 because
-        # # when the map is saved keep an inappropriate origin
-        # extraCommands = ""
-        # # extraCommands += "molmap #2 2.1 gridSpacing 1.05 modelId 3\n"
-        # extraCommands += "molmap #2 2.1 gridSpacing 1.05 replace false\n"
-        # extraCommands += "scipionwrite #3 " \
-        #                  "prefix DONOTSAVESESSION_\n"
-        # extraCommands += "exit\n"
-        # result = eval("protChimera1.DONOTSAVESESSION_Atom_struct__3_%06d"
-        #               % protChimera1.getObjId())
-        # args = {'extraCommands': extraCommands,
-        #         'pdbFileToBeRefined': result,
-        #         }
-        # protChimera2 = self.newProtocol(ChimeraProtOperate,
-        #                                 **args)
-        # protChimera2.setObjLabel('chimera operate\n pdb\n save '
-        #                          'model-derived map')
-        # self.launchProtocol(protChimera2)
-        # try:
-        #     result = eval("protChimera2.DONOTSAVESESSION_Map__3_%06d.getFileName()"
-        #                   % protChimera2.getObjId())
-        # except:
-        #     self.assertTrue(False, "There was a problem with the alignment")
-        #
-        # self.assertTrue(os.path.exists(result))
-        #
-        # # protocol chimera map subtraction
-        # extraCommands = "run(session, 'select all')\n"
-        # extraCommands += "run(session, 'exit')\n"
-        # result = eval("protChimera2.DONOTSAVESESSION_Map__3_%06d"
-        #               % protChimera2.getObjId())
-        # args = {'extraCommands': extraCommands,
-        #         'inputVolume': volume,
-        #         'mapOrModel': 0,
-        #         'inputVolume2': result,
-        #         }
-        # protChimera3 = self.newProtocol(ChimeraSubtractionMaps, **args)
-        # protChimera3.setObjLabel('chimera subtract\n map -\n'
-        #                          'model-derived map\n')
-        # self.launchProtocol(protChimera3)
-        #
-        # # Dynamically defined name of the variable because it does depend on
-        # # the protocol ID
-        # try:
-        #     result = eval("protChimera3.difference_Map__8_%06d.getFileName()"
-        #          % protChimera3.getObjId())
-        # except:
-        #     self.assertTrue(False,  "There was a problem with the alignment")
-        #
-        # self.assertTrue(os.path.exists(result))
-        #
-        # try:
-        #     result = eval("protChimera3.filtered_Map__9_%06d.getFileName()"
-        #          % protChimera3.getObjId())
-        # except:
-        #     self.assertTrue(False,  "There was a problem with the alignment")
-        #
-        # self.assertTrue(os.path.exists(result))
+        # Branch to observe the effect of modifying the residue overlapping between
+        # the sequence and the ALA chain (firstaa and lastaa)
+        args3 = {'inputVolume': volume,
+                 'resolution': 3.2,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue1_2,
+                 'lastaa': self.LastResidue1_2
+                 }
+        protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args3)
+        protSearchFit3.setObjLabel(
+            'search fit\n volume 3844\nfragment_5ni1_A_94_118_MutALA\noverlap_80_130')
+        self.launchProtocol(protSearchFit3)
+
+        self.assertTrue(os.path.exists(protSearchFit3.outputAtomStruct_4.getFileName()))
+
+    def testPhenixSearchFit3(self):
+        """ This test checks the fitting of the structure of a traced fragment (residues)
+          of the haemoglobin chain A in the whole density map"""
+        print("Run Phenix Search Fit to fit the loop like structure "
+              "(traced fragment) of the haemoglobin chain A in"
+              " the whole density map\n")
+
+        # Import Volume
+        volume = self._importVolumeHEMOGLOBINA()
+
+        # import PDB
+        structure = self._importAtomStructHEMOGLOBINA()
+
+        # import sequence
+        sequence = self._importSequenceHEMOGLOBINA()
+
+        # create auxiliary CMD file for chimera operate to select only
+        # a small fragment of the structure (loop between residues 42 and 55)
+        extraCommands = ""
+        extraCommands += "select all & ~ #2/A:42-55\n"
+        extraCommands += "del sel\n"
+        extraCommands += "scipionwrite #2 " \
+                         "prefix DONOTSAVESESSION_5ni1_chainA_42_55_\n"
+        extraCommands += "exit\n"
+
+        args1 = {'extraCommands': extraCommands,
+                 'pdbFileToBeRefined': structure
+                }
+        protChimera1 = self.newProtocol(ChimeraProtOperate, **args1)
+        protChimera1.setObjLabel('chimera operate\n fragment_5ni1_A')
+        self.launchProtocol(protChimera1)
+
+        # Dynamically defined name of the variable because it does depend on
+        # the protocol ID
+        result = ""
+        try:
+            result = eval(
+                "protChimera1.DONOTSAVESESSION_5ni1_chainA_42_55_Atom_struct__2_%06d" %
+                protChimera1.getObjId())
+        except:
+            self.assertTrue(False, "There was a problem with the alignment")
+
+        self.assertTrue(os.path.exists(result.getFileName()))
+
+        args2 = {'inputVolume': volume,
+                 'resolution': 3.2,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue2,
+                 'lastaa' : self.LastResidue2
+                }
+        protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args2)
+        protSearchFit3.setObjLabel('search fit\n volume 3844\n5ni1_A_42_55')
+        self.launchProtocol(protSearchFit3)
+
+        self.assertTrue(os.path.exists(protSearchFit3.outputAtomStruct_4.getFileName()))
+
+    def testPhenixSearchFit4(self):
+        """ This test checks the fitting of the structure of the traced fragment
+            carbon skeleton (ALA) of the haemoglobin chain A in the whole density map"""
+        print("Run Phenix Search Fit to fit the loop like "
+              "(carbon skeleton fragment) of the haemoglobin chain A in "
+              "the whole density map to retrieve the residues\n")
+
+        # Import Volume
+        volume = self._importVolumeHEMOGLOBINA()
+
+        # import PDB
+        structure = self._importAtomStructHEMOGLOBINA()
+
+        # import sequence
+        sequence = self._importSequenceHEMOGLOBINA()
+
+        # create auxiliary CMD file for chimera operate to select only
+        # a small fragment of the structure (loop between residues 42 and 55)
+        extraCommands = ""
+        extraCommands += "select all & ~ #2/A:42-55\n"
+        extraCommands += "del sel\n"
+        extraCommands += "swapaa #2/A:42-55 ALA\n"
+        extraCommands += "scipionwrite #2 " \
+                         "prefix DONOTSAVESESSION_5ni1_chainA_42_55_MutALA_\n"
+        extraCommands += "exit\n"
+
+        args1 = {'extraCommands': extraCommands,
+                'pdbFileToBeRefined': structure
+                }
+        protChimera2 = self.newProtocol(ChimeraProtOperate, **args1)
+        protChimera2.setObjLabel('chimera operate\n fragment_5ni1_A_MutALA')
+        self.launchProtocol(protChimera2)
+
+        # Dynamically defined name of the variable because it does depend on
+        # the protocol ID
+        result = ""
+        try:
+            result = eval(
+                "protChimera2.DONOTSAVESESSION_5ni1_chainA_42_55_MutALA_Atom_struct__2_%06d" %
+                protChimera2.getObjId())
+        except:
+            self.assertTrue(False, "There was a problem with the alignment")
+
+        self.assertTrue(os.path.exists(result.getFileName()))
+
+        args2 = {'inputVolume': volume,
+                 'resolution': 3.2,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue2,
+                 'lastaa': self.LastResidue2
+                }
+        protSearchFit4 = self.newProtocol(PhenixProtSearchFit, **args2)
+        protSearchFit4.setObjLabel(
+            'search fit\n volume 3844\nfragment_5ni1_A_42_55_MutALA\nseq 5ni1_A')
+        self.launchProtocol(protSearchFit4)
+
+        self.assertTrue(os.path.exists(protSearchFit4.outputAtomStruct_4.getFileName()))
+
+    def testPhenixSearchFit5(self):
+        """ This test checks the fitting of the structure of a traced fragment (residues)
+          of the haemoglobin chain M in the whole density map"""
+        print("Run Phenix Search Fit to fit the loop like structure "
+              "(traced fragment) of the haemoglobin chain M in"
+              " the whole density map\n")
+
+        # Import Volume
+        volume = self._importVolumeATADENOVIRUS()
+
+        # import PDB
+        structure = self._importAtomStructATADENOVIRUS()
+
+        # import sequence
+        sequence = self._importSequenceATADENOVIRUS()
+
+        # create auxiliary CMD file for chimera operate to select only
+        # a small fragment of the structure (helix between residues 130 and 156)
+        extraCommands = ""
+        extraCommands += "select all & ~ #2/M:130-156\n"
+        extraCommands += "del sel\n"
+        extraCommands += "scipionwrite #2 " \
+                         "prefix DONOTSAVESESSION_6qi5_chainM_130_156_\n"
+        extraCommands += "exit\n"
+
+        args1 = {'extraCommands': extraCommands,
+                 'pdbFileToBeRefined': structure
+                }
+        protChimera1 = self.newProtocol(ChimeraProtOperate, **args1)
+        protChimera1.setObjLabel('chimera operate\n fragment_6qi5_M')
+        self.launchProtocol(protChimera1)
+
+        # Dynamically defined name of the variable because it does depend on
+        # the protocol ID
+        result = ""
+        try:
+            result = eval(
+                "protChimera1.DONOTSAVESESSION_6qi5_chainM_130_156_Atom_struct__2_%06d" %
+                protChimera1.getObjId())
+        except:
+            self.assertTrue(False, "There was a problem with the alignment")
+
+        self.assertTrue(os.path.exists(result.getFileName()))
+
+        args2 = {'inputVolume': volume,
+                 'resolution': 3.4,
+                 'inputStructure': result,
+                 'inputSequence': sequence,
+                 'firstaa': self.FirstResidue3,
+                 'lastaa' : self.LastResidue3
+                }
+        protSearchFit5 = self.newProtocol(PhenixProtSearchFit, **args2)
+        protSearchFit5.setObjLabel('search fit\n volume 4551\n5ni1_M_130_156')
+        self.launchProtocol(protSearchFit5)
+
+        self.assertTrue(os.path.exists(protSearchFit5.outputAtomStruct_4.getFileName()))
+
+
