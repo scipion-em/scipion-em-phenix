@@ -74,26 +74,22 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         form.addParam('inputSequence', PointerParam, pointerClass="Sequence",
                          label='Test sequence', important=True,
                          help="Input the aminoacid sequence to fit with the "
-                              "alanine chain")
-        # form.addParam("firstaa", IntParam, important=True, default = -1,
-        #               label='First residue',
-        #               help='First residue in the sequence to be considered,'
-        #                    ' -1 -> first aa (1-> first aminoacid also)')
-        # form.addParam("lastaa", IntParam, important=True, default = -1,
-        #               label='Last residue',
-        #               help='Last residue in the sequence to be considered,'
-        #                    ' -1 -> first aa (1-> first aminoacid also)')
+                              "ALA chain.")
         form.addParam('firstaa', StringParam, important=True,
                       label='First residue',
-                      help='First residue in the sequence to be considered,')
+                      help='Select the first residue of the sequence fragment '
+                           'that you would like to consider.\n The sequence '
+                           'should overlap total or partially the ALA chain.')
         form.addParam('lastaa', StringParam, important=True,
                       label='Last residue',
-                      help='Last residue in the sequence to be considered,')
+                      help='Select the last residue of the sequence fragment '
+                           'that you would like to consider.\nThe sequence '
+                           'should overlap total or partially the ALA chain.')
         form.addParam('extraCommands', StringParam,
                        label="Extra Params ",
                        default="",
                        expertLevel=LEVEL_ADVANCED,
-                       help="This string will be added to the coot\n"
+                       help="This string will be added to the Coot\n"
                             " script")
         # real space refine
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
@@ -184,16 +180,11 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         chainName = next(atomStruct.getStructure().get_chains()).get_id()
         firstAAinChain = next(atomStruct.getStructure().get_residues()).id[1]
 
-        # starting and ending aa
+        # starting and ending residue
         firstaa = int(self.firstaa.get().split(":")[1].split(",")[0].strip())
         lastaa = int(self.lastaa.get().split(":")[1].split(",")[0].strip())
 
-        # compute sequence size
-        # sequenceSize = len(self.inputSequence.get().getSequence())
-        # if lastaa == -1:
-        #     lastaa = sequenceSize
-        # if firstaa == -1:
-        #     firstaa = 1
+        # compute number of steps according to the sequence size
         numberOfSteps = lastaa - firstaa + 1
 
         # steps
@@ -395,7 +386,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             atomStructFn = row[0][:-4] + "_real_space_refined.cif"
             atomStruct = AtomStruct()
             atomStruct.setFileName(atomStructFn)
-            argsOutput["outpubAtomStruct_%d" % counter] = atomStruct
+            argsOutput["outputAtomStruct_%d" % counter] = atomStruct
             # self._defineSourceRelation(self.inputStructure.get(), atomStruct)
         c.close()
         conn.close()
