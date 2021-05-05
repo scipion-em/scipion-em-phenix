@@ -28,6 +28,9 @@ from phenix.protocols import PhenixProtSearchFit
 from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from chimera.protocols import ChimeraProtOperate
+from xmipp3.protocols.protocol_extract_asymmetric_unit import XmippProtExtractUnit
+from pwem.constants import SCIPION_SYM_NAME
+from xmipp3.constants import XMIPP_SYM_NAME, XMIPP_TO_SCIPION, XMIPP_I222r
 from pyworkflow.tests import *
 import pwem.protocols as emprot
 import os.path
@@ -250,7 +253,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'lastaa': self.LastResidue1
                 }
         protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
-        protSearchFit2.setObjLabel('search fit\n volume 3844\nfragment_5ni1_A_94_118_MutALA\nseq 5ni1_A')
+        protSearchFit2.setObjLabel(
+            'search fit\n volume 3844\nfragment_5ni1_A_94_118_MutALA\nseq 5ni1_A')
         self.launchProtocol(protSearchFit2)
 
         self.assertTrue(os.path.exists(protSearchFit2.outputAtomStruct_4.getFileName()))
@@ -389,9 +393,9 @@ class TestPhenixProtSearchFit(TestImportData):
 
     def testPhenixSearchFit5(self):
         """ This test checks the fitting of the structure of a traced fragment (residues)
-          of the haemoglobin chain M in the whole density map"""
+          of the adenovirus chain M in the whole density map"""
         print("Run Phenix Search Fit to fit the loop like structure "
-              "(traced fragment) of the haemoglobin chain M in"
+              "(traced fragment) of the adenovirus chain M in"
               " the whole density map\n")
 
         # Import Volume
@@ -403,16 +407,35 @@ class TestPhenixProtSearchFit(TestImportData):
         # import sequence
         sequence = self._importSequenceATADENOVIRUS()
 
+        # run extract asymmetric unit
+        # sym = XMIPP_SYM_NAME[XMIPP_I222r] + " " \
+        #       "(" + SCIPION_SYM_NAME[XMIPP_TO_SCIPION[XMIPP_I222r]] + ")"
+        sym = XMIPP_I222r
+        args = {'inputVolumes': volume,
+                'symmetryGroup': sym,
+                'innerRadius': 202.0,
+                'outerRadius': 389.0,
+                'expandFactor': .2}
+
+        protExtractAsymUnit = self.newProtocol(XmippProtExtractUnit, **args)
+        protExtractAsymUnit.setObjLabel('extract asym unit')
+        self.launchProtocol(protExtractAsymUnit)
+
         # create auxiliary CMD file for chimera operate to select only
         # a small fragment of the structure (helix between residues 130 and 156)
         extraCommands = ""
-        extraCommands += "select all & ~ #2/M:130-156\n"
+        extraCommands += "select #3 & ~ #3/M:130-156\n"
         extraCommands += "del sel\n"
-        extraCommands += "scipionwrite #2 " \
+        extraCommands += "sym #3 i,222r copies true\n"
+        extraCommands += "move -462.88,16.37,26.51 coordinateSystem #1 models #3\n"
+        extraCommands += "mmaker #3 to #4.37\n"
+        extraCommands += "fitmap #3 inMap #2\n"
+        extraCommands += "scipionwrite #3 " \
                          "prefix DONOTSAVESESSION_6qi5_chainM_130_156_\n"
         extraCommands += "exit\n"
 
         args1 = {'extraCommands': extraCommands,
+                 'inputVolume': protExtractAsymUnit.outputVolume,
                  'pdbFileToBeRefined': structure
                 }
         protChimera1 = self.newProtocol(ChimeraProtOperate, **args1)
@@ -424,14 +447,14 @@ class TestPhenixProtSearchFit(TestImportData):
         result = ""
         try:
             result = eval(
-                "protChimera1.DONOTSAVESESSION_6qi5_chainM_130_156_Atom_struct__2_%06d" %
+                "protChimera1.DONOTSAVESESSION_6qi5_chainM_130_156_Atom_struct__3_%06d" %
                 protChimera1.getObjId())
         except:
             self.assertTrue(False, "There was a problem with the alignment")
 
         self.assertTrue(os.path.exists(result.getFileName()))
 
-        args2 = {'inputVolume': volume,
+        args2 = {'inputVolume': protExtractAsymUnit.outputVolume,
                  'resolution': 3.4,
                  'inputStructure': result,
                  'inputSequence': sequence,
