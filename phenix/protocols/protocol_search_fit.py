@@ -15,7 +15,6 @@
 # *
 # * You should have received a copy of the GNU General Public License
 # * along with this program; if not, write to the Free Software
-# * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 # * 02111-1307  USA
 # *
 # *  All comments concerning this program package may be sent to the
@@ -276,7 +275,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         ##    f.write('cur.execute("%s")\n' % command)
         if len(self.extraCommands.get()) > 0:
             f.write("\n#Extra Commands\n")
-            f.write("%\n" % self.extraCommands.get())
+            f.write("%s\n" % self.extraCommands.get())
         f.write("conn.commit()\n")
         f.write("cur.close()\n")
         f.write("conn.close()\n")
