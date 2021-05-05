@@ -181,7 +181,7 @@ class TestPhenixProtSearchFit(TestImportData):
             result = eval(
                 "protChimera1.DONOTSAVESESSION_5ni1_chainA_94_118_Atom_struct__2_%06d" %
                 protChimera1.getObjId())
-        except:
+        except (NameError, SyntaxError) as e:
             self.assertTrue(False, "There was a problem with the alignment")
 
         self.assertTrue(os.path.exists(result.getFileName()))
