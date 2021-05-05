@@ -161,9 +161,9 @@ class TestPhenixPdbCif(TestImportData):
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=1.)
+                                   clashScore, delta=0.75)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=1.)
+                                   overallScore, delta=0.75)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
@@ -269,7 +269,7 @@ class TestPhenixPdbCif(TestImportData):
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
         result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
-                      protChimera.getObjId())
+                 protChimera.getObjId())
 
         # EMRinger
         args = {'inputVolume': volume_hemo_orig,
@@ -501,7 +501,7 @@ class TestPhenixPdbCif(TestImportData):
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
         result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
-                      protChimera.getObjId())
+                 protChimera.getObjId())
         # MolProbity
         args = {
                 'inputVolume': volume_hemo_org,
@@ -669,7 +669,7 @@ class TestPhenixPdbCif(TestImportData):
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
         result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
-                      protChimera.getObjId())
+                 protChimera.getObjId())
 
         # MolProbity
         args = {
