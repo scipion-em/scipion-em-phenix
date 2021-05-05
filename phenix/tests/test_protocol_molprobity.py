@@ -269,7 +269,7 @@ class TestMolprobityValidation2(TestImportData):
     """ Test the protocol of MolProbity validation
     """
     def checkResults(self, ramOutliers, ramFavored, rotOutliers, cbetaOutliers,
-                     clashScore, overallScore, protMolProbity, places=1):
+                     clashScore, overallScore, protMolProbity, places=0):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -407,7 +407,8 @@ class TestMolprobityValidation2(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__3_000174
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {

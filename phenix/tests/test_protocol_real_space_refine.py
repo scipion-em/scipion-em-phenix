@@ -416,7 +416,8 @@ class TestPhenixRSRefine(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000168
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {
@@ -597,7 +598,8 @@ class TestPhenixRSRefine(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000393
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {
@@ -698,7 +700,8 @@ class TestPhenixRSRefine(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__2_000618
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__2_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {
@@ -795,7 +798,8 @@ class TestPhenixRSRefine(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__3_000851
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {

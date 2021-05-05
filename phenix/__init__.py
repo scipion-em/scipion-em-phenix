@@ -36,7 +36,7 @@ from pwem.constants import MAXIT
 
 _logo = "phenix.png"
 _references = ['Adams_2010']
-__version__ = "3.0.4"
+__version__ = "3.1.1"
 
 
 class Plugin(pwem.Plugin):
@@ -47,7 +47,7 @@ class Plugin(pwem.Plugin):
     @classmethod
     def _defineVariables(cls):
         if Plugin.getPhenixVersion() == PHENIXVERSION:
-            cls._defineEmVar(PHENIX_HOME, 'phenix-1.13')
+            cls._defineEmVar(PHENIX_HOME, 'phenix-1.18.2')
         else:
             cls._defineEmVar(PHENIX_HOME, ('phenix-' + (Plugin.getPhenixVersion())))
 
