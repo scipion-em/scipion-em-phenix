@@ -74,20 +74,22 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         form.addParam('inputSequence', PointerParam, pointerClass="Sequence",
                          label='Test sequence', important=True,
                          help="Input the aminoacid sequence to fit with the "
-                              "alanine chain")
-        form.addParam("firstaa", IntParam, important=True, default = -1,
-                      label='First aa',
-                      help='First aminoacid in the sequence to be considered,'
-                           ' -1 -> first aa (1-> first aminoacid also)')
-        form.addParam("lastaa", IntParam, important=True, default = -1,
-                      label='Last aa',
-                      help='Last aminoacid in the sequence to be considered,'
-                           ' -1 -> first aa (1-> first aminoacid also)')
+                              "ALA chain.")
+        form.addParam('firstaa', StringParam, important=True,
+                      label='First residue',
+                      help='Select the first residue of the sequence fragment '
+                           'that you would like to consider.\n The sequence '
+                           'should overlap total or partially the ALA chain.')
+        form.addParam('lastaa', StringParam, important=True,
+                      label='Last residue',
+                      help='Select the last residue of the sequence fragment '
+                           'that you would like to consider.\nThe sequence '
+                           'should overlap total or partially the ALA chain.')
         form.addParam('extraCommands', StringParam,
                        label="Extra Params ",
                        default="",
                        expertLevel=LEVEL_ADVANCED,
-                       help="This string will be added to the coot\n"
+                       help="This string will be added to the Coot\n"
                             " script")
         # real space refine
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
@@ -176,19 +178,13 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         # we assume that there is a single model and a single chain
         atomStructSize = sum(1 for _ in atomStruct.getStructure().get_residues())
         chainName = next(atomStruct.getStructure().get_chains()).get_id()
-        firstAAinChain =next(atomStruct.getStructure().get_residues()).id[1]
+        firstAAinChain = next(atomStruct.getStructure().get_residues()).id[1]
 
+        # starting and ending residue
+        firstaa = int(self.firstaa.get().split(":")[1].split(",")[0].strip())
+        lastaa = int(self.lastaa.get().split(":")[1].split(",")[0].strip())
 
-        # starting and ending aa
-        firstaa = self.firstaa.get()
-        lastaa = self.lastaa.get()
-
-        # compute sequence size
-        sequenceSize = len(self.inputSequence.get().getSequence())
-        if lastaa == -1:
-            lastaa = sequenceSize
-        if firstaa == -1:
-            firstaa = 1
+        # compute number of steps according to the sequence size
         numberOfSteps = lastaa - firstaa + 1
 
         # steps
@@ -196,12 +192,12 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         # mutateChain
         mutateId = self._insertFunctionStep('mutateStep',
                                             firstaa,  # in seq
-                                            firstAAinChain, # in struct
+                                            firstAAinChain,  # in struct
                                             atomStructSize,
                                             chainName,
                                             numberOfSteps,
                                             prerequisites=[prepareId])
-        refineIdList=[]
+        refineIdList = []
         numberOfThreads = self.numberOfMpi.get()
         for start in range(numberOfThreads):
             refineId = self._insertFunctionStep('refineStep2',
@@ -211,15 +207,17 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         self._insertFunctionStep('createOutputStep', prerequisites=refineIdList)
 
     # --------------------------- STEPS functions --------------------------
+
+
     def createTable(self):
         """ Create table and clean it if needed"""
         conn = sqlite3.connect(os.path.abspath(self._getExtraPath(DATAFILE)))
         c = conn.cursor()
         create_table_sql = """CREATE TABLE IF NOT EXISTS %s (   id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                           filename TEXT, 
-                                                           done int DEFAULT 0,
-                                                           model_to_map_fit float DEFAULT -1
-                                                           )""" % TABLE
+                                                                  filename TEXT,
+                                                                  done int DEFAULT 0,
+                                                                  model_to_map_fit float DEFAULT -1
+                                                                  )""" % TABLE
         print("create_table_sql", create_table_sql)
         c.execute(create_table_sql)
         c.close()
@@ -308,8 +306,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         conn = sqlite3.connect(os.path.abspath(self._getExtraPath(DATAFILE)))
         c = conn.cursor()
         while 1:
-            command = """SELECT filename from %s 
-                         WHERE done=0 
+            command = """SELECT filename from %s
+                         WHERE done=0
                          LIMIT 1""" % TABLE
             c.execute(command)
             myrow = c.fetchone()
@@ -320,8 +318,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                 break  # break while if no job is available
 
             atomStructFn, = myrow
-            accepted = c.execute("""UPDATE %s 
-                                    SET done=1 
+            accepted = c.execute("""UPDATE %s
+                                    SET done=1
                                     WHERE filename='%s' AND done=0""" % (TABLE, atomStructFn))
             # ^^^^^^ This will return the number of rows updated.
             # Note that we only update if done is still '0', so if we get 1 updated
@@ -361,8 +359,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             logFileFn = atomStructFn[:-4] + "_real_space_refined.log"
             model_to_map_fit = self.extractNumber(logFileFn)
             print("model_to_map_fit", model_to_map_fit)
-            accepted = c.execute("""UPDATE %s 
-                                    SET model_to_map_fit=%f 
+            accepted = c.execute("""UPDATE %s
+                                    SET model_to_map_fit=%f
                                     WHERE filename='%s'""" % (TABLE,
                                                               float(model_to_map_fit),
                                                               atomStructFn)
@@ -377,9 +375,9 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         conn = sqlite3.connect(os.path.abspath(self._getExtraPath(DATAFILE)))
         c = conn.cursor()
         sqlCommand = """SELECT filename, model_to_map_fit
-                        FROM   %s
-                        ORDER BY model_to_map_fit DESC
-                        LIMIT 5""" % TABLE
+                                    FROM   %s
+                                    ORDER BY model_to_map_fit DESC
+                                    LIMIT 5""" % TABLE
         c.execute(sqlCommand)
         rows = c.fetchall()
 
@@ -388,8 +386,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             atomStructFn = row[0][:-4] + "_real_space_refined.cif"
             atomStruct = AtomStruct()
             atomStruct.setFileName(atomStructFn)
-            argsOutput["outpubAtomStruct_%d" % counter ] = atomStruct
-            #self._defineSourceRelation(self.inputStructure.get(), atomStruct)
+            argsOutput["outputAtomStruct_%d" % counter] = atomStruct
+            # self._defineSourceRelation(self.inputStructure.get(), atomStruct)
         c.close()
         conn.close()
         self._defineOutputs(**argsOutput)
@@ -403,7 +401,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             errors.append("Error: You should provide a volume.\n")
         return errors
 
-#    def _citations(self):
+#   def _citations(self):
 #        return ['Barad_2015']
 
     def _summary(self):
@@ -442,3 +440,4 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         if numberOfThreads > 1:
             args += " nproc=%d" % numberOfThreads
         return args
+

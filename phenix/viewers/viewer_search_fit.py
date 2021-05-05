@@ -1,6 +1,7 @@
 # **************************************************************************
 # *
 # * Authors:     Roberto Marabini
+# *              Marta Martinez (mmmtnez@cnb.csic.es)
 # *
 # * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
 # *
@@ -62,7 +63,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('showMapModel', LabelParam,
-                      label="Show volume and atomic structures",
+                      label="Show volume and atomic structures in ChimeraX",
                       help="Display input volume and atom struct"
                            " plus 5 better atom struct candidates.")
         form.addParam("numAtomStruct", IntParam, label="Max. Number Atom Structs.",
@@ -83,7 +84,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         }
 
     def _showMapModel(self, e=None):
-        bildFileName = self.protocol._getTmpPath("axis_output.bild")
+        bildFileName = self.protocol._getExtraPath("axis_output.bild")
 
         _inputVol = self.protocol.inputVolume.get()
         dim = _inputVol.getDim()[0]

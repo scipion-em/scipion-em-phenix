@@ -161,9 +161,9 @@ class TestPhenixPdbCif(TestImportData):
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=1.)
+                                   clashScore, delta=0.75)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=1.)
+                                   overallScore, delta=0.75)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))

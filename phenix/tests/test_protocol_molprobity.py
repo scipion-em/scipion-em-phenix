@@ -407,7 +407,8 @@ class TestMolprobityValidation2(TestImportData):
         protChimera = self.newProtocol(ChimeraProtOperate, **args)
         protChimera.setObjLabel('chimera operate\n repairing CIF\n')
         self.launchProtocol(protChimera)
-        result = protChimera.repaired_CIF_ChimeraX_Atom_struct__3_000174
+        result = eval("protChimera.repaired_CIF_ChimeraX_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
 
         # MolProbity
         args = {

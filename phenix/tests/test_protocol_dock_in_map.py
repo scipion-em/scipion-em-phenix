@@ -129,10 +129,10 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.DONOTSAVESESSION_A_Atom_struct__3_000223
-        self.assertIsNotNone(protChimera.DONOTSAVESESSION_A_Atom_struct__3_000223.getFileName(),
+        chainA = eval("protChimera.DONOTSAVESESSION_A_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
+        self.assertIsNotNone(chainA.getFileName(),
                              "There was a problem with the alignment")
-
 
         # extract unit cell from map
         args = {'inputVolumes': map,
@@ -195,9 +195,10 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.DONOTSAVESESSION_A_Atom_struct__3_000438
-        self.assertIsNotNone(protChimera.DONOTSAVESESSION_A_Atom_struct__3_000438.getFileName(),
-                             "There was a problem with the alignment")
+        chainA = eval("protChimera.DONOTSAVESESSION_A_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
+        self.assertIsNotNone(chainA.getFileName(),
+                              "There was a problem with the alignment")
 
         # dock chainA in the full map
         args = {
@@ -247,9 +248,11 @@ class TestProtDockInMap(TestImportData):
                                        **args)
         protChimera.setObjLabel('chimera operate\n extract chain A')
         self.launchProtocol(protChimera)
-        chainA = protChimera.DONOTSAVESESSION_A_Atom_struct__3_000609
-        self.assertIsNotNone(protChimera.DONOTSAVESESSION_A_Atom_struct__3_000609.getFileName(),
+        chainA = eval("protChimera.DONOTSAVESESSION_A_Atom_struct__3_%06d" % \
+                      protChimera.getObjId())
+        self.assertIsNotNone(chainA.getFileName(),
                              "There was a problem with the alignment")
+
         # dock two chainA in the full map
         args = {
                 'inputVolume1': map,
