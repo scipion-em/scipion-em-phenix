@@ -276,7 +276,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         ##    f.write('cur.execute("%s")\n' % command)
         if len(self.extraCommands.get()) > 0:
             f.write("\n#Extra Commands\n")
-            f.write("%\n" % self.extraCommands.get())
+            f.write("%s\n" % self.extraCommands.get())
         f.write("conn.commit()\n")
         f.write("cur.close()\n")
         f.write("conn.close()\n")
