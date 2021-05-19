@@ -62,6 +62,12 @@ class TestImportData(TestImportBase):
     FirstResidue3 = '{"residue": 128, "E"}' # Atadenovirus sequence (chain M)
     LastResidue3 = '{"residue": 157, "G"}' # Atadenovirus sequence (chain M)
 
+    def importVolume(self, args, label):
+        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
+        protImportVol.setObjLabel(label)
+        self.launchProtocol(protImportVol)
+        return protImportVol.outputVolume
+
     def _importVolumeHEMOGLOBINA(self):
         args = {'filesPath': self.dsModBuild.getFile('volumes/emd_3488.map'),
                 'samplingRate': 1.05,
@@ -70,42 +76,39 @@ class TestImportData(TestImportBase):
                 'y': 0.0,
                 'z': 0.0
                 }
-        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume haemoglobin\n with default '
-                                  'origin\n')
-        self.launchProtocol(protImportVol)
-        volume = protImportVol.outputVolume
-        return volume
+        return self.importVolume(args, 'import volume haemoglobin\n'
+                                       ' with default origin\n')
 
     def _importVolumeATADENOVIRUS(self):
         args = {'importFrom': ProtImportVolumes.IMPORT_FROM_EMDB,
                 'emdbId': 4551
                 }
-        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume 4551\natadenovirus\n')
-        self.launchProtocol(protImportVol)
-        volume = protImportVol.outputVolume
-        return volume
+        return self.importVolume(args, 'import volume 4551\n'
+                                       'atadenovirus\n')
+
+    def importAtomStruct(self, args, label):
+        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
+        protImportPDB.setObjLabel(label)
+        self.launchProtocol(protImportPDB)
+        return protImportPDB.outputPdb
 
     def _importAtomStructHEMOGLOBINA(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID1
                 }
-        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 5ni1')
-        self.launchProtocol(protImportPDB)
-        structure = protImportPDB.outputPdb
-        return structure
+        return self.importAtomStruct(args, 'import pdb\n 5ni1')
 
     def _importAtomStructATADENOVIRUS(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID2
                 }
-        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 6qi5')
-        self.launchProtocol(protImportPDB)
-        structure = protImportPDB.outputPdb
-        return structure
+        return self.importAtomStruct(args,'import pdb\n 6qi5')
+
+    def importSequence(self, args, label):
+        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
+        protImportSequence.setObjLabel(label)
+        self.launchProtocol(protImportSequence)
+        return protImportSequence.outputSequence
 
     def _importSequenceHEMOGLOBINA(self):
         args = {'inputSequenceName': self.NAME1,
@@ -116,11 +119,7 @@ class TestImportData(TestImportBase):
                 'pdbId': self.pdbID1,
                 'inputStructureChain': self.CHAIN1
                 }
-        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('import sequence\n 5ni1_A_seq')
-        self.launchProtocol(protImportSequence)
-        sequence = protImportSequence.outputSequence
-        return sequence
+        return self.importSequence(args, 'import sequence\n 5ni1_A_seq')
 
     def _importSequenceATADENOVIRUS(self):
         args = {'inputSequenceName': self.NAME2,
@@ -131,12 +130,7 @@ class TestImportData(TestImportBase):
                 'pdbId': self.pdbID2,
                 'inputStructureChain': self.CHAIN2
                 }
-        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('import sequence\n 6qi5_M_seq')
-        self.launchProtocol(protImportSequence)
-        sequence = protImportSequence.outputSequence
-        return sequence
-
+        return self.importSequence(args,'import sequence\n 6qi5_M_seq')
 
 class TestPhenixProtSearchFit(TestImportData):
     """ Test the chimera subtraction map protocol
