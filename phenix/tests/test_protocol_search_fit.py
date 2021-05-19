@@ -185,7 +185,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1,
-                 'lastaa' : self.LastResidue1
+                 'lastaa' : self.LastResidue1,
+                 'numberOfMpi' : 8
                 }
         protSearchFit1 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit1.setObjLabel('search fit\n volume 3844\n5ni1_A_94_118')
@@ -244,7 +245,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1,
-                 'lastaa': self.LastResidue1
+                 'lastaa': self.LastResidue1,
+                 'numberOfMpi' : 8
                 }
         protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit2.setObjLabel(
@@ -260,7 +262,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1_2,
-                 'lastaa': self.LastResidue1_2
+                 'lastaa': self.LastResidue1_2,
+                 'numberOfMpi' : 8
                  }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args3)
         protSearchFit3.setObjLabel(
@@ -318,7 +321,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue2,
-                 'lastaa' : self.LastResidue2
+                 'lastaa' : self.LastResidue2,
+                 'numberOfMpi' : 8
                 }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit3.setObjLabel('search fit\n volume 3844\n5ni1_A_42_55')
@@ -376,7 +380,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue2,
-                 'lastaa': self.LastResidue2
+                 'lastaa': self.LastResidue2,
+                 'numberOfMpi' : 8
                 }
         protSearchFit4 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit4.setObjLabel(
@@ -453,7 +458,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue3,
-                 'lastaa' : self.LastResidue3
+                 'lastaa' : self.LastResidue3,
+                 'numberOfMpi' : 8
                 }
         protSearchFit5 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit5.setObjLabel('search fit\n volume 4551\n5ni1_M_130_156')
