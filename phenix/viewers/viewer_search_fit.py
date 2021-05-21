@@ -194,7 +194,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                         ) AS sub
                         WHERE model_to_map_fit != -1
                         """ % (fromRelation, fromRelation)
-        print("sqlCommand", sqlCommand)
+        # print("sqlCommand", sqlCommand)
         c.execute(sqlCommand)
         rows = c.fetchone(); std_2 = rows[0]
         std = math.sqrt(std_2)
