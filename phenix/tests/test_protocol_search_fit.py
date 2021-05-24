@@ -62,6 +62,12 @@ class TestImportData(TestImportBase):
     FirstResidue3 = '{"residue": 128, "E"}' # Atadenovirus sequence (chain M)
     LastResidue3 = '{"residue": 157, "G"}' # Atadenovirus sequence (chain M)
 
+    def importVolume(self, args, label):
+        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
+        protImportVol.setObjLabel(label)
+        self.launchProtocol(protImportVol)
+        return protImportVol.outputVolume
+
     def _importVolumeHEMOGLOBINA(self):
         args = {'filesPath': self.dsModBuild.getFile('volumes/emd_3488.map'),
                 'samplingRate': 1.05,
@@ -70,42 +76,39 @@ class TestImportData(TestImportBase):
                 'y': 0.0,
                 'z': 0.0
                 }
-        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume haemoglobin\n with default '
-                                  'origin\n')
-        self.launchProtocol(protImportVol)
-        volume = protImportVol.outputVolume
-        return volume
+        return self.importVolume(args, 'import volume haemoglobin\n'
+                                       ' with default origin\n')
 
     def _importVolumeATADENOVIRUS(self):
         args = {'importFrom': ProtImportVolumes.IMPORT_FROM_EMDB,
                 'emdbId': 4551
                 }
-        protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
-        protImportVol.setObjLabel('import volume 4551\natadenovirus\n')
-        self.launchProtocol(protImportVol)
-        volume = protImportVol.outputVolume
-        return volume
+        return self.importVolume(args, 'import volume 4551\n'
+                                       'atadenovirus\n')
+
+    def importAtomStruct(self, args, label):
+        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
+        protImportPDB.setObjLabel(label)
+        self.launchProtocol(protImportPDB)
+        return protImportPDB.outputPdb
 
     def _importAtomStructHEMOGLOBINA(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID1
                 }
-        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 5ni1')
-        self.launchProtocol(protImportPDB)
-        structure = protImportPDB.outputPdb
-        return structure
+        return self.importAtomStruct(args, 'import pdb\n 5ni1')
 
     def _importAtomStructATADENOVIRUS(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
                 'pdbId': self.pdbID2
                 }
-        protImportPDB = self.newProtocol(emprot.ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 6qi5')
-        self.launchProtocol(protImportPDB)
-        structure = protImportPDB.outputPdb
-        return structure
+        return self.importAtomStruct(args,'import pdb\n 6qi5')
+
+    def importSequence(self, args, label):
+        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
+        protImportSequence.setObjLabel(label)
+        self.launchProtocol(protImportSequence)
+        return protImportSequence.outputSequence
 
     def _importSequenceHEMOGLOBINA(self):
         args = {'inputSequenceName': self.NAME1,
@@ -116,11 +119,7 @@ class TestImportData(TestImportBase):
                 'pdbId': self.pdbID1,
                 'inputStructureChain': self.CHAIN1
                 }
-        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('import sequence\n 5ni1_A_seq')
-        self.launchProtocol(protImportSequence)
-        sequence = protImportSequence.outputSequence
-        return sequence
+        return self.importSequence(args, 'import sequence\n 5ni1_A_seq')
 
     def _importSequenceATADENOVIRUS(self):
         args = {'inputSequenceName': self.NAME2,
@@ -131,12 +130,7 @@ class TestImportData(TestImportBase):
                 'pdbId': self.pdbID2,
                 'inputStructureChain': self.CHAIN2
                 }
-        protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('import sequence\n 6qi5_M_seq')
-        self.launchProtocol(protImportSequence)
-        sequence = protImportSequence.outputSequence
-        return sequence
-
+        return self.importSequence(args,'import sequence\n 6qi5_M_seq')
 
 class TestPhenixProtSearchFit(TestImportData):
     """ Test the chimera subtraction map protocol
@@ -181,7 +175,7 @@ class TestPhenixProtSearchFit(TestImportData):
             result = eval(
                 "protChimera1.DONOTSAVESESSION_5ni1_chainA_94_118_Atom_struct__2_%06d" %
                 protChimera1.getObjId())
-        except:
+        except (NameError, SyntaxError) as e:
             self.assertTrue(False, "There was a problem with the alignment")
 
         self.assertTrue(os.path.exists(result.getFileName()))
@@ -191,7 +185,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1,
-                 'lastaa' : self.LastResidue1
+                 'lastaa' : self.LastResidue1,
+                 'numberOfMpi' : 8
                 }
         protSearchFit1 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit1.setObjLabel('search fit\n volume 3844\n5ni1_A_94_118')
@@ -250,7 +245,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1,
-                 'lastaa': self.LastResidue1
+                 'lastaa': self.LastResidue1,
+                 'numberOfMpi' : 8
                 }
         protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit2.setObjLabel(
@@ -266,7 +262,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue1_2,
-                 'lastaa': self.LastResidue1_2
+                 'lastaa': self.LastResidue1_2,
+                 'numberOfMpi' : 8
                  }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args3)
         protSearchFit3.setObjLabel(
@@ -324,7 +321,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue2,
-                 'lastaa' : self.LastResidue2
+                 'lastaa' : self.LastResidue2,
+                 'numberOfMpi' : 8
                 }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit3.setObjLabel('search fit\n volume 3844\n5ni1_A_42_55')
@@ -382,7 +380,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue2,
-                 'lastaa': self.LastResidue2
+                 'lastaa': self.LastResidue2,
+                 'numberOfMpi' : 8
                 }
         protSearchFit4 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit4.setObjLabel(
@@ -459,7 +458,8 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'firstaa': self.FirstResidue3,
-                 'lastaa' : self.LastResidue3
+                 'lastaa' : self.LastResidue3,
+                 'numberOfMpi' : 8
                 }
         protSearchFit5 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit5.setObjLabel('search fit\n volume 4551\n5ni1_M_130_156')

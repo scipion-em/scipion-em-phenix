@@ -167,39 +167,33 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         c.execute(sqlCommand)
         rows = c.fetchall()
 
-        for counter, row in enumerate(rows):
+        for counter, row in enumerate(rows, 1):
             xList.append(counter)
             yList.append(float(row[0]))
         # compute avg
-        sqlCommand = """SELECT AVG(model_to_map_fit)
-                        FROM   %s
-                        WHERE model_to_map_fit != -1
-                        ORDER BY id
-                        LIMIT %d""" % (TABLE, self.numAtomStruct)
-        c.execute(sqlCommand)
-        rows = c.fetchall()
-
-        for counter, row in enumerate(rows):
-            xList.append(counter)
-            yList.append(float(row[0]))
-        # compute avg
-        sqlCommand = """SELECT AVG(model_to_map_fit)
-                        FROM   %s
-                        WHERE model_to_map_fit != -1
-                        ORDER BY id
-                        LIMIT %d""" % (TABLE, self.numAtomStruct)
+        sqlCommand = """SELECT AVG(model_to_map_fit) 
+                        FROM (SELECT model_to_map_fit
+                             FROM %s
+                             WHERE model_to_map_fit != -1
+                             ORDER BY id
+                             LIMIT %d)""" % (TABLE, self.numAtomStruct)
         c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
         print("avg", avg)
-        sqlCommand = """SELECT AVG((%s.model_to_map_fit - sub.a) * (%s.model_to_map_fit - sub.a)) as var
+        fromRelation = """(SELECT model_to_map_fit
+                             FROM %s
+                             WHERE model_to_map_fit != -1
+                             ORDER BY id
+                             LIMIT %d) AS mainTable""" % (TABLE, self.numAtomStruct)
+
+        sqlCommand = """SELECT AVG((mainTable.model_to_map_fit - sub.a) * (mainTable.model_to_map_fit - sub.a)) as var
                         FROM %s,
                         (SELECT AVG(model_to_map_fit) AS a
                          FROM %s
                          WHERE model_to_map_fit != -1
                         ) AS sub
                         WHERE model_to_map_fit != -1
-                        """ % (TABLE, TABLE, TABLE, TABLE)
-        print("sqlCommand", sqlCommand)
+                        """ % (fromRelation, fromRelation)
         c.execute(sqlCommand)
         rows = c.fetchone(); std_2 = rows[0]
         std = math.sqrt(std_2)
@@ -217,6 +211,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         plt.xlabel('#Atom Structs')
         plt.ylabel('Map Model Fit Score')
         plt.show()
+        print(xList, yList)
 
         # SELECT FLOOR(model_to_map_fit/5.00)*5 As Grade,
         #        COUNT(*) AS [Grade Count]

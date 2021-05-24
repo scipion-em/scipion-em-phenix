@@ -14,6 +14,7 @@ Current programs implemented:
   * molprobity
   * superpose pdbs
   * validation cryoem
+  * search fit
 
 ===================
 Install this plugin
@@ -64,11 +65,13 @@ To check the installation, simply run the following Scipion tests:
   * scipion test phenix.tests.test_protocol_molprobity
   * scipion test phenix.tests.test_protocol_superpose_pdbs
   * scipion test phenix.tests.test_protocol_validation_cryoem
+  * scipion test phenix.tests.test_protocol_search_fit
+
 
 
 - **Supported versions of PHENIX**
 
-Tested with  `Phenix-1.13-2998, Phenix-1.16-3549 and Phenix- 1.17.1`
+Tested with  `Phenix-1.13-2998, Phenix-1.16-3549, Phenix- 1.17.1 and Phenix 1.18.2`
 
 
 
