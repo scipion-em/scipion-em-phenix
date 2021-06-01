@@ -182,7 +182,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                              FROM %s
                              WHERE model_to_map_fit != -1
                              ORDER BY model_to_map_fit desc
-                             LIMIT %d)""" % (TABLE, self.numAtomStruct)
+                             )""" % (TABLE)
         c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
         print("avg", avg)
@@ -190,7 +190,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                              FROM %s
                              WHERE model_to_map_fit != -1
                              ORDER BY model_to_map_fit desc
-                             LIMIT %d) AS mainTable""" % (TABLE, self.numAtomStruct)
+                             ) AS mainTable""" % (TABLE)
 
         sqlCommand = """SELECT AVG((mainTable.model_to_map_fit - sub.a) * (mainTable.model_to_map_fit - sub.a)) as var
                         FROM %s,
@@ -210,7 +210,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
             errorWindow(self.getTkRoot(), "No data available")
             return
 
-        title = 'Map Model Fit - avg = %f, std = %f'%(avg, std)
+        title = 'avg (all data) = %f, std (all data) = %f'%(avg, std)
         plt.plot(xList, yList, 'x')
         plt.axis([0, max(xList) + 1.0, 0.0, max(yList)+0.1])
         plt.title(title)
