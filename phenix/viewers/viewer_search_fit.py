@@ -159,23 +159,29 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         yList = []
         conn = sqlite3.connect(os.path.abspath(self.protocol._getExtraPath(DATAFILE)))
         c = conn.cursor()
-        sqlCommand = """SELECT model_to_map_fit
-                        FROM   %s
-                        WHERE model_to_map_fit != -1
-                        ORDER BY id
-                        LIMIT %d""" % (TABLE, self.numAtomStruct)
+        sqlCommand = """
+                        SELECT id, model_to_map_fit
+                            FROM (
+                                  SELECT id, model_to_map_fit
+                                  FROM   %s
+                                  WHERE model_to_map_fit != -1
+                                  ORDER BY model_to_map_fit desc
+                                  LIMIT %d) AS a
+                           ORDER BY id
+                          """ % (TABLE, self.numAtomStruct)
+
         c.execute(sqlCommand)
         rows = c.fetchall()
 
-        for counter, row in enumerate(rows, 1):
-            xList.append(counter)
-            yList.append(float(row[0]))
+        for row in rows:
+            xList.append(float(row[0]))
+            yList.append(float(row[1]))
         # compute avg
         sqlCommand = """SELECT AVG(model_to_map_fit) 
                         FROM (SELECT model_to_map_fit
                              FROM %s
                              WHERE model_to_map_fit != -1
-                             ORDER BY id
+                             ORDER BY model_to_map_fit desc
                              LIMIT %d)""" % (TABLE, self.numAtomStruct)
         c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
@@ -183,7 +189,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         fromRelation = """(SELECT model_to_map_fit
                              FROM %s
                              WHERE model_to_map_fit != -1
-                             ORDER BY id
+                             ORDER BY model_to_map_fit desc
                              LIMIT %d) AS mainTable""" % (TABLE, self.numAtomStruct)
 
         sqlCommand = """SELECT AVG((mainTable.model_to_map_fit - sub.a) * (mainTable.model_to_map_fit - sub.a)) as var
@@ -205,7 +211,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
             return
 
         title = 'Map Model Fit - avg = %f, std = %f'%(avg, std)
-        plt.plot(xList, yList)
+        plt.plot(xList, yList, 'x')
         plt.axis([0, max(xList) + 1.0, 0.0, max(yList)+0.1])
         plt.title(title)
         plt.xlabel('#Atom Structs')
