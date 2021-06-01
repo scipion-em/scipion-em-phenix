@@ -69,9 +69,9 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         form.addParam("numAtomStruct", IntParam, label="Max. Number Atom Structs.",
                       default=1000,
                       help="Number of atom structs to show ordered by model_to_map_fit\n")
-        form.addParam("zone", FloatParam, label="Show Area arround input PDB (A)",
+        form.addParam("zone", FloatParam, label="Show Area around input atomic structure (A)",
                       default=3,
-                      help="Limit the display to a zone around the input PDB.\n"
+                      help="Limit the display to a zone around the input atomic structure.\n"
                            "Units = A.")
         form.addParam('showPlot', LabelParam,
                       label="Summary Plot",
