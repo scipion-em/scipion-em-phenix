@@ -1,1 +1,2 @@
 scipion-em-ccp4>=3.0.0
+mpi4py>=3.0.3
