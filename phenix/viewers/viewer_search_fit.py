@@ -69,9 +69,9 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         form.addParam("numAtomStruct", IntParam, label="Max. Number Atom Structs.",
                       default=1000,
                       help="Number of atom structs to show ordered by model_to_map_fit\n")
-        form.addParam("zone", FloatParam, label="Show Area arround input PDB (A)",
+        form.addParam("zone", FloatParam, label="Show Area around input atomic struct (A)",
                       default=3,
-                      help="Limit the display to a zone around the input PDB.\n"
+                      help="Limit the display to a zone around the input atomic structure.\n"
                            "Units = A.")
         form.addParam('showPlot', LabelParam,
                       label="Summary Plot",
@@ -182,7 +182,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                              FROM %s
                              WHERE model_to_map_fit != -1
                              ORDER BY model_to_map_fit desc
-                             LIMIT %d)""" % (TABLE, self.numAtomStruct)
+                             )""" % (TABLE)
         c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
         print("avg", avg)
@@ -190,7 +190,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                              FROM %s
                              WHERE model_to_map_fit != -1
                              ORDER BY model_to_map_fit desc
-                             LIMIT %d) AS mainTable""" % (TABLE, self.numAtomStruct)
+                             ) AS mainTable""" % (TABLE)
 
         sqlCommand = """SELECT AVG((mainTable.model_to_map_fit - sub.a) * (mainTable.model_to_map_fit - sub.a)) as var
                         FROM %s,
@@ -210,7 +210,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
             errorWindow(self.getTkRoot(), "No data available")
             return
 
-        title = 'Map Model Fit - avg = %f, std = %f'%(avg, std)
+        title = 'avg (all data) = %f, std (all data) = %f'%(avg, std)
         plt.plot(xList, yList, 'x')
         plt.axis([0, max(xList) + 1.0, 0.0, max(yList)+0.1])
         plt.title(title)
