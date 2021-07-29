@@ -38,7 +38,8 @@ from phenix import Plugin
 from ccp4 import Plugin as PluginCCP4
 from ccp4.convert import (runCCP4Program)
 from ccp4.constants import CCP4_BINARIES
-from phenix.constants import (REALSPACEREFINE)
+from phenix.constants import (REALSPACEREFINE,
+                              PHENIXVERSION19)
 from pwem.convert.atom_struct import retry
 
 COOT = CCP4_BINARIES['COOT']
@@ -337,10 +338,12 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                  listAtomStruct=[atomStructFn], log=self._log)
 #            refinedFile = False
 #            for item in os.listdir(self._getExtraPath()):
-#                if item.endswith("_real_space_refined.cif"):
-#                    refinedFile = True
+#                p = re.compile('\d+')
+#                if p.search(item) is not None and item.endswith(".cif"):
+#                    self.refinedFile = True
 #                    break
-#            if refinedFile == False:
+#
+#            if self.refinedFile == False:
 #                print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
 #                      " failure: High number of nonbonded interaction distances " \
 #                      "< 0.5. This error has been disable by running the same " \
@@ -412,8 +415,16 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         return summary
 
     def _writeArgsRSR(self, atomStruct, vol):
-        args = "model_file=%s" % atomStruct
-        args += " map_file=%s" % vol
+        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+            args = " "
+        else:
+            args = " model_file="
+        args += "%s " % atomStruct
+        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+            args += " "
+        else:
+            args += " map_file="
+        args += "%s " % vol
         args += " resolution=%f" % self.resolution
         args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="
