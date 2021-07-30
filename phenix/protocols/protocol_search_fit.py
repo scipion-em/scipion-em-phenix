@@ -319,10 +319,10 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                 break  # break while if no job is available
 
             atomStructFn, = myrow
-            accepted = c.execute("""UPDATE %s
-                                    SET done=1
-                                    WHERE filename='%s' AND done=0""" % (TABLE, atomStructFn))
-            # ^^^^^^ This will return the number of rows updated.
+            c.execute("""UPDATE %s
+                            SET done=1
+                          WHERE filename='%s' AND done=0""" % (TABLE, atomStructFn))
+            # ^^^^^^ This will return the number of rows updated (c.rowcount).
             # Note that we only update if done is still '0', so if we get 1 updated
             # row, we're sure no one else took our job. This works because UPDATE is atomic.
 
@@ -343,9 +343,9 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                 # last file
                 lastLogFile = sorted(glob.glob(logFileFn))[-1]
                 phenix_id = lastLogFile[-8:-4]  # _000
-                accepted = c.execute("""UPDATE %s
-                                        SET phenix_id='%s'
-                                        WHERE filename='%s'""" % (TABLE, phenix_id,
+                c.execute("""UPDATE %s
+                                SET phenix_id='%s'
+                              WHERE filename='%s'""" % (TABLE, phenix_id,
                                                                              atomStructFn))
             else:
                 phenix_id = ''
