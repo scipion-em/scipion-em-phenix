@@ -291,15 +291,23 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         # run
         self._log.info('Launching: ' + PluginCCP4.getProgram(COOT) + ' ' + args)
         runCCP4Program(PluginCCP4.getProgram(COOT), args)
-
+    
     def extractNumber(self,filename):
+        """ returns None if log file does not exist
+            or the log file has not store the overall CC_mask value,
+            otherwose returns the CC value"""
+        if os.path.exists(filename):
+            return None
         myfile = open(filename, "rt")
         contents = myfile.read()
         myfile.close()
-        m = re.search(
-            r"Final info \(overall\)\n(\*+)\nmodel-to-map fit, CC_mask: (\d+.\d+)", contents)
-        return m.group(2)
-
+        m = re.findall(
+                r"verall(.+)\n(\*+)\nmodel-to-map fit, CC_mask: (\d+.\d+)", contents)[-1]
+        # [-1] --> find last ocurrence
+        if not m:
+            return None
+        return m[2]
+      
     def refineStep2(self):
         # atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
         ## vol = os.path.abspath(self._getInputVolume().getFileName())
@@ -333,6 +341,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             conn.commit()
 
             args = self._writeArgsRSR(atomStructFn, vol)
+            # do not retry just execute the phenix program
             retry(Plugin.runPhenixProgram,
                  Plugin.getProgram(REALSPACEREFINE), args,
                  # cwd=os.path.abspath(self._getExtraPath()),
@@ -360,6 +369,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
 #                      listAtomStruct=[atomStructFn], log=self._log)
             logFileFn = atomStructFn[:-4] + "_real_space_refined.log"
             model_to_map_fit = self.extractNumber(logFileFn)
+            # check model_to_map_fit, if it is None we need to retry
+            # otherwise just continue.
             print("model_to_map_fit", model_to_map_fit)
             accepted = c.execute("""UPDATE %s 
                                     SET model_to_map_fit=%f 
