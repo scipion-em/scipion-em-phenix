@@ -69,9 +69,9 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         form.addParam("numAtomStruct", IntParam, label="Max. Number Atom Structs.",
                       default=1000,
                       help="Number of atom structs to show ordered by model_to_map_fit\n")
-        form.addParam("zone", FloatParam, label="Show Area arround input PDB (A)",
+        form.addParam("zone", FloatParam, label="Show Area around input atomic struct (A)",
                       default=3,
-                      help="Limit the display to a zone around the input PDB.\n"
+                      help="Limit the display to a zone around the input atomic structure.\n"
                            "Units = A.")
         form.addParam('showPlot', LabelParam,
                       label="Summary Plot",
@@ -122,10 +122,11 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         # zone command
         f.write("volume zone #%d near #%d range %f newMap false\n" %
                 (counter -1, counter, self.zone.get()))
+        f.write("cofr #%d\n" % counter)
         # open database and retrieve all files
         conn = sqlite3.connect(os.path.abspath(self.protocol._getExtraPath(DATAFILE)))
         c = conn.cursor()
-        sqlCommand = """SELECT filename
+        sqlCommand = """SELECT filename, phenix_id
                         FROM   %s
                         WHERE model_to_map_fit != -1
                         ORDER BY model_to_map_fit DESC
@@ -134,7 +135,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         rows = c.fetchall()
 
         for row in rows:
-            atomStructFn = row[0][:-4] + "_real_space_refined.cif"
+            atomStructFn = row[0][:-4] + "_real_space_refined%s.cif" % row[1]
             f.write("open %s\n" % atomStructFn)
         c.close()
         conn.close()
@@ -159,32 +160,38 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         yList = []
         conn = sqlite3.connect(os.path.abspath(self.protocol._getExtraPath(DATAFILE)))
         c = conn.cursor()
-        sqlCommand = """SELECT model_to_map_fit
-                        FROM   %s
-                        WHERE model_to_map_fit != -1
-                        ORDER BY id
-                        LIMIT %d""" % (TABLE, self.numAtomStruct)
+        sqlCommand = """
+                        SELECT id, model_to_map_fit
+                            FROM (
+                                  SELECT id, model_to_map_fit
+                                  FROM   %s
+                                  WHERE model_to_map_fit != -1
+                                  ORDER BY model_to_map_fit desc
+                                  LIMIT %d) AS a
+                           ORDER BY id
+                          """ % (TABLE, self.numAtomStruct)
+
         c.execute(sqlCommand)
         rows = c.fetchall()
 
-        for counter, row in enumerate(rows, 1):
-            xList.append(counter)
-            yList.append(float(row[0]))
+        for row in rows:
+            xList.append(float(row[0]))
+            yList.append(float(row[1]))
         # compute avg
         sqlCommand = """SELECT AVG(model_to_map_fit) 
                         FROM (SELECT model_to_map_fit
                              FROM %s
                              WHERE model_to_map_fit != -1
-                             ORDER BY id
-                             LIMIT %d)""" % (TABLE, self.numAtomStruct)
+                             ORDER BY model_to_map_fit desc
+                             )""" % (TABLE)
         c.execute(sqlCommand)
         rows = c.fetchone(); avg = rows[0]
         print("avg", avg)
         fromRelation = """(SELECT model_to_map_fit
                              FROM %s
                              WHERE model_to_map_fit != -1
-                             ORDER BY id
-                             LIMIT %d) AS mainTable""" % (TABLE, self.numAtomStruct)
+                             ORDER BY model_to_map_fit desc
+                             ) AS mainTable""" % (TABLE)
 
         sqlCommand = """SELECT AVG((mainTable.model_to_map_fit - sub.a) * (mainTable.model_to_map_fit - sub.a)) as var
                         FROM %s,
@@ -204,8 +211,8 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
             errorWindow(self.getTkRoot(), "No data available")
             return
 
-        title = 'Map Model Fit - avg = %f, std = %f'%(avg, std)
-        plt.plot(xList, yList)
+        title = 'avg (all data) = %f, std (all data) = %f'%(avg, std)
+        plt.plot(xList, yList, 'x')
         plt.axis([0, max(xList) + 1.0, 0.0, max(yList)+0.1])
         plt.title(title)
         plt.xlabel('#Atom Structs')
