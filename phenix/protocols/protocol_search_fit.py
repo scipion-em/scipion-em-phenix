@@ -25,6 +25,7 @@
 import os
 import re
 import sqlite3
+import glob
 
 from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import (StringParam,  IntParam,
@@ -38,7 +39,8 @@ from phenix import Plugin
 from ccp4 import Plugin as PluginCCP4
 from ccp4.convert import (runCCP4Program)
 from ccp4.constants import CCP4_BINARIES
-from phenix.constants import (REALSPACEREFINE)
+from phenix.constants import (REALSPACEREFINE,
+                              PHENIXVERSION19)
 from pwem.convert.atom_struct import retry
 
 COOT = CCP4_BINARIES['COOT']
@@ -56,8 +58,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
     """
     _label = 'search fit'
     _program = ""
-    # _version = VERSION_1_2
     FITTEDFILE = 'fitted.mrc'
+    version = Plugin.getPhenixVersion()
 
     def __init__(self, **kwargs):
         super(PhenixProtSearchFit, self).__init__(**kwargs)
@@ -215,7 +217,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         create_table_sql = """CREATE TABLE IF NOT EXISTS %s (   id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                                   filename TEXT,
                                                                   done int DEFAULT 0,
-                                                                  model_to_map_fit float DEFAULT -1
+                                                                  model_to_map_fit float DEFAULT -1,
+                                                                  phenix_id TEXT default ''
                                                                   )""" % TABLE
         print("create_table_sql", create_table_sql)
         c.execute(create_table_sql)
@@ -293,9 +296,10 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         myfile = open(filename, "rt")
         contents = myfile.read()
         myfile.close()
-        m = re.search(
-            r"Final info \(overall\)\n(\*+)\nmodel-to-map fit, CC_mask: (\d+.\d+)", contents)
-        return m.group(2)
+        m = re.findall(
+                r"verall(.+)\n(\*+)\nmodel-to-map fit, CC_mask: (\d+.\d+)", contents)[-1]
+        # [-1] --> find last ocurrence
+        return m[2]
 
     def refineStep2(self):
         # atomStruct = os.path.abspath(self.inputStructure.get().getFileName())
@@ -311,20 +315,18 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             c.execute(command)
             myrow = c.fetchone()
             if not myrow:
-                #c.close()
-                #conn.close()
                 print("refineStep: no more available works")
                 break  # break while if no job is available
 
             atomStructFn, = myrow
-            accepted = c.execute("""UPDATE %s
-                                    SET done=1
-                                    WHERE filename='%s' AND done=0""" % (TABLE, atomStructFn))
-            # ^^^^^^ This will return the number of rows updated.
+            c.execute("""UPDATE %s
+                            SET done=1
+                          WHERE filename='%s' AND done=0""" % (TABLE, atomStructFn))
+            # ^^^^^^ This will return the number of rows updated (c.rowcount).
             # Note that we only update if done is still '0', so if we get 1 updated
             # row, we're sure no one else took our job. This works because UPDATE is atomic.
 
-            if not accepted:
+            if not c.rowcount:
                 # Whoops this job was taken! Try again and get another one
                 continue
             conn.commit()
@@ -335,12 +337,27 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                  # cwd=os.path.abspath(self._getExtraPath()),
                  cwd=cwd,
                  listAtomStruct=[atomStructFn], log=self._log)
+            if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+                # update data base with phenix version
+                logFileFn = atomStructFn[:-4] + "_real_space_refined_???.log"
+                # last file
+                lastLogFile = sorted(glob.glob(logFileFn))[-1]
+                phenix_id = lastLogFile[-8:-4]  # _000
+                c.execute("""UPDATE %s
+                                SET phenix_id='%s'
+                              WHERE filename='%s'""" % (TABLE, phenix_id,
+                                                                             atomStructFn))
+            else:
+                phenix_id = ''
+            conn.commit()
 #            refinedFile = False
 #            for item in os.listdir(self._getExtraPath()):
-#                if item.endswith("_real_space_refined.cif"):
-#                    refinedFile = True
+#                p = re.compile('\d+')
+#                if p.search(item) is not None and item.endswith(".cif"):
+#                    self.refinedFile = True
 #                    break
-#            if refinedFile == False:
+#
+#            if self.refinedFile == False:
 #                print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
 #                      " failure: High number of nonbonded interaction distances " \
 #                      "< 0.5. This error has been disable by running the same " \
@@ -355,9 +372,11 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
 #                      # cwd=os.path.abspath(self._getExtraPath()),
 #                      cwd=cwd,
 #                      listAtomStruct=[atomStructFn], log=self._log)
-            logFileFn = atomStructFn[:-4] + "_real_space_refined.log"
+            # coot_000000_Imol_0000_version_0004_real_space_refined_001.eff
+            # coot_000000_Imol_0000_version_0030.pdb
+            # glob
+            logFileFn = atomStructFn[:-4] + "_real_space_refined%s.log" % phenix_id
             model_to_map_fit = self.extractNumber(logFileFn)
-            print("model_to_map_fit", model_to_map_fit)
             accepted = c.execute("""UPDATE %s
                                     SET model_to_map_fit=%f
                                     WHERE filename='%s'""" % (TABLE,
@@ -373,7 +392,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         # make 5 pdbs with higher score available to scipion
         conn = sqlite3.connect(os.path.abspath(self._getExtraPath(DATAFILE)))
         c = conn.cursor()
-        sqlCommand = """SELECT filename, model_to_map_fit
+        sqlCommand = """SELECT filename, model_to_map_fit, phenix_id
                                     FROM   %s
                                     ORDER BY model_to_map_fit DESC
                                     LIMIT 5""" % TABLE
@@ -382,11 +401,10 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
 
         argsOutput = {}
         for counter, row in enumerate(rows):
-            atomStructFn = row[0][:-4] + "_real_space_refined.cif"
+            atomStructFn = row[0][:-4] + "_real_space_refined%s.log" % row[2]
             atomStruct = AtomStruct()
             atomStruct.setFileName(atomStructFn)
             argsOutput["outputAtomStruct_%d" % counter] = atomStruct
-            # self._defineSourceRelation(self.inputStructure.get(), atomStruct)
         c.close()
         conn.close()
         self._defineOutputs(**argsOutput)
@@ -412,8 +430,16 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         return summary
 
     def _writeArgsRSR(self, atomStruct, vol):
-        args = "model_file=%s" % atomStruct
-        args += " map_file=%s" % vol
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+            args = " "
+        else:
+            args = " model_file="
+        args += "%s " % atomStruct
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+            args += " "
+        else:
+            args += " map_file="
+        args += "%s " % vol
         args += " resolution=%f" % self.resolution
         args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="

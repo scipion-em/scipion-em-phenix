@@ -32,14 +32,15 @@ from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
                               VALIDATION_CRYOEM,
-                              PHENIXVERSION)
+                              PHENIXVERSION,
+                              PHENIXVERSION19)
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
 from pwem.convert.atom_struct import retry, fromCIFTommCIF
 from .protocol_refinement_base import PhenixProtRunRefinementBase
 from phenix import Plugin
-
+import re
 
 PDB = 0
 mmCIF = 1
@@ -168,12 +169,14 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
               # cwd=os.path.abspath(self._getExtraPath()),
               cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log)
-        refinedFile = False
+        self.refinedFile = False
         for item in os.listdir(self._getExtraPath()):
-            if item.endswith("_real_space_refined.cif"):
-                refinedFile = True
+            p = re.compile('\d+')
+            if p.search(item) is not None and item.endswith(".cif"):
+                self.refinedFile = True
                 break
-        if refinedFile == False:
+
+        if self.refinedFile == False:
             print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
                   " failure: High number of nonbonded interaction distances " \
                   "< 0.5. This error has been disable by running the same " \
@@ -265,9 +268,13 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
     def _getRSRefineOutput(self):
         inPdbName = os.path.basename(self.inputStructure.get().getFileName())
-        outAtomStructName = self._getExtraPath(
-            inPdbName.replace("." + inPdbName.split(".")[-1],
-                              "_real_space_refined.cif"))
+        list_cif = []
+        for item in os.listdir(self._getExtraPath()):
+            p = re.compile('\d+')
+            if p.search(item) is not None and item.endswith(".cif"):
+                list_cif.append(item)
+        name = sorted(list_cif)[-1]
+        outAtomStructName = self._getExtraPath(name)
         # convert cif to mmcif by using maxit program
         # to get the right number and name of chains
         log = self._log
@@ -275,8 +282,16 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         fromCIFTommCIF(outAtomStructName, self.outAtomStructName, log)
 
     def _writeArgsRSR(self, atomStruct, vol):
-        args = "model_file=%s" % atomStruct
-        args += " map_file=%s" % vol
+        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+            args = " "
+        else:
+            args = " model_file="
+        args += "%s " % atomStruct
+        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+            args += " "
+        else:
+            args += " map_file="
+        args += "%s " % vol
         args += " resolution=%f" % self.resolution
         args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="

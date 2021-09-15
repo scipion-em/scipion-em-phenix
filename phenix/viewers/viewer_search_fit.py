@@ -122,10 +122,11 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         # zone command
         f.write("volume zone #%d near #%d range %f newMap false\n" %
                 (counter -1, counter, self.zone.get()))
+        f.write("cofr #%d\n" % counter)
         # open database and retrieve all files
         conn = sqlite3.connect(os.path.abspath(self.protocol._getExtraPath(DATAFILE)))
         c = conn.cursor()
-        sqlCommand = """SELECT filename
+        sqlCommand = """SELECT filename, phenix_id
                         FROM   %s
                         WHERE model_to_map_fit != -1
                         ORDER BY model_to_map_fit DESC
@@ -134,7 +135,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         rows = c.fetchall()
 
         for row in rows:
-            atomStructFn = row[0][:-4] + "_real_space_refined.cif"
+            atomStructFn = row[0][:-4] + "_real_space_refined%s.cif" % row[1]
             f.write("open %s\n" % atomStructFn)
         c.close()
         conn.close()

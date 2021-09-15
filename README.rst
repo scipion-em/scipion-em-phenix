@@ -71,7 +71,7 @@ To check the installation, simply run the following Scipion tests:
 
 - **Supported versions of PHENIX**
 
-Tested with  `Phenix-1.13-2998, Phenix-1.16-3549, Phenix- 1.17.1 and Phenix 1.18.2`
+Tested with  `Phenix-1.13-2998, Phenix-1.16-3549, Phenix- 1.17.1, Phenix 1.18.2 and phenix-1.19.2`
 
 
 
@@ -85,6 +85,7 @@ Protocols
 * real_space_refine: Designed for extensive real-space refinement of an atomic structure against the map provided. The map can be derived from X-ray or neutron crystallography, or cryoEM. The program obtains a model that fits the map as well as possible having appropriate geometry. The model should not show validation outliers, such as Ramachandran plot or rotamer outliers.
 * superpose_pdbs: Superposes two atomic structures so that they optimally match.
 * validation_cryoem: generalization of molprobity implemented by Phenix package.
+* search_fit: given a chain of n alanines, a 3D map and a sequence search for the subsequence of n aminoacids that better fits in the density. Only works if the atomic structure has a single chain.
 
 
 ========
