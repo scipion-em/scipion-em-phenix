@@ -256,7 +256,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             outFileName = self._getExtraPath(COOTPDBTEMPLATEFILENAME% (0,0,start))
             f.write("save_coordinates(0, '%s')\n" % outFileName)
             command = "INSERT INTO %s(filename) VALUES('%s')" % (TABLE,
-                                                                 outFileName
+                                                                 os.path.abspath(outFileName)
                                                                  )
             f.write('cur.execute("%s")\n' % command)
 
@@ -406,7 +406,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             args = " "
         else:
             args = " model_file="
-        args += "%s " % os.path.abspath(atomStruct)
+        args += "%s " % atomStruct
         if Plugin.getPhenixVersion() >= PHENIXVERSION19:
             args += " "
         else:
