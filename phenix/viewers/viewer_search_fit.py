@@ -37,6 +37,8 @@ from pwem.viewers import TableView, Chimera
 from pwem import Domain
 from phenix.protocols.protocol_search_fit import (DATAFILE,
                                                   TABLE)
+from phenix import Plugin
+from phenix.constants import PHENIXVERSION19
 
 def errorWindow(tkParent, msg):
     try:
@@ -75,7 +77,10 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
                            "Units = A.")
         form.addParam('showPlot', LabelParam,
                       label="Summary Plot",
-                      help="Plot showing 'model_to_map_fit' values")
+                      help="Plot showing 'model_to_map_fit' values. The X axis indicates \n"
+                           "the XXXX number of each refined atomic structure that appears \n"
+                           "in files named \n"
+                           "coot_000000_Imol_0000_version_XXXX_real_space_refined_000.cif")
 
     def _getVisualizeDict(self):
         return {
@@ -135,7 +140,10 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         rows = c.fetchall()
 
         for row in rows:
-            atomStructFn = row[0][:-4] + "_real_space_refined%s.cif" % row[1]
+            if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+                atomStructFn = row[0][:-4] + "_real_space_refined_000.cif"
+            else:
+                atomStructFn = row[0][:-4] + "_real_space_refined.cif"
             f.write("open %s\n" % atomStructFn)
         c.close()
         conn.close()
@@ -175,7 +183,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         rows = c.fetchall()
 
         for row in rows:
-            xList.append(float(row[0]))
+            xList.append(float(row[0]) - 1.0)
             yList.append(float(row[1]))
         # compute avg
         sqlCommand = """SELECT AVG(model_to_map_fit) 
@@ -213,7 +221,7 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
 
         title = 'avg (all data) = %f, std (all data) = %f'%(avg, std)
         plt.plot(xList, yList, 'x')
-        plt.axis([0, max(xList) + 1.0, 0.0, max(yList)+0.1])
+        plt.axis([-1.0, max(xList) + 1.0, 0.0, max(yList)+0.1])
         plt.title(title)
         plt.xlabel('#Atom Structs')
         plt.ylabel('Map Model Fit Score')
