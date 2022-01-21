@@ -22,7 +22,7 @@
 # ***************************************************************************/
 
 from pwem.protocols.protocol_import import (ProtImportSetOfAtomStructs, ProtImportVolumes)
-from phenix.protocols import PhenixProtRunRSRefineSet
+from phenix.protocols import PhenixProtAddMolprobity, PhenixProtRunRSRefineSet
 from pyworkflow.tests import *
 
 
@@ -58,7 +58,22 @@ class TestImportBase(BaseTest):
       return getattr(protImportPDBs, protImportPDBs._OUTNAME)
 
 
-class TestRSRefineSet(TestImportBase):
+class TestPhenixMolProbInputSet(TestImportBase):
+
+  def testAddMolProbSet(self):
+    """"""
+    args = {'inputVolume': self._importVolume(),
+            'resolution': 3.5,
+            'inputStructureSet': self._importStructurePDBSet(),
+            }
+
+    protMolProb = self.newProtocol(PhenixProtAddMolprobity, **args)
+    protMolProb.setObjLabel('Add molprobity score on SetOfAtomStruct')
+    self.launchProtocol(protMolProb)
+    self.assertEqual(len(protMolProb.outputAtomStructs), len(protMolProb.inputStructureSet.get()))
+    self.assertTrue(hasattr(protMolProb.outputAtomStructs.getFirstItem(), 'molProbScore'))
+
+class TestPhenixRSRefineInputSet(TestImportBase):
 
   def testRSRefineSet(self):
     """"""
@@ -67,7 +82,8 @@ class TestRSRefineSet(TestImportBase):
             'inputStructureSet': self._importStructurePDBSet(),
             }
 
-    protMolProb = self.newProtocol(PhenixProtRunRSRefineSet, **args)
-    protMolProb.setObjLabel('Real space refine on SetOfAtomStruct')
-    self.launchProtocol(protMolProb)
-    self.assertEqual(len(protMolProb.outputAtomStructs), len(protMolProb.inputStructureSet.get()))
+    protRSR = self.newProtocol(PhenixProtRunRSRefineSet, **args)
+    protRSR.setObjLabel('Real space refine on SetOfAtomStruct')
+    self.launchProtocol(protRSR)
+    self.assertEqual(len(protRSR.outputAtomStructs), len(protRSR.inputStructureSet.get()))
+    self.assertTrue(hasattr(protRSR.outputAtomStructs.getFirstItem(), 'molProbScore'))
