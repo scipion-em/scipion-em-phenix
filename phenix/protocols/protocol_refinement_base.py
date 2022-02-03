@@ -155,7 +155,7 @@ atomic structure derived from a cryo-EM density map.
 
 
     def _readValidationPklFile(self, fileName):
-        self.SUMMARYFILENAME = self._getTmpPath(self.SUMMARYFILENAME)
+        SUMMARYFILENAME = self._getTmpPath(self.SUMMARYFILENAME)
         command = """import pickle
 import collections
 import json
@@ -178,9 +178,9 @@ dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
 
         command += """with open('%s',"w") as f:
     f.write(json.dumps(dictSummary))
-""" % (self.SUMMARYFILENAME)
+""" % (SUMMARYFILENAME)
 
-        pythonFileName = self.SUMMARYFILENAME.replace('.txt', '.py')
+        pythonFileName = SUMMARYFILENAME.replace('.txt', '.py')
         # write script file
         with open(pythonFileName, "w") as f:
             f.write(command)
@@ -189,7 +189,7 @@ dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
         Plugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
-        with open(self.SUMMARYFILENAME, "r") as f:
+        with open(SUMMARYFILENAME, "r") as f:
             dictSummary = f.read()
 
         dictSummary = json.loads(
