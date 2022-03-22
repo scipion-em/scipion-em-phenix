@@ -30,7 +30,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19
+from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20
 
 
 class TestImportBase(BaseTest):
@@ -309,6 +309,14 @@ class TestPhenixRSRefine(TestImportData):
                                       clashScore=2.09,
                                       overallScore=1.16,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.4717,
+                                      ramFavored=83.96,
+                                      rotOutliers=5.68,
+                                      cbetaOutliers=1,
+                                      clashScore=4.77,
+                                      overallScore=2.50,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.70,
@@ -393,6 +401,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=3.87,
                                       overallScore=1.59,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -494,6 +510,14 @@ class TestPhenixRSRefine(TestImportData):
                                       clashScore=3.87,
                                       overallScore=1.59,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.11,
@@ -581,6 +605,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=3.76,
                                       overallScore=1.19,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -677,6 +709,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=3.64,
                                       overallScore=1.25,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -785,6 +825,14 @@ class TestPhenixRSRefine(TestImportData):
                                       clashScore=3.87,
                                       overallScore=1.59,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.11,
@@ -887,6 +935,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=3.64,
                                       overallScore=1.25,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=95.23,
+                                      rotOutliers=0.43,
+                                      cbetaOutliers=0,
+                                      clashScore=3.53,
+                                      overallScore=1.48,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,

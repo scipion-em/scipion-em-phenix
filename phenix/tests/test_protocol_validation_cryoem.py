@@ -33,7 +33,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19
+from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20
 
 
 class TestImportBase(BaseTest):
@@ -324,6 +324,14 @@ class TestValCryoEM(TestImportData):
                                       clashScore=2.09,
                                       overallScore=1.27,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=0.47,
+                                      ramFavored=83.96,
+                                      rotOutliers=5.68,
+                                      cbetaOutliers=1,
+                                      clashScore=4.77,
+                                      overallScore=2.50,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.23,
@@ -361,6 +369,14 @@ class TestValCryoEM(TestImportData):
                                 clashScore=2.09,
                                 overallScore=1.16,
                                 protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkMPResults(ramOutliers=0.47,
+                                 ramFavored=83.96,
+                                 rotOutliers=5.68,
+                                 cbetaOutliers=1,
+                                 clashScore=4.77,
+                                 overallScore=2.50,
+                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=96.23,
@@ -396,7 +412,16 @@ class TestValCryoEM(TestImportData):
         # self.assertTrue(False)
 
         # check validation cryoem results
-        self.checkValCryoEMResults(ramOutliers=0.00,
+        if Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkValCryoEMResults(ramOutliers=0.47,
+                                       ramFavored=83.96,
+                                       rotOutliers=5.68,
+                                       cbetaOutliers=1,
+                                       clashScore=4.77,
+                                       overallScore=2.50,
+                                       protValCryoEM=protValCryoEM)
+        else:
+            self.checkValCryoEMResults(ramOutliers=0.00,
                                   ramFavored=96.70,
                                   rotOutliers=3.98,
                                   cbetaOutliers=0,
@@ -642,6 +667,14 @@ class TestValCryoEM(TestImportData):
                                       clashScore=7.65,
                                       overallScore=1.75,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkRSRefineResults(ramOutliers=1.77,
+                                      ramFavored=87.62,
+                                      rotOutliers=10.40,
+                                      cbetaOutliers=2,
+                                      clashScore=12.73,
+                                      overallScore=3.00,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=94.42,
@@ -685,6 +718,14 @@ class TestValCryoEM(TestImportData):
                                 cbetaOutliers=0,
                                 clashScore=7.65,
                                 overallScore=1.75,
+                                protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkMPResults(ramOutliers=1.77,
+                                ramFavored=87.62,
+                                rotOutliers=10.40,
+                                cbetaOutliers=2,
+                                clashScore=11.11,
+                                overallScore=2.94,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -737,6 +778,14 @@ class TestValCryoEM(TestImportData):
                                        cbetaOutliers=0,
                                        clashScore=7.65,
                                        overallScore=1.75,
+                                       protValCryoEM=protValCryoEM)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkValCryoEMResults(ramOutliers=1.77,
+                                       ramFavored=87.62,
+                                       rotOutliers=10.40,
+                                       cbetaOutliers=2,
+                                       clashScore=11.11,
+                                       overallScore=2.94,
                                        protValCryoEM=protValCryoEM)
         else:
             self.checkValCryoEMResults(ramOutliers=0.00,

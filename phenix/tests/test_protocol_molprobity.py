@@ -28,7 +28,7 @@ from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import PHENIXVERSION18, Plugin
+from phenix import PHENIXVERSION18, PHENIXVERSION20, Plugin
 
 
 class TestImportBase(BaseTest):
@@ -664,13 +664,22 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        self.checkResults(ramOutliers=0.20,
-                          ramFavored=97.35,
-                          rotOutliers=12.24,
-                          cbetaOutliers=0,
-                          clashScore=130.72,
-                          overallScore=3.53,
-                          protMolProbity=protMolProbity)
+        if Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkResults(ramOutliers=0.20,
+                              ramFavored=97.35,
+                              rotOutliers=12.24,
+                              cbetaOutliers=0,
+                              clashScore=132.67,
+                              overallScore=3.54,
+                              protMolProbity=protMolProbity)
+        else:
+            self.checkResults(ramOutliers=0.20,
+                              ramFavored=97.35,
+                              rotOutliers=12.24,
+                              cbetaOutliers=0,
+                              clashScore=130.72,
+                              overallScore=3.53,
+                              protMolProbity=protMolProbity)
 
     def testMolProbityValidationManyOutliers2(self):
         """ This test checks that MolProbity validation protocol runs with
@@ -693,11 +702,20 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        self.checkResults(ramOutliers=3.82,
-                          ramFavored=89.09,
-                          rotOutliers=31.35,
-                          cbetaOutliers=746,
-                          clashScore=276.52,
-                          overallScore=4.61,
-                          protMolProbity=protMolProbity)
+        if Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkResults(ramOutliers=3.82,
+                              ramFavored=89.09,
+                              rotOutliers=31.44,
+                              cbetaOutliers=746,
+                              clashScore=281.68,
+                              overallScore=4.62,
+                              protMolProbity=protMolProbity)
+        else:
+            self.checkResults(ramOutliers=3.82,
+                              ramFavored=89.09,
+                              rotOutliers=31.35,
+                              cbetaOutliers=746,
+                              clashScore=276.52,
+                              overallScore=4.61,
+                              protMolProbity=protMolProbity)
 
