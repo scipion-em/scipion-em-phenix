@@ -49,6 +49,7 @@ EMRINGER = 'emringer.py'
 GETVERSION = 'phenix.version'
 DOCKINMAP = 'dock_in_map.py'
 SYMMETRY = 'map_symmetry.py'
+PROCESS = 'process_predicted_model.py'
 mapBinarytoDirectory ={
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,
@@ -58,6 +59,7 @@ mapBinarytoDirectory ={
     EMRINGER : PHENIX_SCRIPT_PATH1,
     GETVERSION: PHENIX_GETVERSION_PATH,
     DOCKINMAP: PHENIX_SCRIPT_PATH2,
-    SYMMETRY: PHENIX_SCRIPT_PATH2
+    SYMMETRY: PHENIX_SCRIPT_PATH2,
+    PROCESS: PHENIX_SCRIPT_PATH2
 }
 DISPLAY='display'
