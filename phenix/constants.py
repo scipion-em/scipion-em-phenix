@@ -29,6 +29,7 @@ PHENIXVERSIONFILENAME = './phenix_env.sh'
 PHENIXVERSION = '1.13' # plugin version
 PHENIXVERSION18 = '1.18' # september 2020
 PHENIXVERSION19 = '1.19' # june 2021
+PHENIXVERSION20 = '1.20' # march 2022
 
 #python used to run phenix scripts
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
