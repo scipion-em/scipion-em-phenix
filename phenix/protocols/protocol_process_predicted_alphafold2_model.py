@@ -28,7 +28,9 @@ import os
 from pyworkflow import Config
 from pyworkflow.object import String, Float, Integer
 from pwem.protocols import EMProtocol
-from pyworkflow.protocol.params import PointerParam, BooleanParam, EnumParam
+from pyworkflow.protocol.constants import LEVEL_ADVANCED
+from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
+                                        StringParam, FloatParam)
 from phenix.constants import PROCESS, PHENIX_HOME
 from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
 
@@ -46,9 +48,9 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     _label = 'process predicted model'
     _program = ""
     # _version = VERSION_1_2
-    PROCESSPREDICTEDFILE = 'proccessed_predicted_model.cif'
+    PROCESSPREDICTEDFILE = '_proccessed.pdb'
     SEQREMAINDER = '_remainder.seq'
-    ContentOfBvalueField = ['LDDT', 'RMSD', 'B-value']
+    ContentOfBvalueField = ['LDDT (AlphaFold2)', 'RMSD', 'B-value']
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -57,7 +59,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       pointerClass="AtomStruct",
                       label='Predicted AlphaFold2 model', important=True,
                       help="Atom structure model (PDBx/mmCIF) retrieved by AlphaFold2.")
-        form.addParam('inputProgramToAlign1_1', EnumParam,
+        form.addParam('contentBvalueField', EnumParam,
                       choices=self.ContentOfBvalueField, important=True,
                       label="Contents of B-value field:", default=0,
                       help="The B-value field in most predicted models represents \n"
@@ -66,17 +68,33 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       "An actual B-value (atomic displacement parameter)\n"
                       "In process_predicted_model, confidence values or error estimates "
                       "in A or are first converted in new pseudo B-values.")
-        form.addParam('removeLowConfidenceResidues', BooleanParam, default=False,
+        form.addParam('removeLowConfidenceResidues', BooleanParam, default=True,
                       label='Remove low-confidence residues',
                       help="""For AlphaFold2 models, low-confidence corresponds 
                       approximately to an LDDT value of about 0.7 (on a scale of 
                       0 to 1, or 70 on a scale of 0 to 100), or to an RMSD value 
                       of about 1.5, or to a B-value of about 60.""")
-        form.addParam('splitModel', BooleanParam, default=False,
+        form.addParam('splitModel', BooleanParam, default=True,
                       label='Split model into compact regions',
                       help="""group the pieces from your trimmed model into compact 
                       domains, or even to split some pieces into compact domains""")
-
+        form.addParam('maximumDomains', FloatParam, default=3.0,
+                      label='Processing option: Maximum domains',
+                      help="""Maximum domains to obtain. You can use this to merge
+                      the closest domains at the end of splitting the model. Make it
+                      bigger to get more domains.""")
+        form.addParam('minimumDomainLength', FloatParam, default=10.0,
+                      label='Processing option: Minimum domain length (residues)',
+                      help="""Minimum length of a domain to keep (reject at end if
+                      smaller).""")
+        form.addParam('extraParams', StringParam,
+                      label="Extra Params ",
+                      default="",
+                      expertLevel=LEVEL_ADVANCED,
+                      help="This string will be added to the phenix command.\n"
+                           "Syntax: paramName1=value1 paramName2=value2 ")
+        #maximum_domains
+        #minimum_domain_length
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
         self._insertFunctionStep('runProcessPredictedModel')
@@ -85,35 +103,44 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     # --------------------------- STEPS functions --------------------------
 
     def runProcessPredictedModel(self):
+        # phenix.process_predicted_model my_model.pdb b_value_field_is=lddt
         args = os.path.abspath(self.inputPredictedModel.get().getFileName())
         args += " "
-        args += inputProgramToAlign1_1
+        args += "b_value_field_is="
+        if self.contentBvalueField == 0:
+            args +="lddt"
+        elif self.contentBvalueField == 1:
+            args += "rmsd"
+        else:
+            args += "b_value"
+        if self.removeLowConfidenceResidues != True:
+            args += " "
+            args += "remove_low_confidence_residues=False"
+        if self.splitModel != True:
+            args += " "
+            args += "split_model_by_compact_regions=False"
+        if self.maximumDomains != 3.0:
+            args += " "
+            args += "maximum_domains=" + self.maximumDomains
+        if self.minimumDomainLength != 10.0:
+            args += " "
+            args += "minimum_domain_length=" + self.minimumDomainLength
+        if len(str(self.extraParams)) > 0:
+            args += " %s " % self.extraParams.get()
 
-        try:
-            Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args,
-                                    extraEnvDict=None, cwd=cwd)
-        except:
-            # This exception will run when using phenix v. 1.16 after running
-            # real space refine the .cif file generated can not be recognized by
-            # superpose pdbs program and an error is produced
-            list_args = args.split()
-            self._runChangingCifFormatSuperpose(list_args)
+        cwd = self._getExtraPath()
+        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args,
+                                extraEnvDict=None, cwd=cwd)
 
     def createOutputStep(self):
-        fnPdb = os.path.basename(self.inputStructureMoving.get().getFileName())
+        fnPdb = os.path.basename(self.inputPredictedModel.get().getFileName())
         fnPdb = fnPdb.split('.')[0]
-        for file in os.listdir(self._getExtraPath()):
-            if file.endswith('_fitted.pdb'):
-                os.rename(self._getExtraPath() + "/" + file,
-                          self._getExtraPath() + "/" + fnPdb + "_fitted.pdb")
-        pdb = AtomStruct()
-        pdb.setFileName(self._getExtraPath(fnPdb + "_fitted.pdb"))
-        if self.inputStructureFixed.get().getVolume() is not None:
-            pdb.setVolume(self.inputStructureFixed.get().getVolume())
-        self._defineOutputs(outputPdb=pdb)
-        self._defineSourceRelation(self.inputStructureFixed.get(), pdb)
-        self._defineSourceRelation(self.inputStructureMoving.get(), pdb)
 
+        pdb = AtomStruct()
+        pdb.setFileName(self._getExtraPath(fnPdb + self.PROCESSPREDICTEDFILE))
+        self._defineOutputs(outputPdb=pdb)
+        self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
+        ### Add remaining sequence
         logFile = os.path.abspath(self._getLogsPath()) + "/run.stdout"
         self._parseLogFile(logFile)
         self._store()
@@ -123,7 +150,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     def _validate(self):
         errors = []
         # Check that the program exists
-        program = Plugin.getProgram(SUPERPOSE)
+        program = Plugin.getProgram(PROCESS)
         if not os.path.exists(program):
             errors.append("Cannot find " + program)
 
@@ -134,22 +161,21 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             if program is not None:
                 errors.append("Current values:")
                 errors.append("PHENIX_HOME = %s" % Plugin.getVar(PHENIX_HOME))
-                errors.append("SUPERPOSE = %s" % SUPERPOSE)
+                errors.append("PROCESS = %s" % PROCESS)
 
         return errors
 
     def _summary(self):
         summary = []
         try:
-            summary.append("RMSD between fixed and moving atoms (start): " +
-                           str(self.startRMSD))
-            summary.append("RMSD between fixed and moving atoms (final): " +
-                           str(self.finalRMSD))
+            #TODO
+            summary.append("processed predicted model: " +
+                           str(self.PROCESSPREDICTEDFILE))
         except:
-            summary.append("RMSD not yet computed")
+            summary.append("predicted model not yet processed")
         summary.append(
-            "http://www.phenix-online.org/documentation/superpose_pdbs.htm")
-        summary.append("Peter Zwart, Pavel Afonine, Ralf W. Grosse-Kunstleve")
+            "https://phenix-online.org/version_docs/dev-4380/reference/process_predicted_model.html")
+        summary.append("Tom Terwilliger, Claudia Millan Nebot, Tristan Croll")
 
         return summary
 
@@ -179,7 +205,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     for i in range(0, 2):
                         list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
                     args1 = list_args1[0] + " " + list_args1[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
                                             extraEnvDict=None, cwd=cwd)
                 except:
                     # convert cifs to pdbs
@@ -188,7 +214,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                         list_args2.append(fromCIFToPDB(
                             list_args[i], list_args[i].replace('.cif', '.pdb')))
                     args2 = list_args2[0] + " " + list_args2[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
                                             extraEnvDict=None, cwd=cwd)
             elif list_args[0].endswith(".cif") and list_args[1].endswith(".pdb"):
                 try:
@@ -197,7 +223,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     list_args1.append(fromCIFToPDB(
                         list_args[0], list_args[0].replace('.cif', '.pdb')))
                     args1 = list_args1[0] + " " + list_args[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
                                             extraEnvDict=None, cwd=cwd)
                 except:
                     try:
@@ -206,7 +232,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                         list_args2.append(fromPDBToCIF(
                             list_args[1], list_args[1].replace('.pdb', '.cif')))
                         args2 = list_args[0] + " " + list_args2[0]
-                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
                                                 extraEnvDict=None, cwd=cwd)
                     except:
                         # upgrade cif
@@ -216,7 +242,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                             list_args3[i].append(fromCIFTommCIF(
                                 list_args0[i], list_args0[i]))
                         args3 = list_args3[0] + " " + list_args3[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
                                                 args3, extraEnvDict=None, cwd=cwd)
             elif list_args[0].endswith(".pdb") and list_args[1].endswith(".cif"):
                 try:
@@ -225,7 +251,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     list_args1.append(fromCIFToPDB(
                         list_args[1], list_args[1].replace('.cif', '.pdb')))
                     args1 = list_args[0] + " " + list_args1[0]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
                                             extraEnvDict=None, cwd=cwd)
                 except:
                     try:
@@ -234,7 +260,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                         list_args2.append(fromPDBToCIF(
                             list_args[0], list_args[0].replace('.pdb', '.cif')))
                         args2 = list_args2[0] + " " + list_args[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
                                                 extraEnvDict=None, cwd=cwd)
                     except:
                         # upgrade cifs
@@ -244,7 +270,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                             list_args3.append(fromCIFTommCIF(
                                 list_args0[i], list_args0[i]))
                         args3 = list_args3[0] + " " + list_args3[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
                                                 args3, extraEnvDict=None, cwd=cwd)
         except:
             # biopython conversion
@@ -254,7 +280,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     aSH.read(list_args[i])
                     aSH.write(list_args[i])
                     args = list_args[0] + " " + list_args[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
                                             args, extraEnvDict=None, cwd=cwd)
             except:
                 print("CIF file standarization failed.")
