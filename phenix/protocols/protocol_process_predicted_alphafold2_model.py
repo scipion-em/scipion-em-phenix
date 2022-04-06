@@ -26,16 +26,16 @@
 import os
 
 from pyworkflow import Config
-from pyworkflow.object import String, Float, Integer
+from pyworkflow import utils as pwutils
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
                                         StringParam, FloatParam)
 from phenix.constants import PROCESS, PHENIX_HOME
-from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
+from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler, retry
 
 try:
-    from pwem.objects import AtomStruct
+    from pwem.objects import AtomStruct, Sequence
 except:
     from pwem.objects import PdbFile as AtomStruct
 from phenix import Plugin
@@ -48,7 +48,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     _label = 'process predicted model'
     _program = ""
     # _version = VERSION_1_2
-    PROCESSPREDICTEDFILE = '_proccessed.pdb'
+    PROCESSPREDICTEDFILE = '_processed.pdb'
     SEQREMAINDER = '_remainder.seq'
     ContentOfBvalueField = ['LDDT (AlphaFold2)', 'RMSD', 'B-value']
 
@@ -93,8 +93,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       expertLevel=LEVEL_ADVANCED,
                       help="This string will be added to the phenix command.\n"
                            "Syntax: paramName1=value1 paramName2=value2 ")
-        #maximum_domains
-        #minimum_domain_length
+
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
         self._insertFunctionStep('runProcessPredictedModel')
@@ -104,45 +103,25 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
 
     def runProcessPredictedModel(self):
         # phenix.process_predicted_model my_model.pdb b_value_field_is=lddt
-        args = os.path.abspath(self.inputPredictedModel.get().getFileName())
-        args += " "
-        args += "b_value_field_is="
-        if self.contentBvalueField == 0:
-            args +="lddt"
-        elif self.contentBvalueField == 1:
-            args += "rmsd"
-        else:
-            args += "b_value"
-        if self.removeLowConfidenceResidues != True:
-            args += " "
-            args += "remove_low_confidence_residues=False"
-        if self.splitModel != True:
-            args += " "
-            args += "split_model_by_compact_regions=False"
-        if self.maximumDomains != 3.0:
-            args += " "
-            args += "maximum_domains=" + self.maximumDomains
-        if self.minimumDomainLength != 10.0:
-            args += " "
-            args += "minimum_domain_length=" + self.minimumDomainLength
-        if len(str(self.extraParams)) > 0:
-            args += " %s " % self.extraParams.get()
-
-        cwd = self._getExtraPath()
-        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args,
-                                extraEnvDict=None, cwd=cwd)
-
+        self.atomStruct = os.path.abspath(self.inputPredictedModel.get().getFileName())
+        atomStruct_localPath = os.path.abspath(self._getExtraPath(self.atomStruct.split('/')[-1]))
+        if str(self.atomStruct) != str(atomStruct_localPath):
+            pwutils.copyFile(self.atomStruct, atomStruct_localPath)
+            self.atomStruct = atomStruct_localPath
+        args = self._writeArgsProcessAlphaFold(self.atomStruct)
+        cwd = os.getcwd() + "/" + self._getExtraPath()
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(PROCESS),
+              args, cwd=cwd,
+              listAtomStruct=[self.atomStruct], log=self._log)
     def createOutputStep(self):
-        fnPdb = os.path.basename(self.inputPredictedModel.get().getFileName())
-        fnPdb = fnPdb.split('.')[0]
-
         pdb = AtomStruct()
-        pdb.setFileName(self._getExtraPath(fnPdb + self.PROCESSPREDICTEDFILE))
+        for fileName in os.listdir(self._getExtraPath()):
+            if fileName.endswith(self.PROCESSPREDICTEDFILE):
+                pdb.setFileName(self._getExtraPath(fileName))
+        self.output = pdb.getFileName().split('/')[-1]
         self._defineOutputs(outputPdb=pdb)
         self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
-        ### Add remaining sequence
-        logFile = os.path.abspath(self._getLogsPath()) + "/run.stdout"
-        self._parseLogFile(logFile)
+
         self._store()
 
     # --------------------------- INFO functions ---------------------------
@@ -168,9 +147,9 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     def _summary(self):
         summary = []
         try:
-            #TODO
+            # TODO: It doesn't work
             summary.append("processed predicted model: " +
-                           str(self.PROCESSPREDICTEDFILE))
+                           str(self.output))
         except:
             summary.append("predicted model not yet processed")
         summary.append(
@@ -181,108 +160,29 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
 
     # --------------------------- UTILS functions --------------------------
 
-    def _parseLogFile(self, logFile):
-        with open(logFile) as f:
-            line = f.readline()
-            while line:
-                words = line.strip().split()
-                if len(words) > 1:
-                    if (words[0] == 'RMSD' and words[1] == 'between' and
-                            words[6] == '(start):'):
-                        self.startRMSD = Float(words[7])
-                    elif (words[0] == 'RMSD' and words[1] == 'between' and
-                          words[6] == '(final):'):
-                        self.finalRMSD = Float(words[7])
-                line = f.readline()
-
-    def _runChangingCifFormatSuperpose(self, list_args):
-        cwd = os.getcwd() + "/" + self._getExtraPath()
-        try:
-            if list_args[0].endswith(".cif") and list_args[1].endswith(".cif"):
-                try:
-                    # upgrade cifs
-                    list_args1 = []
-                    for i in range(0, 2):
-                        list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
-                    args1 = list_args1[0] + " " + list_args1[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
-                                            extraEnvDict=None, cwd=cwd)
-                except:
-                    # convert cifs to pdbs
-                    list_args2 = []
-                    for i in range(0, 2):
-                        list_args2.append(fromCIFToPDB(
-                            list_args[i], list_args[i].replace('.cif', '.pdb')))
-                    args2 = list_args2[0] + " " + list_args2[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
-                                            extraEnvDict=None, cwd=cwd)
-            elif list_args[0].endswith(".cif") and list_args[1].endswith(".pdb"):
-                try:
-                    # pdbs: convert cif to pdb
-                    list_args1 = []
-                    list_args1.append(fromCIFToPDB(
-                        list_args[0], list_args[0].replace('.cif', '.pdb')))
-                    args1 = list_args1[0] + " " + list_args[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
-                                            extraEnvDict=None, cwd=cwd)
-                except:
-                    try:
-                        # cifs: convert pdb to cif
-                        list_args2 = []
-                        list_args2.append(fromPDBToCIF(
-                            list_args[1], list_args[1].replace('.pdb', '.cif')))
-                        args2 = list_args[0] + " " + list_args2[0]
-                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
-                                                extraEnvDict=None, cwd=cwd)
-                    except:
-                        # upgrade cif
-                        list_args3 = []
-                        list_args0 = args2.split()
-                        for i in range(0, 2):
-                            list_args3[i].append(fromCIFTommCIF(
-                                list_args0[i], list_args0[i]))
-                        args3 = list_args3[0] + " " + list_args3[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
-                                                args3, extraEnvDict=None, cwd=cwd)
-            elif list_args[0].endswith(".pdb") and list_args[1].endswith(".cif"):
-                try:
-                    # pdbs: convert cif to pdb
-                    list_args1 = []
-                    list_args1.append(fromCIFToPDB(
-                        list_args[1], list_args[1].replace('.cif', '.pdb')))
-                    args1 = list_args[0] + " " + list_args1[0]
-                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args1,
-                                            extraEnvDict=None, cwd=cwd)
-                except:
-                    try:
-                        # cifs: convert pdb to cif
-                        list_args2 = []
-                        list_args2.append(fromPDBToCIF(
-                            list_args[0], list_args[0].replace('.pdb', '.cif')))
-                        args2 = list_args2[0] + " " + list_args[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS), args2,
-                                                extraEnvDict=None, cwd=cwd)
-                    except:
-                        # upgrade cifs
-                        list_args3 = []
-                        list_args0 = args2.split()
-                        for i in range(0, 2):
-                            list_args3.append(fromCIFTommCIF(
-                                list_args0[i], list_args0[i]))
-                        args3 = list_args3[0] + " " + list_args3[1]
-                        Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
-                                                args3, extraEnvDict=None, cwd=cwd)
-        except:
-            # biopython conversion
-            aSH = AtomicStructHandler()
-            try:
-                for i in range(0, 2):
-                    aSH.read(list_args[i])
-                    aSH.write(list_args[i])
-                    args = list_args[0] + " " + list_args[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(PROCESS),
-                                            args, extraEnvDict=None, cwd=cwd)
-            except:
-                print("CIF file standarization failed.")
-
-
+    def _writeArgsProcessAlphaFold(self, atomStruct):
+        args = " "
+        args += "%s " % atomStruct
+        args += " "
+        args += "b_value_field_is="
+        if self.contentBvalueField == 0:
+            args += "lddt"
+        elif self.contentBvalueField == 1:
+            args += "rmsd"
+        else:
+            args += "b_value"
+        if self.removeLowConfidenceResidues != True:
+            args += " "
+            args += "remove_low_confidence_residues=False"
+        if self.splitModel != True:
+            args += " "
+            args += "split_model_by_compact_regions=False"
+        if self.maximumDomains != 3.0:
+            args += " "
+            args += "maximum_domains=" + str(self.maximumDomains)
+        if self.minimumDomainLength != 10.0:
+            args += " "
+            args += "minimum_domain_length=" + str(self.minimumDomainLength)
+        if len(str(self.extraParams)) > 0:
+            args += " %s " % self.extraParams.get()
+        return args
