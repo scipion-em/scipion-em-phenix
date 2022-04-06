@@ -34,7 +34,7 @@ from pwem import Domain
 from phenix import Plugin
 
 class PhenixProtRunDockInMapViewer(Viewer):
-    """ Visualize the output of protocols  superpose pdb """
+    """ Visualize the output of protocol dock in map """
     _environments = [DESKTOP_TKINTER]
     _label = 'Dock in map viewer'
     _targets = [PhenixProtRunDockInMap]
