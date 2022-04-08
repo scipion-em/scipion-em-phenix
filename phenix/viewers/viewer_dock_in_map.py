@@ -28,6 +28,8 @@
 import os
 
 from phenix.protocols.protocol_dock_in_map import PhenixProtRunDockInMap
+from phenix.protocols.protocol_dock_predicted_alphafold2_model import \
+    PhenixProtDockPredictedAlphaFold2Model
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer
 from pwem.viewers import Chimera
 from pwem import Domain
@@ -37,7 +39,7 @@ class PhenixProtRunDockInMapViewer(Viewer):
     """ Visualize the output of protocol dock in map """
     _environments = [DESKTOP_TKINTER]
     _label = 'Dock in map viewer'
-    _targets = [PhenixProtRunDockInMap]
+    _targets = [PhenixProtRunDockInMap, PhenixProtDockPredictedAlphaFold2Model]
 
     def _visualize(self, obj, **args):
         fnCmd = self.protocol._getExtraPath("chimera_output.cxc")
@@ -74,6 +76,8 @@ class PhenixProtRunDockInMapViewer(Viewer):
                             % (sampling, x, y, z))
             for filename in self.pdbList:
                 f.write("open %s\n" % filename)
+            if len(self.pdbList) > 2:
+                f.write("color bfactor  #%d  palette alphafold" % 3)
 
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
@@ -83,14 +87,25 @@ class PhenixProtRunDockInMapViewer(Viewer):
 
     def _getVols(self):
         self.vols = []
-        vol1 = self.protocol.inputVolume1.get()
-        if vol1 is not None:
-            self.vols.append(vol1)
+        if self.protocol.hasAttribute("inputVolume1"):
+            vol1 = self.protocol.inputVolume1.get()
+            if vol1 is not None:
+                self.vols.append(vol1)
+        if self.protocol.hasAttribute("inputVolume"):
+            vol2 = self.protocol.inputVolume.get()
+            if vol2 is not None:
+                self.vols.append(vol2)
 
     def _getPdbs(self):
         self.pdbList = []
-        inputPdb = self.protocol.inputStructure.get().getFileName()
-        self.pdbList.append(inputPdb)
+        if self.protocol.hasAttribute("inputVolume1"):
+            inputPdb1 = self.protocol.inputStructure.get().getFileName()
+            self.pdbList.append(inputPdb1)
+        if self.protocol.hasAttribute("inputVolume"):
+            inputPdb2 = self.protocol.inputPredictedModel.get().getFileName()
+            self.pdbList.append(inputPdb2)
+            inputPdb3 = self.protocol.inputProcessedPredictedModel.get().getFileName()
+            self.pdbList.append(inputPdb3)
         outputPdb = self.protocol.outputPdb.getFileName()
         self.pdbList.append(outputPdb)
 
