@@ -41,9 +41,14 @@ class PhenixProtRunProcessPredictedAlphaFoldViewer(ProtocolViewer):
     _environments = [DESKTOP_TKINTER, WEB_DJANGO]
     _label = 'Process predicted alphafold2 model viewer'
     _targets = [PhenixProtProcessPredictedAlphaFold2Model]
+    REMAINDER = False
 
     def __init__(self,  **kwargs):
         ProtocolViewer.__init__(self,  **kwargs)
+        for fileName in os.listdir(self.protocol._getExtraPath()):
+            if fileName.endswith(self.protocol.SEQREMAINDER):
+                self.fileName = fileName
+                self.REMAINDER = True
 
     def _defineParams(self, form):
         form.addSection(label='Visualize results')
@@ -51,10 +56,11 @@ class PhenixProtRunProcessPredictedAlphaFoldViewer(ProtocolViewer):
                       label="Structures in ChimeraX",
                       help="Clik the eye to visualize the input predicted"
                            " model by Alphafold2, as well as the processed one.\n")
-        form.addParam('RemainSequences', LabelParam,
-                      label="Remaining Sequences",
-                      help="Open a text file with the sequence fragments "
-                           "removed from the processed one.\n")
+        if self.REMAINDER:
+            form.addParam('RemainSequences', LabelParam,
+                          label="Remaining Sequences",
+                          help="Open a text file with the sequence fragments "
+                               "removed from the processed one.\n")
 
     def _getVisualizeDict(self):
         return {
@@ -84,6 +90,7 @@ class PhenixProtRunProcessPredictedAlphaFoldViewer(ProtocolViewer):
             pdbList = self._getPdbs()
             for filename in pdbList:
                 f.write("open %s\n" % filename)
+            f.write("color bfactor  #%d  palette alphafold" % 2)
 
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
@@ -92,11 +99,9 @@ class PhenixProtRunProcessPredictedAlphaFoldViewer(ProtocolViewer):
         return []
 
     def _visualizeRemainSequences(self, e=None):
-        for fileName in os.listdir(self.protocol._getExtraPath()):
-            if fileName.endswith(self.protocol.SEQREMAINDER):
-                # Visualization of extra file
-                openTextFileEditor(os.path.abspath(
-                    self.protocol._getExtraPath(fileName)))
+        # Visualization of extra file
+        openTextFileEditor(os.path.abspath(
+            self.protocol._getExtraPath(self.fileName)))
 
     def _getPdbs(self):
         pdbList = []
