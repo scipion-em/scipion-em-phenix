@@ -58,7 +58,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         form.addParam('inputPredictedModel', PointerParam,
                       pointerClass="AtomStruct",
                       label='Predicted AlphaFold2 model', important=True,
-                      help="Atom structure model (PDBx/mmCIF) retrieved by AlphaFold2.")
+                      help="Atom structure model (PDBx/mmCIF) retrieved from AlphaFold2.")
         form.addParam('contentBvalueField', EnumParam,
                       choices=self.ContentOfBvalueField, important=True,
                       label="Contents of B-value field:", default=0,
@@ -96,23 +96,25 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
 
     # --------------------------- INSERT steps functions ---------------
     def _insertAllSteps(self):
+
         self._insertFunctionStep('runProcessPredictedModel')
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
 
     def runProcessPredictedModel(self):
-        # phenix.process_predicted_model my_model.pdb b_value_field_is=lddt
-        self.atomStruct = os.path.abspath(self.inputPredictedModel.get().getFileName())
-        atomStruct_localPath = os.path.abspath(self._getExtraPath(self.atomStruct.split('/')[-1]))
-        if str(self.atomStruct) != str(atomStruct_localPath):
-            pwutils.copyFile(self.atomStruct, atomStruct_localPath)
-            self.atomStruct = atomStruct_localPath
-        args = self._writeArgsProcessAlphaFold(self.atomStruct)
+        atomStruct = os.path.abspath(
+            self.inputPredictedModel.get().getFileName())
+        atomStruct_localPath = os.path.abspath(
+            self._getExtraPath(atomStruct.split('/')[-1]))
+        if str(atomStruct) != str(atomStruct_localPath):
+            pwutils.path.createLink(atomStruct, atomStruct_localPath)
+            atomStruct = atomStruct_localPath
+        args = self._writeArgsProcessAlphaFold(atomStruct)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(PROCESS),
               args, cwd=cwd,
-              listAtomStruct=[self.atomStruct], log=self._log)
+              listAtomStruct=[atomStruct], log=self._log)
     def createOutputStep(self):
         pdb = AtomStruct()
         for fileName in os.listdir(self._getExtraPath()):
@@ -146,17 +148,20 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
 
     def _summary(self):
         summary = []
-        try:
-            # TODO: It doesn't work
-            summary.append("processed predicted model: " +
-                           str(self.output))
-        except:
-            summary.append("predicted model not yet processed")
+        # try:
+        #     # TODO: It doesn't work
+        #     summary.append("processed predicted model: " +
+        #                    str(self.output))
+        # except:
+        #     summary.append("predicted model not yet processed")
         summary.append(
             "https://phenix-online.org/version_docs/dev-4380/reference/process_predicted_model.html")
-        summary.append("Tom Terwilliger, Claudia Millan Nebot, Tristan Croll")
+        # summary.append("Tom Terwilliger, Claudia Millan Nebot, Tristan Croll")
 
         return summary
+
+    def _citations(self):
+        return ['Terwilliger_2022']
 
     # --------------------------- UTILS functions --------------------------
 
