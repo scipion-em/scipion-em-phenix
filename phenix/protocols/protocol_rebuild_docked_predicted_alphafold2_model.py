@@ -70,7 +70,7 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
                       label='Input map', important=True,
                       help="Set the starting density map.")
         form.addParam('asymmetricMap', BooleanParam, default=True,
-                      label='Assymetric map:',
+                      label='Asymmetric map:',
                       help="If your map has symmetry be sure to set this param No."
                            " Otherwise symmetry will automatically determined.")
         form.addParam('resolution', FloatParam, default=3.0,
@@ -112,14 +112,10 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
         if str(dockedAtomStruct) != str(dockedAtomStruct_localPath):
             pwutils.path.createLink(dockedAtomStruct, dockedAtomStruct_localPath)
             dockedAtomStruct = dockedAtomStruct_localPath
-        dockedAtomStruct_localPath = os.path.abspath(
-            self._getExtraPath(dockedAtomStruct.split('/')[-1]))
-        if str(dockedAtomStruct) != str(dockedAtomStruct_localPath):
-            pwutils.path.createLink(dockedAtomStruct, dockedAtomStruct_localPath)
-            dockedAtomStruct = dockedAtomStruct_localPath
-        prefix = os.path.abspath(self._getExtraPath(dockedAtomStruct))
+
+        self.prefix = os.path.abspath(self._getExtraPath(dockedAtomStruct))
         args = self._writeArgsDockAlphaFold(
-            predictedAtomStruct, dockedAtomStruct, localVolName, prefix)
+            predictedAtomStruct, dockedAtomStruct, localVolName, self.prefix)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(REBUILDDOCKPREDICTEDMODEL),
               args, cwd=cwd,
@@ -127,8 +123,12 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
               log=self._log)
     def createOutputStep(self):
         pdb = AtomStruct()
+        nameProcessed = ''
+        nameProcessed = self.prefix.split("/")[-1]
         for fileName in os.listdir(self._getExtraPath()):
-            if (fileName.split(".")[3] == "pdb"):
+            if (fileName.endswith("pdb") and
+                    len(fileName.split(".")) > len(nameProcessed.split("."))):
+                print("fileName: ", fileName)
                 pdb.setFileName(self._getExtraPath(fileName))
         self._defineOutputs(outputPdb=pdb)
         self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
@@ -159,11 +159,9 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
     def _summary(self):
         summary = []
         # try:
-        #     # TODO: It doesn't work
-        #     summary.append("processed predicted model: " +
-        #                    str(self.output))
+        #     summary.append("protocol finished with results")
         # except:
-        #     summary.append("procesecced predicted model not yet docked")
+        #     summary.append("processed predicted model not yet docked")
         summary.append(
             "https://phenix-online.org/version_docs/dev-4380/reference/rebuild_predicted_model.html")
 
@@ -185,7 +183,7 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
             self, predictedAtomStruct, processedAtomStruct, vol, prefix):
         args = " "
         args += "model=%s " % predictedAtomStruct
-        args += "processed_model_file=%s " % processedAtomStruct
+        args += "docked_model_file=%s " % processedAtomStruct
         # if self.modelCopies > 1:
         #     args += " search_model_copies=%d" % self.modelCopies
         #     args += " use_symmetry=True "

@@ -30,6 +30,10 @@ import os
 from phenix.protocols.protocol_dock_in_map import PhenixProtRunDockInMap
 from phenix.protocols.protocol_dock_predicted_alphafold2_model import \
     PhenixProtDockPredictedAlphaFold2Model
+from phenix.protocols.protocol_rebuild_docked_predicted_alphafold2_model import \
+    PhenixProtRebuildDockPredictedAlphaFold2Model
+from phenix.protocols.protocol_dock_and_rebuild_alphafold_model import \
+    PhenixProtDockAndRebuildAlphaFold2Model
 from pyworkflow.viewer import DESKTOP_TKINTER, Viewer
 from pwem.viewers import Chimera
 from pwem import Domain
@@ -39,7 +43,9 @@ class PhenixProtRunDockInMapViewer(Viewer):
     """ Visualize the output of protocol dock in map """
     _environments = [DESKTOP_TKINTER]
     _label = 'Dock in map viewer'
-    _targets = [PhenixProtRunDockInMap, PhenixProtDockPredictedAlphaFold2Model]
+    _targets = [PhenixProtRunDockInMap, PhenixProtDockPredictedAlphaFold2Model,
+                PhenixProtRebuildDockPredictedAlphaFold2Model,
+                PhenixProtDockAndRebuildAlphaFold2Model]
 
     def _visualize(self, obj, **args):
         fnCmd = self.protocol._getExtraPath("chimera_output.cxc")
@@ -102,10 +108,15 @@ class PhenixProtRunDockInMapViewer(Viewer):
             inputPdb1 = self.protocol.inputStructure.get().getFileName()
             self.pdbList.append(inputPdb1)
         if self.protocol.hasAttribute("inputVolume"):
-            inputPdb2 = self.protocol.inputPredictedModel.get().getFileName()
-            self.pdbList.append(inputPdb2)
-            inputPdb3 = self.protocol.inputProcessedPredictedModel.get().getFileName()
-            self.pdbList.append(inputPdb3)
+            if self.protocol.hasAttribute("inputPredictedModel"):
+                inputPdb2 = self.protocol.inputPredictedModel.get().getFileName()
+                self.pdbList.append(inputPdb2)
+            elif self.protocol.hasAttribute("inputProcessedPredictedModel"):
+                inputPdb3 = self.protocol.inputProcessedPredictedModel.get().getFileName()
+                self.pdbList.append(inputPdb3)
+            elif self.protocol.hasAttribute("inputDockedPredictedModel"):
+                inputPdb4 = self.protocol.inputDockedPredictedModel.get().getFileName()
+                self.pdbList.append(inputPdb4)
         outputPdb = self.protocol.outputPdb.getFileName()
         self.pdbList.append(outputPdb)
 

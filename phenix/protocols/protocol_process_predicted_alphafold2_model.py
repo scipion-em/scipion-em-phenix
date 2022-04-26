@@ -149,11 +149,9 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     def _summary(self):
         summary = []
         # try:
-        #     # TODO: It doesn't work
-        #     summary.append("processed predicted model: " +
-        #                    str(self.output))
+        #     summary.append("protocol finished with results")
         # except:
-        #     summary.append("predicted model not yet processed")
+        #     summary.append("processed predicted model not yet docked")
         summary.append(
             "https://phenix-online.org/version_docs/dev-4380/reference/process_predicted_model.html")
         # summary.append("Tom Terwilliger, Claudia Millan Nebot, Tristan Croll")

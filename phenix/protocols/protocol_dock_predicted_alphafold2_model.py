@@ -78,7 +78,7 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         form.addParam('asymmetricMap', BooleanParam, default=True,
                       label='Assymetric map:',
                       help="If your map has symmetry be sure to set this param No."
-                           " Otherwise symmetry will automatically determined.")
+                           " Otherwise symmetry will be automatically determined.")
         form.addParam('resolution', FloatParam, default=3.0,
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
@@ -172,11 +172,9 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
     def _summary(self):
         summary = []
         # try:
-        #     # TODO: It doesn't work
-        #     summary.append("processed predicted model: " +
-        #                    str(self.output))
+        #     summary.append("protocol finished with results")
         # except:
-        #     summary.append("procesecced predicted model not yet docked")
+        #     summary.append("processed predicted model not yet docked")
         summary.append(
             "https://phenix-online.org/version_docs/dev-4380/reference/dock_predicted_model.html")
 
