@@ -82,8 +82,12 @@ class PhenixProtRunDockInMapViewer(Viewer):
                             % (sampling, x, y, z))
             for filename in self.pdbList:
                 f.write("open %s\n" % filename)
-            if len(self.pdbList) > 2:
+            if self.protocol.hasAttribute("inputVolume"):
                 f.write("color bfactor  #%d  palette alphafold" % 3)
+            elif not self.protocol.hasAttribute("inputVolume") and \
+                self.protocol.hasAttribute("inputPredictedModel"):
+                f.write("color bfactor  #%d  palette alphafold" % 2)
+                # f.write("color bfactor palette alphafold\n")
 
         # run in the background
         chimeraPlugin = Domain.importFromPlugin('chimera', 'Plugin', doRaise=True)
@@ -111,10 +115,10 @@ class PhenixProtRunDockInMapViewer(Viewer):
             if self.protocol.hasAttribute("inputPredictedModel"):
                 inputPdb2 = self.protocol.inputPredictedModel.get().getFileName()
                 self.pdbList.append(inputPdb2)
-            elif self.protocol.hasAttribute("inputProcessedPredictedModel"):
+            if self.protocol.hasAttribute("inputProcessedPredictedModel"):
                 inputPdb3 = self.protocol.inputProcessedPredictedModel.get().getFileName()
                 self.pdbList.append(inputPdb3)
-            elif self.protocol.hasAttribute("inputDockedPredictedModel"):
+            if self.protocol.hasAttribute("inputDockedPredictedModel"):
                 inputPdb4 = self.protocol.inputDockedPredictedModel.get().getFileName()
                 self.pdbList.append(inputPdb4)
         outputPdb = self.protocol.outputPdb.getFileName()
