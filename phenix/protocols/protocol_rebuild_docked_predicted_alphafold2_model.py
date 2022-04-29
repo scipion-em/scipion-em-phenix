@@ -69,10 +69,10 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
         form.addParam('inputVolume', PointerParam, pointerClass="Volume",
                       label='Input map', important=True,
                       help="Set the starting density map.")
-        form.addParam('asymmetricMap', BooleanParam, default=True,
-                      label='Asymmetric map:',
-                      help="If your map has symmetry be sure to set this param No."
-                           " Otherwise symmetry will automatically determined.")
+        # form.addParam('asymmetricMap', BooleanParam, default=True,
+        #               label='Asymmetric map:',
+        #               help="If your map has symmetry be sure to set this param No."
+        #                    " Otherwise symmetry will automatically determined.")
         form.addParam('resolution', FloatParam, default=3.0,
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
@@ -188,8 +188,8 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
         #     args += " search_model_copies=%d" % self.modelCopies
         #     args += " use_symmetry=True "
         args += "full_map=%s " % vol
-        if not self.asymmetricMap:
-            args += " asymmetric_map=False "
+        # if not self.asymmetricMap:
+        #     args += " asymmetric_map=False "
         args += "resolution=%f" % self.resolution
         args += " "
         args += "output_model_prefix=%s" % prefix
