@@ -64,10 +64,10 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         form.addParam('inputVolume', PointerParam, pointerClass="Volume",
                       label='Input map', important=True,
                       help="Set the starting density map.")
-        form.addParam('asymmetricMap', BooleanParam, default=True,
-                      label='Asymmetric map:',
-                      help="If your map has symmetry be sure to set this param No."
-                           " Otherwise symmetry will be automatically determined.")
+        # form.addParam('asymmetricMap', BooleanParam, default=True,
+        #               label='Asymmetric map:',
+        #               help="If your map has symmetry be sure to set this param No."
+        #                    " Otherwise symmetry will be automatically determined.")
         form.addParam('resolution', FloatParam, default=3.0,
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
@@ -89,6 +89,16 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
+
+    def convertInputStep(self):
+        """ convert 3D maps to MRC '.mrc' format
+        """
+        vol = self._getInputVolume()
+        inVolName = vol.getFileName()
+        newFn = self._getExtraPath(self.DOCKINMAPFILE)
+        origin = vol.getOrigin(force=True).getShifts()
+        sampling = vol.getSamplingRate()
+        Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
 
     def runDockAndBuildModel(self):
         vol = self._getInputVolume()
@@ -180,8 +190,8 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         #     args += " search_model_copies=%d" % self.modelCopies
         #     args += " use_symmetry=True "
         args += "full_map=%s " % vol
-        if not self.asymmetricMap:
-            args += " asymmetric_map=False "
+        # if not self.asymmetricMap:
+        #     args += " asymmetric_map=False "
         args += "resolution=%f" % self.resolution
         args += " "
         args += "output_model_prefix=%s" % prefix
