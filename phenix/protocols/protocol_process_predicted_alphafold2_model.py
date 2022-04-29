@@ -30,7 +30,7 @@ from pyworkflow import utils as pwutils
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
-                                        StringParam, FloatParam)
+                                        StringParam, FloatParam, IntParam)
 from phenix.constants import PROCESS, PHENIX_HOME
 from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler, retry
 
@@ -68,6 +68,11 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       "An actual B-value (atomic displacement parameter)\n"
                       "In process_predicted_model, confidence values or error estimates "
                       "in A or are first converted in new pseudo B-values.")
+        form.addParam('minLDDT', IntParam, default=70,
+                      label='Minimun LDDT value (max. RMSD)',
+                      help="""Cutoff value to remove low-confidence residues. 
+                       Values of LDDT range between 0 and 100. A minimum LDDT 
+                       of 70 corresponds to a maximum RMSD of 1.5.""")
         form.addParam('removeLowConfidenceResidues', BooleanParam, default=True,
                       label='Remove low-confidence residues',
                       help="""For AlphaFold2 models, low-confidence corresponds 
@@ -174,18 +179,16 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             args += "rmsd"
         else:
             args += "b_value"
+        if self.minLDDT != 70:
+            args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
         if self.removeLowConfidenceResidues != True:
-            args += " "
-            args += "remove_low_confidence_residues=False"
+            args += " remove_low_confidence_residues=False"
         if self.splitModel != True:
-            args += " "
-            args += "split_model_by_compact_regions=False"
+            args += " split_model_by_compact_regions=False"
         if self.maximumDomains != 3.0:
-            args += " "
-            args += "maximum_domains=" + str(self.maximumDomains)
+            args += " maximum_domains=" + str(self.maximumDomains)
         if self.minimumDomainLength != 10.0:
-            args += " "
-            args += "minimum_domain_length=" + str(self.minimumDomainLength)
+            args += " minimum_domain_length=" + str(self.minimumDomainLength)
         if len(str(self.extraParams)) > 0:
             args += " %s " % self.extraParams.get()
         return args
