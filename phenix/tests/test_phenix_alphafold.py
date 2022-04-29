@@ -166,6 +166,17 @@ class TestImportData(TestImportBase):
         self.launchProtocol(protImportAlphaFoldPDB)
         return protImportAlphaFoldPDB
 
+    def _importStructure3(self):
+        """Import atom structure prdiction by alphafold from EBI using uniprotid"""
+        uniProtID = 'A0A087WSY6'
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
+                'pdbFile': self._getAlphaFoldModelFromEBI(uniProtID)
+                }
+        protImportAlphaFoldPDB = self.newProtocol(ProtImportPdb, **args)
+        protImportAlphaFoldPDB.setObjLabel('import from EBI with \n uniProtID %s' % uniProtID)
+        self.launchProtocol(protImportAlphaFoldPDB)
+        return protImportAlphaFoldPDB
+
 
 class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
 
@@ -506,3 +517,27 @@ class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
         self.assertTrue(os.path.exists(
             protDockBuildPrediction.outputPdb.getFileName()))
 
+class TestCProtProcessDockBuildPredictedAlphaFold(TestImportData):
+
+    def testCProcessPrediction1(self):
+        """ Test the protocol process alpahafold2 predicted model
+        """
+        print("Run phenix process_predicted_model protocol from a imported "
+              "predicted atomic structure ")
+
+        # import PDB
+        protImportPDB = self._importStructure3()
+        structure3 = protImportPDB.outputPdb
+        self.assertTrue(structure3.getFileName())
+        self.assertFalse(structure3.getVolume())
+
+        args = {
+                'inputPredictedModel': structure3,
+               }
+
+        protProcessPrediction = self.newProtocol(
+            PhenixProtProcessPredictedAlphaFold2Model, **args)
+        protProcessPrediction.setObjLabel('Process prediction\nA0A08WSY6\n')
+        self.launchProtocol(protProcessPrediction)
+        self.assertTrue(os.path.exists(
+            protProcessPrediction.outputPdb.getFileName()))
