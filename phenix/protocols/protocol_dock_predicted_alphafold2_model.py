@@ -75,10 +75,10 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         form.addParam('inputVolume', PointerParam, pointerClass="Volume",
                       label='Input map', important=True,
                       help="Set the starting density map.")
-        form.addParam('asymmetricMap', BooleanParam, default=True,
-                      label='Assymetric map:',
-                      help="If your map has symmetry be sure to set this param No."
-                           " Otherwise symmetry will be automatically determined.")
+        # form.addParam('asymmetricMap', BooleanParam, default=True,
+        #               label='Assymetric map:',
+        #               help="If your map has symmetry be sure to set this param No."
+        #                    " Otherwise symmetry will be automatically determined.")
         form.addParam('resolution', FloatParam, default=3.0,
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
@@ -201,8 +201,8 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         #     args += " search_model_copies=%d" % self.modelCopies
         #     args += " use_symmetry=True "
         args += "full_map=%s " % vol
-        if not self.asymmetricMap:
-            args += " asymmetric_map=False "
+        # if not self.asymmetricMap:
+        #     args += " asymmetric_map=False "
         args += "resolution=%f" % self.resolution
         args += " "
         args += "output_model_prefix=%s" % prefix
@@ -213,3 +213,93 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         if len(str(self.extraParams)) > 0:
             args += " %s " % self.extraParams.get()
         return args
+
+    def _runChangingCifFormatSuperpose(self, list_args):
+        cwd = os.getcwd() + "/" + self._getExtraPath()
+        try:
+            if list_args[0].endswith(".cif") and list_args[1].endswith(".cif"):
+                try:
+                    # upgrade cifs
+                    list_args1 = []
+                    for i in range(0, 2):
+                        list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
+                    args1 = list_args1[0] + " " + list_args1[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            extraEnvDict=None, cwd=cwd)
+                except:
+                    # convert cifs to pdbs
+                    list_args2 = []
+                    for i in range(0, 2):
+                        list_args2.append(fromCIFToPDB(
+                            list_args[i], list_args[i].replace('.cif', '.pdb')))
+                    args2 = list_args2[0] + " " + list_args2[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                            extraEnvDict=None, cwd=cwd)
+            elif list_args[0].endswith(".cif") and list_args[1].endswith(".pdb"):
+                try:
+                    # pdbs: convert cif to pdb
+                    list_args1 = []
+                    list_args1.append(fromCIFToPDB(
+                        list_args[0], list_args[0].replace('.cif', '.pdb')))
+                    args1 = list_args1[0] + " " + list_args[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            extraEnvDict=None, cwd=cwd)
+                except:
+                    try:
+                        # cifs: convert pdb to cif
+                        list_args2 = []
+                        list_args2.append(fromPDBToCIF(
+                            list_args[1], list_args[1].replace('.pdb', '.cif')))
+                        args2 = list_args[0] + " " + list_args2[0]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                                extraEnvDict=None, cwd=cwd)
+                    except:
+                        # upgrade cif
+                        list_args3 = []
+                        list_args0 = args2.split()
+                        for i in range(0, 2):
+                            list_args3[i].append(fromCIFTommCIF(
+                                list_args0[i], list_args0[i]))
+                        args3 = list_args3[0] + " " + list_args3[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                                args3, extraEnvDict=None, cwd=cwd)
+            elif list_args[0].endswith(".pdb") and list_args[1].endswith(".cif"):
+                try:
+                    # pdbs: convert cif to pdb
+                    list_args1 = []
+                    list_args1.append(fromCIFToPDB(
+                        list_args[1], list_args[1].replace('.cif', '.pdb')))
+                    args1 = list_args[0] + " " + list_args1[0]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
+                                            extraEnvDict=None, cwd=cwd)
+                except:
+                    try:
+                        # cifs: convert pdb to cif
+                        list_args2 = []
+                        list_args2.append(fromPDBToCIF(
+                            list_args[0], list_args[0].replace('.pdb', '.cif')))
+                        args2 = list_args2[0] + " " + list_args[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
+                                                extraEnvDict=None, cwd=cwd)
+                    except:
+                        # upgrade cifs
+                        list_args3 = []
+                        list_args0 = args2.split()
+                        for i in range(0, 2):
+                            list_args3.append(fromCIFTommCIF(
+                                list_args0[i], list_args0[i]))
+                        args3 = list_args3[0] + " " + list_args3[1]
+                        Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                                args3, extraEnvDict=None, cwd=cwd)
+        except:
+            # biopython conversion
+            aSH = AtomicStructHandler()
+            try:
+                for i in range(0, 2):
+                    aSH.read(list_args[i])
+                    aSH.write(list_args[i])
+                    args = list_args[0] + " " + list_args[1]
+                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                            args, extraEnvDict=None, cwd=cwd)
+            except:
+                print("CIF file standarization failed.")
