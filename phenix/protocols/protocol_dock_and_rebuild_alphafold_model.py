@@ -90,21 +90,14 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
 
     # --------------------------- STEPS functions --------------------------
 
-    def convertInputStep(self):
-        """ convert 3D maps to MRC '.mrc' format
-        """
-        vol = self._getInputVolume()
-        inVolName = vol.getFileName()
-        newFn = self._getExtraPath(self.DOCKINMAPFILE)
-        origin = vol.getOrigin(force=True).getShifts()
-        sampling = vol.getSamplingRate()
-        Ccp4Header.fixFile(inVolName, newFn, origin, sampling, Ccp4Header.START)  # ORIGIN
-
     def runDockAndBuildModel(self):
         vol = self._getInputVolume()
         inVolName = vol.getFileName()
         mapFile = self.DOCKINMAPFILE
         localVolName = os.path.abspath(self._getExtraPath(mapFile))
+        origin = vol.getOrigin(force=True).getShifts()
+        sampling = vol.getSamplingRate()
+        Ccp4Header.fixFile(inVolName, mapFile, origin, sampling, Ccp4Header.START)  # ORIGIN
         pwutils.path.createLink(inVolName, localVolName)
         predictedAtomStruct = os.path.abspath(
             self.inputPredictedModel.get().getFileName())
