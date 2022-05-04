@@ -97,8 +97,7 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         localVolName = os.path.abspath(self._getExtraPath(mapFile))
         origin = vol.getOrigin(force=True).getShifts()
         sampling = vol.getSamplingRate()
-        Ccp4Header.fixFile(inVolName, mapFile, origin, sampling, Ccp4Header.START)  # ORIGIN
-        pwutils.path.createLink(inVolName, localVolName)
+        Ccp4Header.fixFile(inVolName, localVolName, origin, sampling, Ccp4Header.START)  # ORIGIN
         predictedAtomStruct = os.path.abspath(
             self.inputPredictedModel.get().getFileName())
 
