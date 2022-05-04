@@ -70,6 +70,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       "in A or are first converted in new pseudo B-values.")
         form.addParam('minLDDT', IntParam, default=70,
                       label='Minimun LDDT value (max. RMSD)',
+                      condition=('contentBvalueField==%d ' % 0),
                       help="""Cutoff value to remove low-confidence residues. 
                        Values of LDDT range between 0 and 100. A minimum LDDT 
                        of 70 corresponds to a maximum RMSD of 1.5.""")
@@ -125,6 +126,10 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         for fileName in os.listdir(self._getExtraPath()):
             if fileName.endswith(self.PROCESSPREDICTEDFILE):
                 pdb.setFileName(self._getExtraPath(fileName))
+            else:
+                print("WARNING!!!\n"
+                      "Review your input prediction file "
+                      "(check the values of the B-factor column)")
         self.output = pdb.getFileName().split('/')[-1]
         self._defineOutputs(outputPdb=pdb)
         self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
@@ -179,7 +184,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             args += "rmsd"
         else:
             args += "b_value"
-        if self.minLDDT != 70:
+        if self.contentBvalueField == 0 and self.minLDDT != 70:
             args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
         if self.removeLowConfidenceResidues != True:
             args += " remove_low_confidence_residues=False"
