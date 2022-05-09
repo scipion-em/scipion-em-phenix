@@ -32,7 +32,8 @@ from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
                                         StringParam, FloatParam, IntParam)
 from phenix.constants import PROCESS, PHENIX_HOME
-from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler, retry
+from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, \
+    fromCIFTommCIF, AtomicStructHandler, retry
 
 try:
     from pwem.objects import AtomStruct, Sequence
@@ -69,7 +70,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       "In process_predicted_model, confidence values or error estimates "
                       "in A or are first converted in new pseudo B-values.")
         form.addParam('minLDDT', IntParam, default=70,
-                      label='Minimun LDDT value (max. RMSD)',
+                      label='Minimun LDDT value',
                       condition=('contentBvalueField==%d ' % 0),
                       help="""Cutoff value to remove low-confidence residues. 
                        Values of LDDT range between 0 and 100. A minimum LDDT 
@@ -126,10 +127,6 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         for fileName in os.listdir(self._getExtraPath()):
             if fileName.endswith(self.PROCESSPREDICTEDFILE):
                 pdb.setFileName(self._getExtraPath(fileName))
-            else:
-                print("WARNING!!!\n"
-                      "Review your input prediction file "
-                      "(check the values of the B-factor column)")
         self.output = pdb.getFileName().split('/')[-1]
         self._defineOutputs(outputPdb=pdb)
         self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
@@ -153,6 +150,22 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                 errors.append("Current values:")
                 errors.append("PHENIX_HOME = %s" % Plugin.getVar(PHENIX_HOME))
                 errors.append("PROCESS = %s" % PROCESS)
+        # Check if the B-factor column contains common LDDT, RMSD or B-factor
+        # values and avoid running the protocol if the average of those values
+        # don't follow the expected value
+        atomStruct = os.path.abspath(
+            self.inputPredictedModel.get().getFileName())
+        self.structureHandler = AtomicStructHandler()
+        self.structureHandler.read(atomStruct)
+        bFactorValues = self.structureHandler. getStructureBFactorValues()
+        if self._average(bFactorValues) > 20.0 and self.contentBvalueField == 1:
+            errors.append("WARNING!!!: average B-factor column > 20.0\n"
+                          "Review your input prediction file\n"
+                          "(check the values of the B-factor column)")
+        elif self._average(bFactorValues) < 20.0 and self.contentBvalueField != 1:
+            errors.append("WARNING!!!: average B-factor column < 20.0\n"
+                          "Review your input prediction file\n"
+                          "(check the values of the B-factor column)")
 
         return errors
 
@@ -197,3 +210,10 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         if len(str(self.extraParams)) > 0:
             args += " %s " % self.extraParams.get()
         return args
+
+    def _average(self, list):
+        sum_list = 0.00
+        for item in list:
+            sum_list += item
+        avg = sum_list / len(list)
+        return avg
