@@ -80,7 +80,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         form.addParam('residues', StringParam, important=True,
                       label='Residues',
                       help='Select the first and last residues of the sequence fragment '
-                           'that you would like to consider.\n The sequence '
+                           'that you would like to consider (Use Ctrl for multiple selection).\n The sequence '
                            'should overlap total or partially the ALA chain.')
 
         form.addParam('extraCommands', StringParam,
