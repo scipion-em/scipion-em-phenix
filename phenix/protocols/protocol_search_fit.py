@@ -26,6 +26,7 @@ import os
 import re
 import sqlite3
 import glob
+import json
 
 from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import (StringParam,  IntParam,
@@ -76,16 +77,12 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                          label='Test sequence', important=True,
                          help="Input the aminoacid sequence to fit with the "
                               "ALA chain.")
-        form.addParam('firstaa', StringParam, important=True,
-                      label='First residue',
-                      help='Select the first residue of the sequence fragment '
+        form.addParam('residues', StringParam, important=True,
+                      label='Residues',
+                      help='Select the first and last residues of the sequence fragment '
                            'that you would like to consider.\n The sequence '
                            'should overlap total or partially the ALA chain.')
-        form.addParam('lastaa', StringParam, important=True,
-                      label='Last residue',
-                      help='Select the last residue of the sequence fragment '
-                           'that you would like to consider.\nThe sequence '
-                           'should overlap total or partially the ALA chain.')
+
         form.addParam('extraCommands', StringParam,
                        label="Extra Params ",
                        default="",
@@ -182,8 +179,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         firstAAinChain = next(atomStruct.getStructure().get_residues()).id[1]
 
         # starting and ending residue
-        firstaa = int(self.firstaa.get().split(":")[1].split(",")[0].strip())
-        lastaa = int(self.lastaa.get().split(":")[1].split(",")[0].strip())
+        firstaa, lastaa = self.getIdxRemoveResidues()
 
         # compute number of steps according to the sequence size
         numberOfSteps = lastaa - firstaa + 1
@@ -438,3 +434,6 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             args += " nproc=%d" % numberOfThreads
         return args
 
+    def getIdxRemoveResidues(self):
+        idxs = json.loads(getattr(self, 'residues').get())['index'].split('-')
+        return list(map(int, idxs))
