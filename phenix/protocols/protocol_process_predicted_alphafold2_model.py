@@ -30,7 +30,7 @@ from pyworkflow import utils as pwutils
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
-                                        StringParam, FloatParam, IntParam)
+                                        StringParam, FloatParam, IntParam, PathParam)
 from phenix.constants import PROCESS, PHENIX_HOME
 from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, \
     fromCIFTommCIF, AtomicStructHandler, retry
@@ -75,6 +75,16 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       help="""Cutoff value to remove low-confidence residues. 
                        Values of LDDT range between 0 and 100. A minimum LDDT 
                        of 70 corresponds to a maximum RMSD of 1.5.""")
+        form.addParam('maxRMSD', FloatParam, default=1.5,
+                      label='Maximum RMSD value',
+                      condition=('contentBvalueField==%d ' % 1),
+                      help="""Cutoff value to remove low-confidence residues.\n 
+                      A maximum RMSD of 1.5 A corresponds to a minimum LDDT 
+                      of 70.""")
+        form.addParam('paeFile', PathParam,
+                     label='PAE file', condition=('contentBvalueField!=%d ' % 2),
+                     help="Optional input .json file with matrix of inter-residue"
+                          " estimated errors.")
         form.addParam('removeLowConfidenceResidues', BooleanParam, default=True,
                       label='Remove low-confidence residues',
                       help="""For AlphaFold2 models, low-confidence corresponds 
@@ -112,8 +122,10 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     def runProcessPredictedModel(self):
         atomStruct = os.path.abspath(
             self.inputPredictedModel.get().getFileName())
+
         atomStruct_localPath = os.path.abspath(
             self._getExtraPath(atomStruct.split('/')[-1]))
+
         if str(atomStruct) != str(atomStruct_localPath):
             pwutils.path.createLink(atomStruct, atomStruct_localPath)
             atomStruct = atomStruct_localPath
@@ -127,6 +139,8 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         for fileName in os.listdir(self._getExtraPath()):
             if fileName.endswith(self.PROCESSPREDICTEDFILE):
                 pdb.setFileName(self._getExtraPath(fileName))
+            else:
+                print("fileName: ", fileName)
         self.output = pdb.getFileName().split('/')[-1]
         self._defineOutputs(outputPdb=pdb)
         self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
@@ -150,6 +164,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                 errors.append("Current values:")
                 errors.append("PHENIX_HOME = %s" % Plugin.getVar(PHENIX_HOME))
                 errors.append("PROCESS = %s" % PROCESS)
+
         # Check if the B-factor column contains common LDDT, RMSD or B-factor
         # values and avoid running the protocol if the average of those values
         # don't follow the expected value
@@ -157,16 +172,24 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             self.inputPredictedModel.get().getFileName())
         self.structureHandler = AtomicStructHandler()
         self.structureHandler.read(atomStruct)
-        bFactorValues = self.structureHandler. getStructureBFactorValues()
+        bFactorValues, listOfResiduesBFactors = \
+            self.structureHandler. getStructureBFactorValues()
         if self._average(bFactorValues) > 20.0 and self.contentBvalueField == 1:
             errors.append("WARNING!!!: average B-factor column > 20.0\n"
                           "Review your input prediction file\n"
                           "(check the values of the B-factor column)")
-        elif self._average(bFactorValues) < 20.0 and self.contentBvalueField != 1:
-            errors.append("WARNING!!!: average B-factor column < 20.0\n"
-                          "Review your input prediction file\n"
-                          "(check the values of the B-factor column)")
 
+        # Check  if there are at least 5 sequential residues satisfying the threshold
+        if self.contentBvalueField == 0:
+            threshold = self.minLDDT
+        elif self.contentBvalueField == 1:
+            threshold = self.maxRMSD
+        new_list= \
+            self._minSequentialResidues(
+                listOfResiduesBFactors, self.contentBvalueField, threshold)
+        if len(new_list) == 0:
+            errors.append("WARNING!!!:\n"
+                          "Less than five sequential residues matching params")
         return errors
 
     def _summary(self):
@@ -193,12 +216,18 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         args += "b_value_field_is="
         if self.contentBvalueField == 0:
             args += "lddt"
+            if self.minLDDT != 70:
+                args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
+            if self.paeFile.get():
+                args += " pae_file=%s  " % self.paeFile.get()
         elif self.contentBvalueField == 1:
             args += "rmsd"
+            if self.maxRMSD != 1.5:
+                args += " minimum_lddt=None maximum_rmsd=%.2f  " % self.maxRMSD
+            if self.paeFile.get():
+                args += " pae_file=%s  " % self.paeFile.get()
         else:
             args += "b_value"
-        if self.contentBvalueField == 0 and self.minLDDT != 70:
-            args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
         if self.removeLowConfidenceResidues != True:
             args += " remove_low_confidence_residues=False"
         if self.splitModel != True:
@@ -217,3 +246,39 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             sum_list += item
         avg = sum_list / len(list)
         return avg
+
+    def _minSequentialResidues(self, listOfResiduesBFactors, contentBvalueField, threshold):
+        list_res = []
+        for item in listOfResiduesBFactors:
+            # item example LDDT (Bfactor colum, residue average(atoms)) == 70.0:
+            # [0, 'A', 103, 'PHE', 96.01]
+            # adding 1 (TRUE) or 0 (FALSE) to each item list if it satisfies
+            # the threshold condition
+            # item example with LDDT (Bfactor colum, residue average(atoms))==
+            # 70.0 [0, 'A', 103, 'PHE', 96.01, 1]
+            if contentBvalueField == 0:
+                if item[4] > threshold:
+                    item.append(1)
+                else:
+                    item.append(0)
+            if contentBvalueField == 1:
+                if item[4] < threshold:
+                    item.append(1)
+                else:
+                    item.append(0)
+            list_res.append(item)
+        size = len(list_res)
+        # minimum_sequential_residues = 5
+        new_list = []
+        for i in range(size - 4):
+            # same model, same chain and same threshold condition (TRUE)
+            if list_res[i][0] == list_res[i + 1][0] == list_res[i + 2][0] \
+                    == list_res[i + 3][0] == list_res[i + 4][0] and \
+                    list_res[i][1] == list_res[i + 1][1] == list_res[i + 2][1] \
+                    == list_res[i + 3][1] == list_res[i + 4][1] and \
+                    list_res[i][1] == list_res[i + 1][1] == list_res[i + 2][1] \
+                    == list_res[i + 3][1] == list_res[i + 4][1] and \
+                    list_res[i][5] == list_res[i + 1][5] == list_res[i + 2][5] \
+                    == list_res[i + 3][5] == list_res[i + 4][5] == 1:
+                new_list.append(list_res[i][0:4])
+        return new_list
