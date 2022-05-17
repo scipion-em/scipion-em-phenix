@@ -184,10 +184,10 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             threshold = self.minLDDT
         elif self.contentBvalueField == 1:
             threshold = self.maxRMSD
-        new_list= \
+        result = \
             self._minSequentialResidues(
                 listOfResiduesBFactors, self.contentBvalueField, threshold)
-        if len(new_list) == 0:
+        if not result:
             errors.append("WARNING!!!:\n"
                           "Less than five sequential residues matching params")
         return errors
@@ -248,6 +248,9 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         return avg
 
     def _minSequentialResidues(self, listOfResiduesBFactors, contentBvalueField, threshold):
+        """This method retuns True when there exist 5 consecutive residues matching the
+        threshold condition (example: LDDT > 70.00 or RMSD < 1.50). It returns False if there
+         aren't 5 consecutive residues matching the threshold condition"""
         list_res = []
         for item in listOfResiduesBFactors:
             # item example LDDT (Bfactor colum, residue average(atoms)) == 70.0:
@@ -261,7 +264,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     item.append(1)
                 else:
                     item.append(0)
-            if contentBvalueField == 1:
+            elif contentBvalueField == 1:
                 if item[4] < threshold:
                     item.append(1)
                 else:
@@ -269,7 +272,6 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
             list_res.append(item)
         size = len(list_res)
         # minimum_sequential_residues = 5
-        new_list = []
         for i in range(size - 4):
             # same model, same chain and same threshold condition (TRUE)
             if list_res[i][0] == list_res[i + 1][0] == list_res[i + 2][0] \
@@ -280,5 +282,5 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                     == list_res[i + 3][1] == list_res[i + 4][1] and \
                     list_res[i][5] == list_res[i + 1][5] == list_res[i + 2][5] \
                     == list_res[i + 3][5] == list_res[i + 4][5] == 1:
-                new_list.append(list_res[i][0:4])
-        return new_list
+                return True
+        return False
