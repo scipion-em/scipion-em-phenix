@@ -53,14 +53,10 @@ class TestImportData(TestImportBase):
     CHAIN2 = '{"model": 0, "chain": "M", "residues": 451}'
     NAME1 = '5ni1_A-seq' # Haemoglobin sequence (chain A)
     NAME2 = '6qi5_M-seq' # Atadenovirus sequence (chain M)
-    FirstResidue1 = '{"residue": 90, "K"}' # Haemoglobin sequence (chain A)
-    LastResidue1 = '{"residue": 120, "A"}' # Haemoglobin sequence (chain A)
-    FirstResidue1_2 = '{"residue": 80, "L"}'  # Haemoglobin sequence (chain A)
-    LastResidue1_2 = '{"residue": 130, "A"}'  # Haemoglobin sequence (chain A)
-    FirstResidue2 = '{"residue": 42, "Y"}' # Haemoglobin sequence (chain A)
-    LastResidue2 = '{"residue": 55, "V"}' # Haemoglobin sequence (chain A)
-    FirstResidue3 = '{"residue": 128, "E"}' # Atadenovirus sequence (chain M)
-    LastResidue3 = '{"residue": 157, "G"}' # Atadenovirus sequence (chain M)
+    removeResidues1 = '{"index": "90-120", "residues": "KLRVDPVNFKLLSHCLLVTLAAHLPAEFTPA"}'
+    removeResidues1_2 = '{"index": "80-130", "residues": "LSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLA"}'
+    removeResidues2 = '{"index": "42-55", "residues": "YFPHFDLSHGSAQV"}'
+    removeResidues3 = '{"index": "128-157", "residues": "ELSIPEGDYTVGSLIDMLNNAVVENYLEVG"}'
 
     def importVolume(self, args, label):
         protImportVol = self.newProtocol(emprot.ProtImportVolumes, **args)
@@ -184,8 +180,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.2,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue1,
-                 'lastaa' : self.LastResidue1,
+                 'residues': self.removeResidues1,
                  'numberOfMpi' : 8
                 }
         protSearchFit1 = self.newProtocol(PhenixProtSearchFit, **args2)
@@ -244,8 +239,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.2,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue1,
-                 'lastaa': self.LastResidue1,
+                 'residues': self.removeResidues1,
                  'numberOfMpi' : 8
                 }
         protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
@@ -261,8 +255,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.2,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue1_2,
-                 'lastaa': self.LastResidue1_2,
+                 'residues': self.removeResidues1_2,
                  'numberOfMpi' : 8
                  }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args3)
@@ -320,8 +313,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.2,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue2,
-                 'lastaa' : self.LastResidue2,
+                 'residues': self.removeResidues2,
                  'numberOfMpi' : 8
                 }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args2)
@@ -379,8 +371,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.2,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue2,
-                 'lastaa': self.LastResidue2,
+                 'residues': self.removeResidues2,
                  'numberOfMpi' : 8
                 }
         protSearchFit4 = self.newProtocol(PhenixProtSearchFit, **args2)
@@ -457,8 +448,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'resolution': 3.4,
                  'inputStructure': result,
                  'inputSequence': sequence,
-                 'firstaa': self.FirstResidue3,
-                 'lastaa' : self.LastResidue3,
+                 'residues': self.removeResidues3,
                  'numberOfMpi' : 8
                 }
         protSearchFit5 = self.newProtocol(PhenixProtSearchFit, **args2)
