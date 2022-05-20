@@ -25,44 +25,11 @@
 # *
 # **************************************************************************
 
-import pyworkflow.wizard as pwizard
-from pwem.wizards import GetStructureChainsWizard, pwobj, emconv
+from pwem.wizards import SelectResidueWizard
 from .protocols import PhenixProtSearchFit
-from pyworkflow.gui.tree import ListTreeProviderString
-from pyworkflow.gui import dialog
 
-
-class GetChainResiduesWizardPhenix(pwizard.Wizard):
-    _targets = [(PhenixProtSearchFit, ['firstaa'])]
-
-    def getSequenceStep(self, form):
-        residueList = []
-        if form.protocol.inputSequence.get() is not None:
-            sequence = list(form.protocol.inputSequence.get().getSequence())
-            for seq_index, seq_residue in enumerate(sequence):
-                residueList.append('{"residue": %d, "%s"}' %
-                                   (seq_index + 1, seq_residue))
-        finalResiduesList = []
-        for i in residueList:
-            finalResiduesList.append(pwobj.String(i))
-        return finalResiduesList
-
-    def show(self, form, *params):
-        finalResiduesList = self.getSequenceStep(form)
-        provider = ListTreeProviderString(finalResiduesList)
-        dlg = dialog.ListDialog(form.root, "Chain residues", provider,
-                                "Select one residue (residue number, "
-                                "residue name)")
-        form.setVar('firstaa', dlg.values[0].get())
-
-class GetChainResidues2WizardPhenix(GetChainResiduesWizardPhenix):
-    _targets = [(PhenixProtSearchFit, ['lastaa'])]
-
-    def show(self, form, *params):
-        finalResiduesList = self.getSequenceStep(form)
-        provider = ListTreeProviderString(finalResiduesList)
-        dlg = dialog.ListDialog(form.root, "Chain residues", provider,
-                                "Select one residue (residue number, "
-                                "residue name)")
-        form.setVar('lastaa', dlg.values[0].get())
+SelectResidueWizard().addTarget(protocol=PhenixProtSearchFit,
+                                 targets=['residues'],
+                                 inputs=['inputSequence'],
+                                 outputs=['residues'])
 
