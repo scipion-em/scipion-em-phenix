@@ -79,4 +79,17 @@
    url = "http://www.sciencedirect.com/science/article/pii/S1047847710000882"
 
 }
+
+@Article{Terwilliger_2022,
+	author = {Terwilliger, Thomas C. and Poon, Billy K. and Afonine, Pavel V. and Schlicksup, Christopher J. and Croll, Tristan I. and Mill{\'a}n, Claudia and Richardson, Jane. S. and Read, Randy J. and Adams, Paul D.},
+	title = {Improving AlphaFold modeling using implicit information from experimental density maps},
+	elocation-id = {2022.01.07.475350},
+	year = {2022},
+	doi = {10.1101/2022.01.07.475350},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2022/01/07/2022.01.07.475350},
+	eprint = {https://www.biorxiv.org/content/early/2022/01/07/2022.01.07.475350.full.pdf},
+	journal = {bioRxiv}
+
+}
 """
