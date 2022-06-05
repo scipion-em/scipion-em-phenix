@@ -81,10 +81,11 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       help="""Cutoff value to remove low-confidence residues.\n 
                       A maximum RMSD of 1.5 A corresponds to a minimum LDDT 
                       of 70.""")
-        form.addParam('paeFile', PathParam,
-                     label='PAE file', condition=('contentBvalueField!=%d ' % 2),
-                     help="Optional input .json file with matrix of inter-residue"
-                          " estimated errors.")
+        form.addParam('paeFile', PointerParam,
+                      pointerClass="PAE",
+                      label='PAE file', condition=('contentBvalueField!=%d ' % 2),
+                      help="Optional input .json file with matrix of inter-residue"
+                           " estimated errors.")
         form.addParam('removeLowConfidenceResidues', BooleanParam, default=True,
                       label='Remove low-confidence residues',
                       help="""For AlphaFold2 models, low-confidence corresponds 
