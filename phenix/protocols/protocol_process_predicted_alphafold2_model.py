@@ -82,7 +82,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       A maximum RMSD of 1.5 A corresponds to a minimum LDDT 
                       of 70.""")
         form.addParam('paeFile', PointerParam,
-                      pointerClass="PAE",
+                      pointerClass="PAE", allowsNull=True,
                       label='PAE file', condition=('contentBvalueField!=%d ' % 2),
                       help="Optional input .json file with matrix of inter-residue"
                            " estimated errors.")
