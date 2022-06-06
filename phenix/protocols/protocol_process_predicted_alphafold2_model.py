@@ -74,17 +74,23 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       condition=('contentBvalueField==%d ' % 0),
                       help="""Cutoff value to remove low-confidence residues. 
                        Values of LDDT range between 0 and 100. A minimum LDDT 
-                       of 70 corresponds to a maximum RMSD of 1.5.""")
+                       of 70 corresponds to a maximum RMSD of 1.5.\nModel 
+                       Confidence:\nVery high (pLDDT > 90)\n
+                       Confident (90 > pLDDT > 70)\nLow (70 > pLDDT > 50)\n
+                       Very low (pLDDT < 50): Probably unstructured in isolation""")
         form.addParam('maxRMSD', FloatParam, default=1.5,
                       label='Maximum RMSD value',
                       condition=('contentBvalueField==%d ' % 1),
                       help="""Cutoff value to remove low-confidence residues.\n 
                       A maximum RMSD of 1.5 A corresponds to a minimum LDDT 
-                      of 70.""")
-        form.addParam('paeFile', PathParam,
-                     label='PAE file', condition=('contentBvalueField!=%d ' % 2),
-                     help="Optional input .json file with matrix of inter-residue"
-                          " estimated errors.")
+                      of 70.\nModel Confidence:\nVery high (pLDDT > 90)\n
+                      Confident (90 > pLDDT > 70)\nLow (70 > pLDDT > 50)\n
+                      Very low (pLDDT < 50): Probably unstructured in isolation""")
+        form.addParam('paeFile', PointerParam,
+                      pointerClass="PAE", allowsNull=True,
+                      label='PAE file', condition=('contentBvalueField!=%d ' % 2),
+                      help="Optional input .json file with matrix of inter-residue"
+                           " estimated errors.")
         form.addParam('removeLowConfidenceResidues', BooleanParam, default=True,
                       label='Remove low-confidence residues',
                       help="""For AlphaFold2 models, low-confidence corresponds 
