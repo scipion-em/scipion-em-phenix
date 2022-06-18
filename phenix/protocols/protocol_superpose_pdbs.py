@@ -31,7 +31,8 @@ from pyworkflow.object import String, Float, Integer
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.params import PointerParam
 from phenix.constants import SUPERPOSE, PHENIX_HOME
-from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
+from pwem.convert.atom_struct import fromCIFToPDB, \
+    fromPDBToCIF, fromCIFTommCIF, AtomicStructHandler
 
 try:
     from pwem.objects import AtomStruct
