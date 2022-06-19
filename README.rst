@@ -59,14 +59,7 @@ Tested with PHENIX version: 1.13-2998.
 
 To check the installation, simply run the following Scipion tests: 
 
-  * scipion test phenix.tests.test_protocol_dock_in_map
-  * scipion test phenix.tests.test_protocol_emringer
-  * scipion test phenix.tests.test_protocol_real_space_refine
-  * scipion test phenix.tests.test_protocol_molprobity
-  * scipion test phenix.tests.test_protocol_superpose_pdbs
-  * scipion test phenix.tests.test_protocol_validation_cryoem
-  * scipion test phenix.tests.test_protocol_search_fit
-
+  * scipion test --grep phenix --run 
 
 
 - **Supported versions of PHENIX**
