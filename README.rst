@@ -71,7 +71,7 @@ To check the installation, simply run the following Scipion tests:
 
 - **Supported versions of PHENIX**
 
-Tested with  `Phenix-1.13-2998, Phenix-1.16-3549, Phenix- 1.17.1, Phenix 1.18.2 and phenix-1.19.2`
+Tested with  `Phenix-1.13-2998, Phenix-1.16-3549, Phenix- 1.17.1, Phenix 1.18.2, phenix-1.19.2 and phenix 1.20.1`
 
 
 
@@ -86,6 +86,13 @@ Protocols
 * superpose_pdbs: Superposes two atomic structures so that they optimally match.
 * validation_cryoem: generalization of molprobity implemented by Phenix package.
 * search_fit: given a chain of n alanines, a 3D map and a sequence search for the subsequence of n aminoacids that better fits in the density. Only works if the atomic structure has a single chain.
+* rebuild_docked_predicted_alphafold2_model: Rebuild predicted model morphs and rebuilds a model produced by AlphaFold,
+     RoseTTAFold and other prediction software into a cryo EM map, using a set
+     of docked domains from the predicted model as a template.
+* protocol_dock_in_map: Docking of a PDB (one or several copies) into a map
+* dock_and_rebuild_alphafold_model: Rebuild predicted model morphs and rebuilds a model produced by AlphaFold, RoseTTAFold and other prediction software into a cryo EM map, using a set of docked domains from the predicted model as a template.
+* protocol_process_predicted_alphafold2_model: Replace values in b-factor field with estimated B values. Optionally remove low-confidence residues and split into domains.
+* dock_predicted_alphafold2_modeldocks the domains from a model produced by AlphaFold, RoseTTAFold and other prediction software into a cryo EM map. It uses the connectivity of the model as a restraint in the docking process so that the docked domains normally are in a reasonable arrangement. It can take map symmetry into account.
 
 
 ========
