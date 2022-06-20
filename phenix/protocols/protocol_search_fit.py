@@ -41,7 +41,8 @@ from ccp4 import Plugin as PluginCCP4
 from ccp4.convert import (runCCP4Program)
 from ccp4.constants import CCP4_BINARIES
 from phenix.constants import (REALSPACEREFINE,
-                              PHENIXVERSION19)
+                              PHENIXVERSION19,
+                              PHENIXVERSION20)
 from pwem.convert.atom_struct import retry
 
 COOT = CCP4_BINARIES['COOT']
@@ -387,7 +388,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         return summary
 
     def _writeArgsRSR(self, atomStruct, vol):
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
             # Necessary step to avoid the failing of phenix-real_space_refine
             # due to the mmcif format
             # (in this case the simplest mmcif format is the best one)
@@ -403,7 +404,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         else:
             args = " model_file="
         args += "%s " % atomStruct
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
             args += " "
         else:
             args += " map_file="
