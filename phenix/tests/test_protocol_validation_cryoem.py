@@ -325,12 +325,12 @@ class TestValCryoEM(TestImportData):
                                       overallScore=1.27,
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.47,
-                                      ramFavored=83.96,
-                                      rotOutliers=5.68,
-                                      cbetaOutliers=1,
-                                      clashScore=4.77,
-                                      overallScore=2.50,
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=98.58,
+                                      rotOutliers=2.84,
+                                      cbetaOutliers=0,
+                                      clashScore=1.79,
+                                      overallScore=1.28,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -370,12 +370,12 @@ class TestValCryoEM(TestImportData):
                                 overallScore=1.16,
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkMPResults(ramOutliers=0.47,
-                                 ramFavored=83.96,
-                                 rotOutliers=5.68,
-                                 cbetaOutliers=1,
-                                 clashScore=4.77,
-                                 overallScore=2.50,
+            self.checkMPResults(ramOutliers=0.00,
+                                 ramFavored=98.58,
+                                 rotOutliers=2.84,
+                                 cbetaOutliers=0,
+                                 clashScore=1.79,
+                                 overallScore=1.28,
                                  protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -413,12 +413,12 @@ class TestValCryoEM(TestImportData):
 
         # check validation cryoem results
         if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkValCryoEMResults(ramOutliers=0.47,
-                                       ramFavored=83.96,
-                                       rotOutliers=5.68,
-                                       cbetaOutliers=1,
-                                       clashScore=4.77,
-                                       overallScore=2.50,
+            self.checkValCryoEMResults(ramOutliers=0.00,
+                                       ramFavored=98.58,
+                                       rotOutliers=2.84,
+                                       cbetaOutliers=0,
+                                       clashScore=1.79,
+                                       overallScore=1.28,
                                        protValCryoEM=protValCryoEM)
         else:
             self.checkValCryoEMResults(ramOutliers=0.00,
@@ -538,6 +538,14 @@ class TestValCryoEM(TestImportData):
                                 clashScore=3.87,
                                 overallScore=1.59,
                                 protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.59,
+                                rotOutliers=1.30,
+                                cbetaOutliers=0,
+                                clashScore=4.31,
+                                overallScore=1.30,
+                                protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=96.11,
@@ -578,6 +586,14 @@ class TestValCryoEM(TestImportData):
                                        cbetaOutliers=0,
                                        clashScore=6.07,
                                        overallScore=2.06,
+                                       protValCryoEM=protValCryoEM)
+        if Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkValCryoEMResults(ramOutliers=0.00,
+                                       ramFavored=98.59,
+                                       rotOutliers=1.30,
+                                       cbetaOutliers=0,
+                                       clashScore=4.42,
+                                       overallScore=1.31,
                                        protValCryoEM=protValCryoEM)
         else:
             self.checkValCryoEMResults(ramOutliers=0.00,
@@ -668,12 +684,12 @@ class TestValCryoEM(TestImportData):
                                       overallScore=1.75,
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=1.77,
-                                      ramFavored=87.62,
-                                      rotOutliers=10.40,
-                                      cbetaOutliers=2,
-                                      clashScore=12.73,
-                                      overallScore=3.00,
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=98.10,
+                                      rotOutliers=2.40,
+                                      cbetaOutliers=0,
+                                      clashScore=7.23,
+                                      overallScore=1.69,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -720,12 +736,12 @@ class TestValCryoEM(TestImportData):
                                 overallScore=1.75,
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkMPResults(ramOutliers=1.77,
-                                ramFavored=87.62,
-                                rotOutliers=10.40,
-                                cbetaOutliers=2,
-                                clashScore=11.11,
-                                overallScore=2.94,
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.10,
+                                rotOutliers=2.40,
+                                cbetaOutliers=0,
+                                clashScore=7.32,
+                                overallScore=1.69,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -780,12 +796,12 @@ class TestValCryoEM(TestImportData):
                                        overallScore=1.75,
                                        protValCryoEM=protValCryoEM)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkValCryoEMResults(ramOutliers=1.77,
-                                       ramFavored=87.62,
-                                       rotOutliers=10.40,
-                                       cbetaOutliers=2,
-                                       clashScore=11.11,
-                                       overallScore=2.94,
+            self.checkValCryoEMResults(ramOutliers=0.00,
+                                       ramFavored=98.10,
+                                       rotOutliers=2.40,
+                                       cbetaOutliers=0,
+                                       clashScore=7.23,
+                                       overallScore=1.69,
                                        protValCryoEM=protValCryoEM)
         else:
             self.checkValCryoEMResults(ramOutliers=0.00,
@@ -905,6 +921,14 @@ class TestValCryoEM(TestImportData):
                                 cbetaOutliers=0,
                                 clashScore=3.87,
                                 overallScore=1.59,
+                                protMolProbity=protMolProbity2)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.59,
+                                rotOutliers=1.30,
+                                cbetaOutliers=0,
+                                clashScore=4.31,
+                                overallScore=1.30,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
