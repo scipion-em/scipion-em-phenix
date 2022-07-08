@@ -22,7 +22,7 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # ***************************************************************************/
 
-# protocol to test the phenix protocol superpose_pdbs
+# protocol to test the phenix protocol dock in map
 import os
 from phenix.protocols import PhenixProtRunDockInMap
 from pwem.protocols.protocol_import import (ProtImportPdb,

@@ -26,6 +26,7 @@ import os
 import re
 import sqlite3
 import glob
+import json
 
 from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import (StringParam,  IntParam,
@@ -40,7 +41,8 @@ from ccp4 import Plugin as PluginCCP4
 from ccp4.convert import (runCCP4Program)
 from ccp4.constants import CCP4_BINARIES
 from phenix.constants import (REALSPACEREFINE,
-                              PHENIXVERSION19)
+                              PHENIXVERSION19,
+                              PHENIXVERSION20)
 from pwem.convert.atom_struct import retry
 
 COOT = CCP4_BINARIES['COOT']
@@ -76,16 +78,12 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                          label='Test sequence', important=True,
                          help="Input the aminoacid sequence to fit with the "
                               "ALA chain.")
-        form.addParam('firstaa', StringParam, important=True,
-                      label='First residue',
-                      help='Select the first residue of the sequence fragment '
-                           'that you would like to consider.\n The sequence '
+        form.addParam('residues', StringParam, important=True,
+                      label='Residues',
+                      help='Select the first and last residues of the sequence fragment '
+                           'that you would like to consider (Use Ctrl for multiple selection).\n The sequence '
                            'should overlap total or partially the ALA chain.')
-        form.addParam('lastaa', StringParam, important=True,
-                      label='Last residue',
-                      help='Select the last residue of the sequence fragment '
-                           'that you would like to consider.\nThe sequence '
-                           'should overlap total or partially the ALA chain.')
+
         form.addParam('extraCommands', StringParam,
                        label="Extra Params ",
                        default="",
@@ -182,8 +180,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         firstAAinChain = next(atomStruct.getStructure().get_residues()).id[1]
 
         # starting and ending residue
-        firstaa = int(self.firstaa.get().split(":")[1].split(",")[0].strip())
-        lastaa = int(self.lastaa.get().split(":")[1].split(",")[0].strip())
+        firstaa, lastaa = self.getIdxRemoveResidues()
 
         # compute number of steps according to the sequence size
         numberOfSteps = lastaa - firstaa + 1
@@ -259,23 +256,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                                                                  os.path.abspath(outFileName)
                                                                  )
             f.write('cur.execute("%s")\n' % command)
-        # invert sequence
-        ##iMol = 1 # pdb id is  0 or 1 for inverse
-        ##f.write('reverse_direction_of_fragment(0, "%s", 1)\n'% chainName)
-        ##f.write('db_mainchain(0, "%s", %d, %d,"forwards")\n' % (chainName, startMut, endMut))
-        ##for start in range(numberOfSteps):
-        ##    seq = self.inputSequence.get().getSequence()[firstaa + start : firstaa + start + atomStructSize]
-        ##    f.write("mutate_residue_range(%d, '%s', %d, %d, '%s')\n" % (iMol,
-        ##                                                              chainName,
-        ##                                                              startMut,
-        ##                                                              endMut,
-        ##                                                              seq))
-        ##    outFileName = self._getExtraPath(COOTPDBTEMPLATEFILENAMEINV% (0,0,start))
-        ##    f.write("save_coordinates(1, '%s')\n" % outFileName)
-        ##    command = "INSERT INTO %s(filename) VALUES('%s')" % (TABLE,
-        ##                                                         os.path.abspath(outFileName)
-        ##                                                         )
-        ##    f.write('cur.execute("%s")\n' % command)
+
         if len(self.extraCommands.get()) > 0:
             f.write("\n#Extra Commands\n")
             f.write("%s\n" % self.extraCommands.get())
@@ -337,9 +318,10 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                  # cwd=os.path.abspath(self._getExtraPath()),
                  cwd=cwd,
                  listAtomStruct=[atomStructFn], log=self._log)
+
             if Plugin.getPhenixVersion() >= PHENIXVERSION19:
                 # update data base with phenix version
-                logFileFn = atomStructFn[:-4] + "_real_space_refined_???.log"
+                logFileFn = atomStructFn[:-4] + "_real_space_refined_000.log"
                 # last file
                 lastLogFile = sorted(glob.glob(logFileFn))[-1]
                 phenix_id = lastLogFile[-8:-4]  # _000
@@ -350,31 +332,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             else:
                 phenix_id = ''
             conn.commit()
-#            refinedFile = False
-#            for item in os.listdir(self._getExtraPath()):
-#                p = re.compile('\d+')
-#                if p.search(item) is not None and item.endswith(".cif"):
-#                    self.refinedFile = True
-#                    break
-#
-#            if self.refinedFile == False:
-#                print("WARNING!!!\nPHENIX error:\n pdb_interpretation.clash_guard" \
-#                      " failure: High number of nonbonded interaction distances " \
-#                      "< 0.5. This error has been disable by running the same " \
-#                      "command with the same following additional " \
-#                      "argument:\npdb_interpretation.clash_guard." \
-#                      "nonbonded_distance_threshold=None ")
-#                args += " "
-#                args += "pdb_interpretation.clash_guard." \
-#                        "nonbonded_distance_threshold=None"
-#                retry(Plugin.runPhenixProgram,
-#                      Plugin.getProgram(REALSPACEREFINE), args,
-#                      # cwd=os.path.abspath(self._getExtraPath()),
-#                      cwd=cwd,
-#                      listAtomStruct=[atomStructFn], log=self._log)
-            # coot_000000_Imol_0000_version_0004_real_space_refined_001.eff
-            # coot_000000_Imol_0000_version_0030.pdb
-            # glob
+
             logFileFn = atomStructFn[:-4] + "_real_space_refined%s.log" % phenix_id
             model_to_map_fit = self.extractNumber(logFileFn)
             accepted = c.execute("""UPDATE %s
@@ -430,12 +388,23 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         return summary
 
     def _writeArgsRSR(self, atomStruct, vol):
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
+            # Necessary step to avoid the failing of phenix-real_space_refine
+            # due to the mmcif format
+            # (in this case the simplest mmcif format is the best one)
+            aSH = AtomicStructHandler()
+            if atomStruct.endswith(".pdb") or atomStruct.endswith(".ent"):
+                newAtomStructName = atomStruct.replace(".pdb", ".cif"). \
+                    replace(".ent", ".cif")
+
+                aSH.read(atomStruct)
+                aSH.write(newAtomStructName)
+                atomStruct = newAtomStructName
             args = " "
         else:
             args = " model_file="
         args += "%s " % atomStruct
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
             args += " "
         else:
             args += " map_file="
@@ -466,3 +435,6 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             args += " nproc=%d" % numberOfThreads
         return args
 
+    def getIdxRemoveResidues(self):
+        idxs = json.loads(getattr(self, 'residues').get())['index'].split('-')
+        return list(map(int, idxs))

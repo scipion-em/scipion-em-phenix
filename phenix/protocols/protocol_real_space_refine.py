@@ -33,7 +33,8 @@ from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
                               VALIDATION_CRYOEM,
                               PHENIXVERSION,
-                              PHENIXVERSION19)
+                              PHENIXVERSION19,
+                              PHENIXVERSION20)
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
@@ -282,12 +283,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         fromCIFTommCIF(outAtomStructName, self.outAtomStructName, log)
 
     def _writeArgsRSR(self, atomStruct, vol):
-        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+        if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
             args = " "
         else:
             args = " model_file="
         args += "%s " % atomStruct
-        if Plugin.getPhenixVersion() == PHENIXVERSION19:
+        if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
             args += " "
         else:
             args += " map_file="
