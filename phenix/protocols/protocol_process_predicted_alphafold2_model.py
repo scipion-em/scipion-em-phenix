@@ -101,12 +101,12 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       label='Split model into compact regions',
                       help="""group the pieces from your trimmed model into compact 
                       domains, or even to split some pieces into compact domains""")
-        form.addParam('maximumDomains', IntParam, default=3,
+        form.addParam('maximumDomains', FloatParam, default=3.0,
                       label='Processing option: Maximum domains',
                       help="""Maximum domains to obtain. You can use this to merge
                       the closest domains at the end of splitting the model. Make it
                       bigger to get more domains.""")
-        form.addParam('minimumDomainLength', IntParam, default=10,
+        form.addParam('minimumDomainLength', FloatParam, default=10.0,
                       label='Processing option: Minimum domain length (residues)',
                       help="""Minimum length of a domain to keep (reject at end if
                       smaller).""")
