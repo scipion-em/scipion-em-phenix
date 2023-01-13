@@ -99,7 +99,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "atoms that move (rotate and translate) as a "
                             "single body.\n")
         group.addParam('localGridSearch', BooleanParam,
-                       label="Local grid search: ", default=False,
+                       label="Local grid search: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
                        help="Refinement strategy that considers "
                             "local rotamer fitting.\n\n Generally, refinement "
@@ -146,6 +146,25 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "with all defaults is sufficient.\n\nADP ("
                             "B-factors) refinement against the map is "
                             "performed at the last macro-cycle only. ")
+        group.addParam('occupancy', BooleanParam,
+                       label="Atom Occupancy ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\n ")
+        group.addParam('nqh_flips', BooleanParam,
+                       label="NQH Flips ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\nAsn, Gln, and His "
+                            "residues can often be fit favorably to the data in "
+                            "two orientations, related by a 180 degree rotation. "
+                            "In many cases, however, only one of these orientations"
+                            " is sterically and electrostatically favorable. "
+                            "phenix.refine uses Reduce to identify Asn, Gln, and "
+                            "His residues that should be flipped, and then flips "
+                            "them automatically.")
 
         # form.addParallelSection(threads=1, mpi=0)
 
@@ -308,6 +327,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += "simulated_annealing+"
         if self.adp == True:
             args += "adp+"
+        if self.occupancy == True:
+            args += "occupancy+"
+        if self.nqh_flips == True:
+            args += "nqh_flips+"
         args = args[:-1]
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
         args += " macro_cycles=%d" % self.macroCycles
