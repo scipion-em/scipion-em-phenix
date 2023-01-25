@@ -137,7 +137,8 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(DOCKPREDICTEDMODEL),
               args, cwd=cwd,
               listAtomStruct=[predictedAtomStruct, processedAtomStruct],
-              log=self._log)
+              log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              
     def createOutputStep(self):
         pdb = AtomStruct()
         for fileName in os.listdir(self._getExtraPath()):
