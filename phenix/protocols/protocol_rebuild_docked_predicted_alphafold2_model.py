@@ -109,18 +109,27 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
 
         dockedAtomStruct_localPath = os.path.abspath(
             self._getExtraPath(dockedAtomStruct.split('/')[-1]))
+
         if str(dockedAtomStruct) != str(dockedAtomStruct_localPath):
             pwutils.path.createLink(dockedAtomStruct, dockedAtomStruct_localPath)
             dockedAtomStruct = dockedAtomStruct_localPath
 
+        # log = self._log
+        # if not dockedAtomStruct.endswith(".pdb"):
+        #     dockedAtomStruct_replaced = dockedAtomStruct.replace("cif", "pdb")
+        #     fromCIFToPDB(dockedAtomStruct, dockedAtomStruct_replaced, log)
+        #     dockedAtomStruct = dockedAtomStruct_replaced
+        # print("dockedAtomStruct2: ", dockedAtomStruct)
         self.prefix = os.path.abspath(self._getExtraPath(dockedAtomStruct))
         args = self._writeArgsDockAlphaFold(
             predictedAtomStruct, dockedAtomStruct, localVolName, self.prefix)
         cwd = os.getcwd() + "/" + self._getExtraPath()
+
         retry(Plugin.runPhenixProgram, Plugin.getProgram(REBUILDDOCKPREDICTEDMODEL),
               args, cwd=cwd,
               listAtomStruct=[predictedAtomStruct, dockedAtomStruct],
-              log=self._log)
+              log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              
     def createOutputStep(self):
         pdb = AtomStruct()
         nameProcessed = ''

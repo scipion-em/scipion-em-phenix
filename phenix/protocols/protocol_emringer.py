@@ -109,10 +109,9 @@ the atomic structure backbone has been perfectly fitted to the map.
         # import time
         # time.sleep(30)
         retry(Plugin.runPhenixProgram, Plugin.getProgram(EMRINGER),
-              # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=self._getExtraPath(),
-              listAtomStruct=[atomStruct], log=self._log)
-              # clean_dir=glob.glob(self._getExtraPath() + ("/*_plots"))[-1]
+              listAtomStruct=[atomStruct], log=self._log,
+              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         # get emringer information

@@ -139,7 +139,9 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(PROCESS),
               args, cwd=cwd,
-              listAtomStruct=[atomStruct], log=self._log)
+              listAtomStruct=[atomStruct], log=self._log,
+              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              
     def createOutputStep(self):
         pdb = AtomStruct()
         for fileName in os.listdir(self._getExtraPath()):
