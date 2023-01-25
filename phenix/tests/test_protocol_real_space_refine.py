@@ -224,7 +224,9 @@ class TestPhenixRSRefine(TestImportData):
         args = {
                 'resolution': 3.5,
                 'inputStructure': structure_refmac3,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -282,8 +284,10 @@ class TestPhenixRSRefine(TestImportData):
         args = {'inputVolume': volume_refmac3,
                 'resolution': 3.5,
                 'inputStructure': structure_refmac3,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
                 # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -311,11 +315,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.0,
-                                      ramFavored=98.58,
-                                      rotOutliers=2.84,
+                                      ramFavored=98.11,
+                                      rotOutliers=0.00,
                                       cbetaOutliers=0,
-                                      clashScore=1.79,
-                                      overallScore=1.28,
+                                      clashScore=3.87,
+                                      overallScore=1.17,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -368,7 +372,9 @@ class TestPhenixRSRefine(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -404,11 +410,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
+                                      ramFavored=98.06,
+                                      rotOutliers=0.22,
                                       cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
+                                      clashScore=5.41,
+                                      overallScore=1.29,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -476,7 +482,9 @@ class TestPhenixRSRefine(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_cif,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -512,11 +520,11 @@ class TestPhenixRSRefine(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
+                                      ramFavored=98.06,
+                                      rotOutliers=0.22,
                                       cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
+                                      clashScore=5.411,
+                                      overallScore=1.29,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -580,7 +588,9 @@ class TestPhenixRSRefine(TestImportData):
                 'morphing': True,
                 'simulatedAnnealing': True,
                 'adp': False,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -684,7 +694,9 @@ class TestPhenixRSRefine(TestImportData):
                 'localGridSearch': True,
                 'morphing': True,
                 'simulatedAnnealing': True,
-                'adp': False
+                'adp': False,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -791,7 +803,9 @@ class TestPhenixRSRefine(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_cif,
-                'outputFormat': mmCIF
+                'outputFormat': mmCIF,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -908,7 +922,9 @@ class TestPhenixRSRefine(TestImportData):
                 'localGridSearch': True,
                 'morphing': True,
                 'simulatedAnnealing': True,
-                'adp': False
+                'adp': False,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False

@@ -156,7 +156,7 @@ class TestValCryoEM(TestImportData):
     """
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
                        cbetaOutliers, clashScore, overallScore,
-                       protMolProbity, places=2, delta=1):
+                       protMolProbity, places=2, delta=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -186,7 +186,7 @@ class TestValCryoEM(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2, delta=3):
+                             protRSRefine, places=2, delta=2):
         # method to check Real Space Refine statistic results of the Final Results
         # Table
         try:
@@ -209,7 +209,7 @@ class TestValCryoEM(TestImportData):
 
     def checkValCryoEMResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protValCryoEM, places=2, delta=3):
+                             protValCryoEM, places=2, delta=2):
         # method to check Validation CryoEM statistic results of the Final Results
         # Table
         try:
@@ -305,8 +305,10 @@ class TestValCryoEM(TestImportData):
         # real_space_refine
         args = {'inputVolume': volume_refmac3,
                 'resolution': 3.5,
-                'inputStructure': structure_refmac3
+                'inputStructure': structure_refmac3,
                 # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -473,7 +475,9 @@ class TestValCryoEM(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -643,7 +647,9 @@ class TestValCryoEM(TestImportData):
         args = {
                 'resolution': 4.0,
                 'inputStructure': structure_nucleosome_pdb,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -685,11 +691,11 @@ class TestValCryoEM(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.10,
-                                      rotOutliers=2.40,
+                                      ramFavored=97.82,
+                                      rotOutliers=0.64,
                                       cbetaOutliers=0,
-                                      clashScore=7.23,
-                                      overallScore=1.69,
+                                      clashScore=12.36,
+                                      overallScore=1.64,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -737,11 +743,11 @@ class TestValCryoEM(TestImportData):
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=98.10,
-                                rotOutliers=2.40,
+                                ramFavored=97.82,
+                                rotOutliers=0.64,
                                 cbetaOutliers=0,
-                                clashScore=7.32,
-                                overallScore=1.69,
+                                clashScore=12.45,
+                                overallScore=1.65,
                                 protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
@@ -797,11 +803,11 @@ class TestValCryoEM(TestImportData):
                                        protValCryoEM=protValCryoEM)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkValCryoEMResults(ramOutliers=0.00,
-                                       ramFavored=98.10,
-                                       rotOutliers=2.40,
+                                       ramFavored=97.82,
+                                       rotOutliers=0.64,
                                        cbetaOutliers=0,
-                                       clashScore=7.23,
-                                       overallScore=1.69,
+                                       clashScore=12.36,
+                                       overallScore=1.64,
                                        protValCryoEM=protValCryoEM)
         else:
             self.checkValCryoEMResults(ramOutliers=0.00,
@@ -857,7 +863,9 @@ class TestValCryoEM(TestImportData):
         args = {'inputVolume': volume_hemo_half1_hal2,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
