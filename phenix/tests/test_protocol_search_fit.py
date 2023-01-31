@@ -181,7 +181,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                 }
@@ -242,7 +242,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                 }
@@ -260,7 +260,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1_2,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                  }
@@ -320,7 +320,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues2,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                 }
@@ -380,7 +380,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues2,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                 }
@@ -459,7 +459,7 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues3,
-                 'numberOfMpi' : 1,
+                 'numberOfMpi' : 8,
                  'occupancy': False,
                  'nqh_flips': False
                 }
