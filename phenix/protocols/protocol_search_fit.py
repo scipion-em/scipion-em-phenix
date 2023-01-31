@@ -333,10 +333,18 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
 
             args = self._writeArgsRSR(atomStructFn, vol)
 
+            # TODO:Review with Rob (break doesn't seem to work)
+            # if self.getLogsLastLines(logFile=1) != []:
+            #    if self.getLogsLastLines(logFile=1)[0].startswith("Sorry: Map and model are not aligned!"):
+            #        break
+
             retry(Plugin.runPhenixProgram,
                  Plugin.getProgram(REALSPACEREFINE), args,
-                 cwd=cwd, listAtomStruct=[atomStructFn], log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
-
+                 cwd=cwd, listAtomStruct=[atomStructFn], log=self._log, 
+                 messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                             "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")],
+                 sdterrLog = self.getLogsLastLines)
+            
             if Plugin.getPhenixVersion() >= PHENIXVERSION19:
                 # update data base with phenix version
                 logFileFn = atomStructFn[:-4] + "_real_space_refined_000.log"
