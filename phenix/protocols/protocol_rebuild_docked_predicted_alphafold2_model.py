@@ -128,7 +128,7 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(REBUILDDOCKPREDICTEDMODEL),
               args, cwd=cwd,
               listAtomStruct=[predictedAtomStruct, dockedAtomStruct],
-              log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              log=self._log, sdterrLog = self.getLogsLastLines)
               
     def createOutputStep(self):
         pdb = AtomStruct()
