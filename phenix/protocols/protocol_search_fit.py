@@ -92,7 +92,7 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                             " script")
         # real space refine
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
-                      default=True, expertLevel=LEVEL_ADVANCED,
+                      default=False, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
                            "restraints.\nOnly for PHENIX versions higher than 1.13.")
         form.addParam("macroCycles", IntParam, label="Macro cycles",
@@ -166,6 +166,25 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                             "with all defaults is sufficient.\n\nADP ("
                             "B-factors) refinement against the map is "
                             "performed at the last macro-cycle only. ")
+        group.addParam('occupancy', BooleanParam,
+                       label="Atom Occupancy ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\n ")
+        group.addParam('nqh_flips', BooleanParam,
+                       label="NQH Flips ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\nAsn, Gln, and His "
+                            "residues can often be fit favorably to the data in "
+                            "two orientations, related by a 180 degree rotation. "
+                            "In many cases, however, only one of these orientations"
+                            " is sterically and electrostatically favorable. "
+                            "phenix.refine uses Reduce to identify Asn, Gln, and "
+                            "His residues that should be flipped, and then flips "
+                            "them automatically.")
         form.addParallelSection(threads=0, mpi=1)
 
 
@@ -313,12 +332,19 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             conn.commit()
 
             args = self._writeArgsRSR(atomStructFn, vol)
+
+            # TODO:Review with Rob (break doesn't seem to work)
+            # if self.getLogsLastLines(logFile=1) != []:
+            #    if self.getLogsLastLines(logFile=1)[0].startswith("Sorry: Map and model are not aligned!"):
+            #        break
+
             retry(Plugin.runPhenixProgram,
                  Plugin.getProgram(REALSPACEREFINE), args,
-                 # cwd=os.path.abspath(self._getExtraPath()),
-                 cwd=cwd,
-                 listAtomStruct=[atomStructFn], log=self._log)
-
+                 cwd=cwd, listAtomStruct=[atomStructFn], log=self._log, 
+                 messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                             "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")],
+                 sdterrLog = self.getLogsLastLines)
+            
             if Plugin.getPhenixVersion() >= PHENIXVERSION19:
                 # update data base with phenix version
                 logFileFn = atomStructFn[:-4] + "_real_space_refined_000.log"
@@ -410,7 +436,8 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             args += " map_file="
         args += "%s " % vol
         args += " resolution=%f" % self.resolution
-        args += " secondary_structure.enabled=%s" % self.doSecondary
+        if self.doSecondary == True:
+            args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="
         if self.minimizationGlobal == True:
             args += "minimization_global+"
@@ -424,10 +451,16 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
             args += "simulated_annealing+"
         if self.adp == True:
             args += "adp+"
+        if self.occupancy == True:
+            args += "occupancy+"
+        if self.nqh_flips == True:
+            args += "nqh_flips+"
         args = args[:-1]
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
-        args += " macro_cycles=%d" % self.macroCycles
-        args += " model_format=pdb+mmcif"
+        if self.macroCycles != 5:
+            args += " macro_cycles=%d" % self.macroCycles
+        # args += " model_format=pdb+mmcif"
+        # args += " wrapping=Auto adp_individual_isotropic=Auto ncs_search.enabled=True"
         # args += " write_pkl_stats=True"
         args += " %s " % self.extraParams.get()
         numberOfThreads = self.numberOfThreads.get()

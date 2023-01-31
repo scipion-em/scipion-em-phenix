@@ -88,14 +88,15 @@ atomic structure inferred from an electron density map.
         args = self._writeArgsMolProbity(atomStruct, vol=volume)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         # script with auxiliary files
+
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
-              args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log)
+            args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, sdterrLog = self.getLogsLastLines)
 
         args = self._writeArgsValCryoEM(atomStruct, volume, self.vol)
 
         if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
             retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
-                  args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log)
+                  args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
@@ -119,6 +120,7 @@ atomic structure inferred from an electron density map.
         summary = PhenixProtRunRefinementBase._summary(self)
         summary.append("https://www.phenix-online.org/documentation/"
                        "reference/validation_cryo_em.html")
+        
         return summary
 
     def _methods(self):

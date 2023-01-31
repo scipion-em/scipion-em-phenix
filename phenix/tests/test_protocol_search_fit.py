@@ -181,7 +181,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                 }
         protSearchFit1 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit1.setObjLabel('search fit\n volume 3844\n5ni1_A_94_118')
@@ -240,7 +242,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                 }
         protSearchFit2 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit2.setObjLabel(
@@ -256,7 +260,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues1_2,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                  }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args3)
         protSearchFit3.setObjLabel(
@@ -314,7 +320,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues2,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                 }
         protSearchFit3 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit3.setObjLabel('search fit\n volume 3844\n5ni1_A_42_55')
@@ -372,7 +380,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues2,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                 }
         protSearchFit4 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit4.setObjLabel(
@@ -449,7 +459,9 @@ class TestPhenixProtSearchFit(TestImportData):
                  'inputStructure': result,
                  'inputSequence': sequence,
                  'residues': self.removeResidues3,
-                 'numberOfMpi' : 8
+                 'numberOfMpi' : 8,
+                 'occupancy': False,
+                 'nqh_flips': False
                 }
         protSearchFit5 = self.newProtocol(PhenixProtSearchFit, **args2)
         protSearchFit5.setObjLabel('search fit\n volume 4551\n5ni1_M_130_156')

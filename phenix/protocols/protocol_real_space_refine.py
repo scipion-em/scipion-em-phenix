@@ -72,7 +72,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                        "Otherwise, values of real-space correlation will indicate "
                        "not correlation at all.\n")
         form.addParam("doSecondary", BooleanParam, label="Secondary structure",
-                      default=True, expertLevel=LEVEL_ADVANCED,
+                      default=False, expertLevel=LEVEL_ADVANCED,
                       help="Set to TRUE to use secondary structure "
                            "restraints.\nOnly for PHENIX versions higher than 1.13.")
         form.addParam("macroCycles", IntParam, label="Macro cycles",
@@ -99,7 +99,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "atoms that move (rotate and translate) as a "
                             "single body.\n")
         group.addParam('localGridSearch', BooleanParam,
-                       label="Local grid search: ", default=False,
+                       label="Local grid search: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
                        help="Refinement strategy that considers "
                             "local rotamer fitting.\n\n Generally, refinement "
@@ -146,6 +146,25 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "with all defaults is sufficient.\n\nADP ("
                             "B-factors) refinement against the map is "
                             "performed at the last macro-cycle only. ")
+        group.addParam('occupancy', BooleanParam,
+                       label="Atom Occupancy ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\n ")
+        group.addParam('nqh_flips', BooleanParam,
+                       label="NQH Flips ",
+                       default=True,
+                       expertLevel=LEVEL_ADVANCED,
+                       help="Phenix default parameter.\nGenerally, refinement "
+                            "with all defaults is sufficient.\nAsn, Gln, and His "
+                            "residues can often be fit favorably to the data in "
+                            "two orientations, related by a 180 degree rotation. "
+                            "In many cases, however, only one of these orientations"
+                            " is sterically and electrostatically favorable. "
+                            "phenix.refine uses Reduce to identify Asn, Gln, and "
+                            "His residues that should be flipped, and then flips "
+                            "them automatically.")
 
         # form.addParallelSection(threads=1, mpi=0)
 
@@ -166,10 +185,12 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         cwd = os.getcwd() + "/" + self._getExtraPath()
 
         retry(Plugin.runPhenixProgram,
-              Plugin.getProgram(REALSPACEREFINE), args,
-              # cwd=os.path.abspath(self._getExtraPath()),
-              cwd=cwd,
-              listAtomStruct=[atomStruct], log=self._log)
+              Plugin.getProgram(REALSPACEREFINE), args, cwd=cwd,
+              listAtomStruct=[atomStruct], log=self._log,
+              messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                         "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")], 
+              sdterrLog = self.getLogsLastLines)
+
         self.refinedFile = False
         for item in os.listdir(self._getExtraPath()):
             p = re.compile('\d+')
@@ -187,10 +208,11 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " pdb_interpretation.clash_guard." \
                     "nonbonded_distance_threshold=None"
             retry(Plugin.runPhenixProgram,
-                  Plugin.getProgram(REALSPACEREFINE), args,
-                  # cwd=os.path.abspath(self._getExtraPath()),
-                  cwd=cwd,
-                  listAtomStruct=[atomStruct], log=self._log)
+                  Plugin.getProgram(REALSPACEREFINE), args, cwd=cwd,
+                  listAtomStruct=[atomStruct], log=self._log,
+                  messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                             "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")], 
+                  sdterrLog = self.getLogsLastLines)
 
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
@@ -201,9 +223,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args = self._writeArgsMolProbity(atomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
-              # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=cwd,
-              listAtomStruct=[atomStruct], log=self._log)
+              listAtomStruct=[atomStruct], log=self._log,
+              sdterrLog = self.getLogsLastLines)
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
@@ -218,9 +240,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args = self._writeArgsValCryoEM(atomStruct, volume, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
-              # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=cwd,
-              listAtomStruct=[atomStruct], log=self._log)
+              listAtomStruct=[atomStruct], log=self._log,
+              sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         # self._getRSRefineOutput()
@@ -294,7 +316,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += " map_file="
         args += "%s " % vol
         args += " resolution=%f" % self.resolution
-        args += " secondary_structure.enabled=%s" % self.doSecondary
+        if self.doSecondary == True:
+            args += " secondary_structure.enabled=%s" % self.doSecondary
         args += " run="
         if self.minimizationGlobal == True:
             args += "minimization_global+"
@@ -308,10 +331,16 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += "simulated_annealing+"
         if self.adp == True:
             args += "adp+"
+        if self.occupancy == True:
+            args += "occupancy+"
+        if self.nqh_flips == True:
+            args += "nqh_flips+"
         args = args[:-1]
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
-        args += " macro_cycles=%d" % self.macroCycles
-        args += " model_format=pdb+mmcif"
+        if self.macroCycles != 5:
+            args += " macro_cycles=%d" % self.macroCycles
+        #args += " model_format=pdb+mmcif"
+        #args += " wrapping=Auto adp_individual_isotropic=Auto ncs_search.enabled=True"
         # args += " write_pkl_stats=True"
         args += " %s " % self.extraParams.get()
         numberOfThreads = self.numberOfThreads.get()

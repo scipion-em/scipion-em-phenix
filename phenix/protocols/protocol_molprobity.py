@@ -85,7 +85,8 @@ atomic structure inferred from an electron density map.
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
               # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=self._getExtraPath(),
-              listAtomStruct=[self.atomStruct], log=self._log)
+              listAtomStruct=[self.atomStruct], log=self._log,
+              sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         MOLPROBITYOUTFILENAME = self._getExtraPath(
@@ -103,7 +104,9 @@ atomic structure inferred from an electron density map.
             retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
                   # args, cwd=os.path.abspath(self._getExtraPath()),
                   args, cwd=self._getExtraPath(),
-                  listAtomStruct=[self.atomStruct], log=self._log)
+                  listAtomStruct=[self.atomStruct], log=self._log,
+                  sdterrLog = self.getLogsLastLines)
+
             self._parseFile(MOLPROBITYOUTFILENAME)
         self._store()
 

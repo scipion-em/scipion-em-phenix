@@ -362,7 +362,9 @@ class TestPhenixPdbCif(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_pdb,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -398,11 +400,11 @@ class TestPhenixPdbCif(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
+                                      ramFavored=98.06,
+                                      rotOutliers=0.22,
                                       cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
+                                      clashScore=5.41,
+                                      overallScore=1.29,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -451,13 +453,13 @@ class TestPhenixPdbCif(TestImportData):
                                 overallScore=1.59,
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
-                                      cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
-                                      protRSRefine=protRSRefine)
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.06,
+                                rotOutliers=0.22,
+                                cbetaOutliers=0,
+                                clashScore=5.41,
+                                overallScore=1.29,
+                                protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=96.11,
@@ -470,7 +472,9 @@ class TestPhenixPdbCif(TestImportData):
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': protRSRefine.outputPdb
+                'inputStructure': protRSRefine.outputPdb,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
         protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nvolume_hemo_org and '
@@ -575,7 +579,9 @@ class TestPhenixPdbCif(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_cif,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -611,11 +617,11 @@ class TestPhenixPdbCif(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
+                                      ramFavored=98.06,
+                                      rotOutliers=0.22,
                                       cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
+                                      clashScore=5.41,
+                                      overallScore=1.29,
                                       protRSRefine=protRSRefine)
         else:
             # values obtained from phenix GUI v. 1.16
@@ -666,13 +672,13 @@ class TestPhenixPdbCif(TestImportData):
                                 overallScore=1.59,
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
-                                      cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
-                                      protRSRefine=protRSRefine)
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.06,
+                                rotOutliers=0.22,
+                                cbetaOutliers=0,
+                                clashScore=5.41,
+                                overallScore=1.29,
+                                protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=96.11,
@@ -685,7 +691,9 @@ class TestPhenixPdbCif(TestImportData):
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': protRSRefine.outputPdb
+                'inputStructure': protRSRefine.outputPdb,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
         protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nvolume_hemo_org and '
@@ -793,7 +801,9 @@ class TestPhenixPdbCif(TestImportData):
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
                 'inputStructure': structure_hemo_cif_PDB,
-                'numberOfThreads': 4
+                'numberOfThreads': 4,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -830,11 +840,11 @@ class TestPhenixPdbCif(TestImportData):
                                       protRSRefine=protRSRefine)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
             self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
+                                      ramFavored=98.06,
+                                      rotOutliers=0.22,
                                       cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
+                                      clashScore=5.41,
+                                      overallScore=1.29,
                                       protRSRefine=protRSRefine)
         else:
             # values obtained from phenix GUI v. 1.16
@@ -885,13 +895,13 @@ class TestPhenixPdbCif(TestImportData):
                                 overallScore=1.59,
                                 protMolProbity=protMolProbity2)
         elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
-                                      cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
-                                      protRSRefine=protRSRefine)
+            self.checkMPResults(ramOutliers=0.00,
+                                ramFavored=98.06,
+                                rotOutliers=0.22,
+                                cbetaOutliers=0,
+                                clashScore=5.41,
+                                overallScore=1.29,
+                                protMolProbity=protMolProbity2)
         else:
             self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=96.11,
@@ -904,7 +914,9 @@ class TestPhenixPdbCif(TestImportData):
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': protRSRefine.outputPdb
+                'inputStructure': protRSRefine.outputPdb,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
         protValCryoEM.setObjLabel('ValCryoEM\nafter RSRefine\nvolume_hemo_org and '
@@ -990,7 +1002,9 @@ class TestPhenixPdbCif(TestImportData):
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': protSuperposePdbs.outputPdb
+                'inputStructure': protSuperposePdbs.outputPdb,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
         protValCryoEM.setObjLabel('ValCryoEM\nafter Superpose\nvolume_hemo_org and\n'
@@ -1040,7 +1054,9 @@ class TestPhenixPdbCif(TestImportData):
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
-                'inputStructure': protSuperposePdbs.outputPdb
+                'inputStructure': protSuperposePdbs.outputPdb,
+                'occupancy': False,
+                'nqh_flips': False
                 }
         protValCryoEM = self.newProtocol(PhenixProtRunValidationCryoEM, **args)
         protValCryoEM.setObjLabel('ValCryoEM\nafter Superpose\nvolume_hemo_org and\n'

@@ -109,10 +109,15 @@ the atomic structure backbone has been perfectly fitted to the map.
         # import time
         # time.sleep(30)
         retry(Plugin.runPhenixProgram, Plugin.getProgram(EMRINGER),
-              # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=self._getExtraPath(),
-              listAtomStruct=[atomStruct], log=self._log)
-              # clean_dir=glob.glob(self._getExtraPath() + ("/*_plots"))[-1]
+              listAtomStruct=[atomStruct], log=self._log,
+              messages=[("max_max = max(maxima)", 
+                        "No features could be detected in the density around the model, so EMRinger can't proceed."), 
+                        ("Sorry: No residues could be scanned by EMRinger, so scores cannot be generated.",
+                        "Sorry: No residues could be scanned by EMRinger, so scores cannot be generated."),
+                        ("Sorry: No features could be detected in the density around the model, so EMRinger can't",
+                        "Sorry: No features could be detected in the density around the model, so EMRinger can't")], 
+                        sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         # get emringer information
