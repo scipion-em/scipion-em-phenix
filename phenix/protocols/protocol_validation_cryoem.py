@@ -90,13 +90,13 @@ atomic structure inferred from an electron density map.
         # script with auxiliary files
 
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
-            args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+            args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, sdterrLog = self.getLogsLastLines)
 
         args = self._writeArgsValCryoEM(atomStruct, volume, self.vol)
 
         if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
             retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
-                  args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+                  args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
