@@ -180,6 +180,9 @@ class TestImportData(TestImportBase):
 
 class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
 
+        # Warnigs detected in this class according to Phenix:
+        # "WARNING, Sorry: Bad helix length. Check HELIX records."
+
     def testAProcessPrediction1(self):
         """ Test the protocol process alpahafold2 predicted model
         """
@@ -349,6 +352,9 @@ class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
 
 
 class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
+
+        # Warnigs detected in this class according to Phenix:
+        # "WARNING, Sorry: Bad helix length. Check HELIX records."
 
     def testAProcessPrediction2(self):
         """ Test the protocol process alpahafold2 predicted model
@@ -524,6 +530,11 @@ class TestCProtProcessDockBuildPredictedAlphaFold(TestImportData):
         """
         print("Run phenix process_predicted_model protocol from a imported "
               "predicted atomic structure ")
+        
+        # According to Phenix, the atomic structure format generates a warning message:
+        # "WARNING, Sorry: Bad helix length. Check HELIX records."
+        # Then, the atomic structure mmcif format requires to be upgraded
+        # (maxit performs it)
 
         # import PDB
         protImportPDB = self._importStructure3()
