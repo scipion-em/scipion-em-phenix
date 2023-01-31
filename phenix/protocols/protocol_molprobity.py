@@ -86,7 +86,7 @@ atomic structure inferred from an electron density map.
               # args, cwd=os.path.abspath(self._getExtraPath()),
               args, cwd=self._getExtraPath(),
               listAtomStruct=[self.atomStruct], log=self._log,
-              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         MOLPROBITYOUTFILENAME = self._getExtraPath(
@@ -105,7 +105,7 @@ atomic structure inferred from an electron density map.
                   # args, cwd=os.path.abspath(self._getExtraPath()),
                   args, cwd=self._getExtraPath(),
                   listAtomStruct=[self.atomStruct], log=self._log,
-                  messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+                  sdterrLog = self.getLogsLastLines)
 
             self._parseFile(MOLPROBITYOUTFILENAME)
         self._store()
