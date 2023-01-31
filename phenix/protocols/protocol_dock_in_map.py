@@ -104,7 +104,7 @@ class PhenixProtRunDockInMap(EMProtocol):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(DOCKINMAP),
             args, cwd=cwd,
             listAtomStruct=[atomStruct], log=self._log,
-            messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+            sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         self._getDockInMapOutput()
