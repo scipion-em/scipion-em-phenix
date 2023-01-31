@@ -187,7 +187,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         retry(Plugin.runPhenixProgram,
               Plugin.getProgram(REALSPACEREFINE), args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log,
-              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                         "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")], 
+              sdterrLog = self.getLogsLastLines)
 
         self.refinedFile = False
         for item in os.listdir(self._getExtraPath()):
@@ -208,7 +210,9 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             retry(Plugin.runPhenixProgram,
                   Plugin.getProgram(REALSPACEREFINE), args, cwd=cwd,
                   listAtomStruct=[atomStruct], log=self._log,
-                  messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+                  messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
+                             "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")], 
+                  sdterrLog = self.getLogsLastLines)
 
     def runMolprobityStep(self, tmpMapFile):
         # PDBx/mmCIF
@@ -221,7 +225,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
               args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log,
-              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              sdterrLog = self.getLogsLastLines)
 
     def runValidationCryoEMStep(self, tmpMapFile):
         # PDBx/mmCIF
@@ -238,7 +242,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
               args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log,
-              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
         # self._getRSRefineOutput()
