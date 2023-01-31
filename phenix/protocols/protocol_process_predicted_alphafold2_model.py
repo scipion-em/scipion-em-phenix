@@ -140,7 +140,7 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         retry(Plugin.runPhenixProgram, Plugin.getProgram(PROCESS),
               args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log,
-              messages=["Sorry:"], sdterrLog = self.getLogsLastLines)
+              sdterrLog = self.getLogsLastLines)
               
     def createOutputStep(self):
         pdb = AtomStruct()
