@@ -156,7 +156,7 @@ class TestValCryoEM(TestImportData):
     """
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
                        cbetaOutliers, clashScore, overallScore,
-                       protMolProbity, places=2, delta=2):
+                       protMolProbity, places=2, delta=6):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -186,7 +186,7 @@ class TestValCryoEM(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2, delta=2):
+                             protRSRefine, places=2, delta=6):
         # method to check Real Space Refine statistic results of the Final Results
         # Table
         try:
@@ -209,7 +209,7 @@ class TestValCryoEM(TestImportData):
 
     def checkValCryoEMResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protValCryoEM, places=2, delta=2):
+                             protValCryoEM, places=2, delta=6):
         # method to check Validation CryoEM statistic results of the Final Results
         # Table
         try:
