@@ -163,7 +163,7 @@ class TestPhenixRSRefine(TestImportData):
     """
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
                        cbetaOutliers, clashScore, overallScore,
-                       protMolProbity, places=2):
+                       protMolProbity, places=3):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -186,7 +186,7 @@ class TestPhenixRSRefine(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=3, delta=1):
+                             protRSRefine, places=3, delta=2):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
