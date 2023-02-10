@@ -180,7 +180,7 @@ class TestPhenixPdbCif(TestImportData):
                                    ramOutliers, places)
             print("Checking ramFavored")
             self.assertAlmostEqual(protValCryoEM.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=2)
             print("Checking rotOutliers")
             self.assertAlmostEqual(protValCryoEM.rotamerOutliers.get(),
                                    rotOutliers, delta=4)

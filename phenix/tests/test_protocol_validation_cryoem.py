@@ -175,7 +175,7 @@ class TestValCryoEM(TestImportData):
                                    cbetaOutliers, delta=delta)
             print("Checking clashScore")
             self.assertAlmostEqual(protMolProbity.clashscore.get(),
-                                   clashScore, delta=2)
+                                   clashScore, delta=delta)
             print("Checking overallScore")
             self.assertAlmostEqual(protMolProbity.overallScore.get(),
                                    overallScore, delta=delta)
