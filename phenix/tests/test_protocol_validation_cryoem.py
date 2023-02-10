@@ -1,4 +1,4 @@
-# ***************************************************************************
+#xkill ***************************************************************************
 # * Authors:    Marta Martinez (mmmtnez@cnb.csic.es)
 # *             Roberto Marabini (roberto@cnb.csic.es)
 # *
@@ -175,7 +175,7 @@ class TestValCryoEM(TestImportData):
                                    cbetaOutliers, delta=delta)
             print("Checking clashScore")
             self.assertAlmostEqual(protMolProbity.clashscore.get(),
-                                   clashScore, delta=2)
+                                   clashScore, delta=delta)
             print("Checking overallScore")
             self.assertAlmostEqual(protMolProbity.overallScore.get(),
                                    overallScore, delta=delta)
