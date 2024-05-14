@@ -343,14 +343,16 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
         if self.rigidBodySelections.get() != "":
             RIGID_BODY_FILENAME = self._getExtraPath("rigid.eff")
-            fi = open(RIGID_BODY_FILENAME, 'r')
-
+            fi = open(RIGID_BODY_FILENAME, 'w')
             fi.write("refinement.rigid_body {\n")
 
             for rigidBody in self.rigidBodySelections.get().split('\n'):
-                fi.write("group = {0}\n".format(rigidBody))
+                if not rigidBody.startswith('group'):
+                    rigidBody = "group = {0}\n".format(rigidBody)
+                fi.write(rigidBody)
 
             fi.write("}\n")
+            fi.close()
 
             args += " " + RIGID_BODY_FILENAME
             
