@@ -342,7 +342,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         args = args[:-1]
 
         if self.rigidBodySelections.get() != "":
-            RIGID_BODY_FILENAME = self._getExtraPath("rigid.eff")
+            RIGID_BODY_FILENAME = os.path.abspath(self._getExtraPath("rigid.eff"))
             fi = open(RIGID_BODY_FILENAME, 'w')
             fi.write("refinement.rigid_body {\n")
 
