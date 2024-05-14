@@ -347,6 +347,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             fi.write("refinement.rigid_body {\n")
 
             for rigidBody in self.rigidBodySelections.get().split('\n'):
+                rigidBody = rigidBody.strip()
                 if not rigidBody.startswith('group'):
                     rigidBody = "group = {0}\n".format(rigidBody)
                 fi.write(rigidBody)
