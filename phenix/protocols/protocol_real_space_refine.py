@@ -28,7 +28,7 @@
 import os
 
 from pwem.objects import AtomStruct
-from pyworkflow.protocol.params import BooleanParam,  IntParam
+from pyworkflow.protocol.params import BooleanParam, IntParam, TextParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
                               VALIDATION_CRYOEM,
@@ -98,6 +98,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                        help="Refinement strategy that considers groups of "
                             "atoms that move (rotate and translate) as a "
                             "single body.\n")
+        group.addParam('rigidBodySelections', TextParam, width=30,
+                       condition='rigidBody==True',
+                       label='Rigid body selections',
+                       help='Write a new rigid body selection definition on each line')
         group.addParam('localGridSearch', BooleanParam,
                        label="Local grid search: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
@@ -336,6 +340,20 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         if self.nqh_flips == True:
             args += "nqh_flips+"
         args = args[:-1]
+
+        if self.rigidBodySelections.get() != "":
+            RIGID_BODY_FILENAME = self._getExtraPath("rigid.eff")
+            fi = open(RIGID_BODY_FILENAME, 'r')
+
+            fi.write("refinement.rigid_body {\n")
+
+            for rigidBody in self.rigidBodySelections.get().split('\n'):
+                fi.write("group = {0}\n".format(rigidBody))
+
+            fi.write("}\n")
+
+            args += " " + RIGID_BODY_FILENAME
+            
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
         if self.macroCycles != 5:
             args += " macro_cycles=%d" % self.macroCycles
