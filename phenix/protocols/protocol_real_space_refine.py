@@ -350,7 +350,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                 rigidBody = rigidBody.strip()
                 if not rigidBody.startswith('group'):
                     rigidBody = "group = {0}".format(rigidBody)
-                fi.write(rigidBody + "\n")
+                fi.write("\t" + rigidBody + "\n")
 
             fi.write("}\n")
             fi.close()
