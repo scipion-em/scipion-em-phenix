@@ -432,7 +432,7 @@ class TestPhenixRSRefine(TestImportData):
                 'nqh_flips': False,
                 'doMolProbity': False,
                 'rigidBodies': True,
-                'rigidBodySelections': """"""
+                'rigidBodySelections': """chain A and resseq 122:160"""
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -446,13 +446,13 @@ class TestPhenixRSRefine(TestImportData):
         with a volume provided directly as inputVol, the input PDB was fitted
         to the volume and refined previously by coot and refmac withouth mask
         in another project; (MolProbity has not been run as it is good to have
-        some tests without it); default refine strategy plus 2 defined rigid bodies
+        some tests without it); default refine strategy plus 3 defined rigid bodies
         """
         print ("Run phenix real_space_refine from imported volume and pdb file "
                "previously fitted and refined by Coot and Refmac without mask "
                "(copy of testPhenixRSRefineFromVolumeAndPDB1 except MolProbity "
                "has not been run as it is good to have some tests without it); "
-               "default refine strategy plus 2 defined rigid bodies")
+               "default refine strategy plus 3 defined rigid bodies")
 
         # Import Volume
         volume_refmac3 = self._importVolRefmac3()
@@ -470,7 +470,9 @@ class TestPhenixRSRefine(TestImportData):
                 'nqh_flips': False,
                 'doMolProbity': False,
                 'rigidBodies': True,
-                'rigidBodySelections': """"""
+                'rigidBodySelections': """chain A and resseq 122:160
+                                          chain A and resseq 30:74
+                                          chain A and resseq 1:29 or chain A and resseq 75:121 or chain A and resseq 161:214"""
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
