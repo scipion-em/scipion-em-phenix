@@ -101,7 +101,11 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         group.addParam('rigidBodySelections', TextParam, width=30,
                        condition='rigidBody==True',
                        label='Rigid body selections',
-                       help='Write a new rigid body selection definition on each line')
+                       help='Write a new rigid body selection definition on each line. '
+                            'Rigid body selections can include chain and residue sequence IDs '
+                            'with any number of blocks separated by AND and OR e.g. '
+                            'group = """chain A AND resseq 25:319 OR chain A AND resid 1301 OR chain A AND resseq 1304:1307""". '
+                            'See https://phenix-online.org/documentation/reference/atom_selections.html#examples-for-selection-expressions')
         group.addParam('localGridSearch', BooleanParam,
                        label="Local grid search: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
