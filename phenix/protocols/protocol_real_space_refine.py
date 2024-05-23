@@ -173,6 +173,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "phenix.refine uses Reduce to identify Asn, Gln, and "
                             "His residues that should be flipped, and then flips "
                             "them automatically.")
+        
+        form.addParam("doMolProbity", BooleanParam, label="Whether to run MolProbity",
+                      default=True, expertLevel=LEVEL_ADVANCED,
+                      help="Set to True to run MolProbity or False to skip this step.")
 
         # form.addParallelSection(threads=1, mpi=0)
 
@@ -180,9 +184,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     def _insertAllSteps(self):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
         self._insertFunctionStep('runRSrefineStep', self.REALSPACEFILE)
-        self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
-        if Plugin.getPhenixVersion() != PHENIXVERSION:
-            self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
+        if self.doMolProbity.get():
+            self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
+            if Plugin.getPhenixVersion() != PHENIXVERSION:
+                self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
@@ -253,7 +258,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
               sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
-        # self._getRSRefineOutput()
+        if not self.doMolProbity.get():
+            self._getRSRefineOutput()
         pdb = AtomStruct()
         pdb.setFileName(self.outAtomStructName)
 
