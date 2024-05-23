@@ -345,7 +345,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
             args += "nqh_flips+"
         args = args[:-1]
 
-        if self.rigidBodySelections.get() != "":
+        if self.rigidBodySelections.hasValue():
             RIGID_BODY_FILENAME = os.path.abspath(self._getExtraPath("rigid.eff"))
             fi = open(RIGID_BODY_FILENAME, 'w')
             fi.write("refinement.rigid_body {\n")
