@@ -100,6 +100,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "single body.\n")
         group.addParam('rigidBodySelections', TextParam, width=30,
                        condition='rigidBody==True',
+                       expertLevel=LEVEL_ADVANCED,
                        label='Rigid body selections',
                        help='Write a new rigid body selection definition on each line. '
                             'Rigid body selections can include chain and residue sequence IDs '
