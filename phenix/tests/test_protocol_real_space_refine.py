@@ -394,7 +394,7 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False,
                 'doMolProbity': False,
-                'rigidBodies': True
+                'rigidBody': True
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
             args['doSecondary'] = False
@@ -431,7 +431,7 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False,
                 'doMolProbity': False,
-                'rigidBodies': True,
+                'rigidBody': True,
                 'rigidBodySelections': """chain A and resseq 122:160"""
                 }
         if Plugin.getPhenixVersion() == PHENIXVERSION:
@@ -469,7 +469,7 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False,
                 'doMolProbity': False,
-                'rigidBodies': True,
+                'rigidBody': True,
                 'rigidBodySelections': """chain A and resseq 122:160
                                           chain A and resseq 30:74
                                           chain A and resseq 1:29 or chain A and resseq 75:121 or chain A and resseq 161:214"""
