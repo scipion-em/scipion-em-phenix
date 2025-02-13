@@ -127,9 +127,8 @@ class TestImportData(TestImportBase):
         return structure_refmac3
 
     def _importStructHemoPDB(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.pdb'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1'
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
         protImportPDB.setObjLabel('import pdb\n 5ni1.pdb')

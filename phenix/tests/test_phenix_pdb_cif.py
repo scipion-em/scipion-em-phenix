@@ -66,9 +66,8 @@ class TestImportData(TestImportBase):
         return volume_hemo_orig
 
     def _importStructHemoPDB(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.pdb'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1',
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
         protImportPDB.setObjLabel('import pdb\n 5ni1.pdb')
@@ -77,9 +76,8 @@ class TestImportData(TestImportBase):
         return structure_hemo_pdb
 
     def _importStructHemoCIF(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.cif'),
+        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
+                'pdbId': '5ni1',
                 }
         protImportPDB = self.newProtocol(ProtImportPdb, **args)
         protImportPDB.setObjLabel('import cif\n 5ni1.cif')

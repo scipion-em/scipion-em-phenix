@@ -125,15 +125,20 @@ class TestImportData(TestImportBase):
         return structure_refmac3
 
     def _importStructHemoPDB(self):
-        args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
-                'pdbFile': self.dsModBuild.getFile(
-                    'PDBx_mmCIF/5ni1.pdb'),
-                }
-        protImportPDB = self.newProtocol(ProtImportPdb, **args)
-        protImportPDB.setObjLabel('import pdb\n 5ni1.pdb')
-        self.launchProtocol(protImportPDB)
-        structure_hemo_pdb = protImportPDB.outputPdb
-        return structure_hemo_pdb
+        # pdb file for hemoglobine fails
+        # beause chimera replace "alpha" by the greek letter for alpha
+        # untill they fix it this function will call
+        # to _importStructHemoCIF
+        return self._importStructHemoCIF()
+        #args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_FILES,
+        #        'pdbFile': self.dsModBuild.getFile(
+        #            'PDBx_mmCIF/5ni1.pdb'),
+        #        }
+        #protImportPDB = self.newProtocol(ProtImportPdb, **args)
+        #protImportPDB.setObjLabel('import pdb\n 5ni1.pdb')
+        #self.launchProtocol(protImportPDB)
+        #structure_hemo_pdb = protImportPDB.outputPdb
+        #return structure_hemo_pdb
 
     def _importStructHemoCIF(self):
         args = {'inputPdbData': ProtImportPdb.IMPORT_FROM_ID,
