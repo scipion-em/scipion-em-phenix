@@ -151,7 +151,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         self.finalRMSD = Float(words[7])
                 line = f.readline()
 
-    def _runChangingCifFormatSuperpose(self, list_args):
+    def _runChangingCifFormatSuperpose(self, list_args, log=None):
         cwd = os.getcwd() + "/" + self._getExtraPath()
         try:
             if list_args[0].endswith(".cif") and list_args[1].endswith(".cif"):
@@ -159,7 +159,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     # upgrade cifs
                     list_args1 = []
                     for i in range(0, 2):
-                        list_args1.append(fromCIFTommCIF(list_args[i], list_args[i]))
+                        list_args1.append(fromCIFTommCIF(list_args[i], list_args[i], log))
                     args1 = list_args1[0] + " " + list_args1[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
                                             extraEnvDict=None, cwd=cwd)
@@ -168,7 +168,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     list_args2 = []
                     for i in range(0, 2):
                         list_args2.append(fromCIFToPDB(
-                            list_args[i], list_args[i].replace('.cif', '.pdb')))
+                            list_args[i], list_args[i].replace('.cif', '.pdb'), log))
                     args2 = list_args2[0] + " " + list_args2[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
                                             extraEnvDict=None, cwd=cwd)
@@ -177,7 +177,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     # pdbs: convert cif to pdb
                     list_args1 = []
                     list_args1.append(fromCIFToPDB(
-                        list_args[0], list_args[0].replace('.cif', '.pdb')))
+                        list_args[0], list_args[0].replace('.cif', '.pdb'), log))
                     args1 = list_args1[0] + " " + list_args[1]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
                                             extraEnvDict=None, cwd=cwd)
@@ -186,7 +186,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         # cifs: convert pdb to cif
                         list_args2 = []
                         list_args2.append(fromPDBToCIF(
-                            list_args[1], list_args[1].replace('.pdb', '.cif')))
+                            list_args[1], list_args[1].replace('.pdb', '.cif'), log))
                         args2 = list_args[0] + " " + list_args2[0]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
                                                 extraEnvDict=None, cwd=cwd)
@@ -196,7 +196,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args0 = args2.split()
                         for i in range(0, 2):
                             list_args3[i].append(fromCIFTommCIF(
-                                list_args0[i], list_args0[i]))
+                                list_args0[i], list_args0[i]), log)
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
                                                 args3, extraEnvDict=None, cwd=cwd)
@@ -205,7 +205,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     # pdbs: convert cif to pdb
                     list_args1 = []
                     list_args1.append(fromCIFToPDB(
-                        list_args[1], list_args[1].replace('.cif', '.pdb')))
+                        list_args[1], list_args[1].replace('.cif', '.pdb'), log))
                     args1 = list_args[0] + " " + list_args1[0]
                     Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args1,
                                             extraEnvDict=None, cwd=cwd)
@@ -214,7 +214,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         # cifs: convert pdb to cif
                         list_args2 = []
                         list_args2.append(fromPDBToCIF(
-                            list_args[0], list_args[0].replace('.pdb', '.cif')))
+                            list_args[0], list_args[0].replace('.pdb', '.cif'), log))
                         args2 = list_args2[0] + " " + list_args[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE), args2,
                                                 extraEnvDict=None, cwd=cwd)
@@ -224,7 +224,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args0 = args2.split()
                         for i in range(0, 2):
                             list_args3.append(fromCIFTommCIF(
-                                list_args0[i], list_args0[i]))
+                                list_args0[i], list_args0[i]), log)
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
                                                 args3, extraEnvDict=None, cwd=cwd)
