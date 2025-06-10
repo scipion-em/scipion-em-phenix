@@ -201,7 +201,7 @@ class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
 
         protProcessPrediction = self.newProtocol(
             PhenixProtProcessPredictedAlphaFold2Model, **args)
-        protProcessPrediction.setObjLabel('Process prediction\nP69905\n')
+        protProcessPrediction.setObjLabel('1-Process prediction\nP69905\n')
         self.launchProtocol(protProcessPrediction)
         self.assertTrue(os.path.exists(
             protProcessPrediction.outputPdb.getFileName()))
@@ -244,7 +244,7 @@ class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protProcessDockPrediction = self.newProtocol(
             PhenixProtDockPredictedAlphaFold2Model, **args)
-        protProcessDockPrediction.setObjLabel('Dock\nprediction processed\nP69905\n')
+        protProcessDockPrediction.setObjLabel('2-Dock\nprediction processed\nP69905\n')
         self.launchProtocol(protProcessDockPrediction)
         self.assertTrue(os.path.exists(
             protProcessDockPrediction.outputPdb.getFileName()))
@@ -287,26 +287,28 @@ class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protProcessDockPrediction = self.newProtocol(
             PhenixProtDockPredictedAlphaFold2Model, **args)
-        protProcessDockPrediction.setObjLabel('Dock\nprediction processed\nP69905\n')
+        protProcessDockPrediction.setObjLabel('3-Dock\nprediction processed\nP69905\n')
         self.launchProtocol(protProcessDockPrediction)
         self.assertTrue(os.path.exists(
             protProcessDockPrediction.outputPdb.getFileName()))
 
-        print("Run phenix rebuild_predicted_model protocol from the previous"
-              "predicted, processed and docked atomic structure ")
+        # Method rebuild_predicted_model.py exits in phenix 1.20 but not in phenix 1.21 anymore
 
-        args = {
-            'inputPredictedModel': structure2,
-            'inputDockedPredictedModel': protProcessDockPrediction.outputPdb,
-            'inputVolume': map,
-            'resolution': 3.2
-        }
-        protRebuildDockPrediction = self.newProtocol(
-            PhenixProtRebuildDockPredictedAlphaFold2Model, **args)
-        protRebuildDockPrediction.setObjLabel('Rebuild\ndock prediction\nP69905\n')
-        self.launchProtocol(protRebuildDockPrediction)
-        self.assertTrue(os.path.exists(
-            protRebuildDockPrediction.outputPdb.getFileName()))
+        # print("Run phenix rebuild_predicted_model protocol from the previous"
+        #       "predicted, processed and docked atomic structure ")
+
+        # args = {
+        #     'inputPredictedModel': structure2,
+        #     'inputDockedPredictedModel': protProcessDockPrediction.outputPdb,
+        #     'inputVolume': map,
+        #     'resolution': 3.2
+        # }
+        # protRebuildDockPrediction = self.newProtocol(
+        #     PhenixProtRebuildDockPredictedAlphaFold2Model, **args)
+        # protRebuildDockPrediction.setObjLabel('Rebuild\ndock prediction\nP69905\n')
+        # self.launchProtocol(protRebuildDockPrediction)
+        # self.assertTrue(os.path.exists(
+        #     protRebuildDockPrediction.outputPdb.getFileName()))
 
     def testDDockBuildPrediction1(self):
         """ Test the protocol dock and rebuild alpahafold2 predicted model
@@ -345,7 +347,7 @@ class TestAProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protDockBuildPrediction = self.newProtocol(
             PhenixProtDockAndRebuildAlphaFold2Model, **args)
-        protDockBuildPrediction.setObjLabel('Dock and rebuild\nprediction\nP69905\n')
+        protDockBuildPrediction.setObjLabel('4-Dock and rebuild\nprediction\nP69905\n')
         self.launchProtocol(protDockBuildPrediction)
         self.assertTrue(os.path.exists(
             protDockBuildPrediction.outputPdb.getFileName()))
@@ -374,7 +376,7 @@ class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
 
         protProcessPrediction = self.newProtocol(
             PhenixProtProcessPredictedAlphaFold2Model, **args)
-        protProcessPrediction.setObjLabel('Process prediction\nQ9BXJ8\n')
+        protProcessPrediction.setObjLabel('5-Process prediction\nQ9BXJ8\n')
         self.launchProtocol(protProcessPrediction)
         self.assertTrue(os.path.exists(
             protProcessPrediction.outputPdb.getFileName()))
@@ -417,7 +419,7 @@ class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protProcessDockPrediction = self.newProtocol(
             PhenixProtDockPredictedAlphaFold2Model, **args)
-        protProcessDockPrediction.setObjLabel('Dock\nprediction processed\nQ9BXJ8\n')
+        protProcessDockPrediction.setObjLabel('6-Dock\nprediction processed\nQ9BXJ8\n')
         self.launchProtocol(protProcessDockPrediction)
         self.assertTrue(os.path.exists(
             protProcessDockPrediction.outputPdb.getFileName()))
@@ -460,26 +462,28 @@ class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protProcessDockPrediction = self.newProtocol(
             PhenixProtDockPredictedAlphaFold2Model, **args)
-        protProcessDockPrediction.setObjLabel('Dock\nprediction processed\nQ9BXJ8\n')
+        protProcessDockPrediction.setObjLabel('7-Dock\nprediction processed\nQ9BXJ8\n')
         self.launchProtocol(protProcessDockPrediction)
         self.assertTrue(os.path.exists(
             protProcessDockPrediction.outputPdb.getFileName()))
+        
+        # Method rebuild_predicted_model.py exits in phenix 1.20 but not in phenix 1.21 anymore
 
-        print("Run phenix rebuild_predicted_model protocol from the previous"
-              "predicted, processed and docked atomic structure ")
+        # print("Run phenix rebuild_predicted_model protocol from the previous"
+        #       "predicted, processed and docked atomic structure ")
 
-        args = {
-            'inputPredictedModel': structure1,
-            'inputDockedPredictedModel': protProcessDockPrediction.outputPdb,
-            'inputVolume': map,
-            'resolution': 3.24
-        }
-        protRebuildDockPrediction = self.newProtocol(
-            PhenixProtRebuildDockPredictedAlphaFold2Model, **args)
-        protRebuildDockPrediction.setObjLabel('Rebuild\ndock prediction\nQ9BXJ8\n')
-        self.launchProtocol(protRebuildDockPrediction)
-        self.assertTrue(os.path.exists(
-            protRebuildDockPrediction.outputPdb.getFileName()))
+        # args = {
+        #     'inputPredictedModel': structure1,
+        #     'inputDockedPredictedModel': protProcessDockPrediction.outputPdb,
+        #     'inputVolume': map,
+        #     'resolution': 3.24
+        # }
+        # protRebuildDockPrediction = self.newProtocol(
+        #     PhenixProtRebuildDockPredictedAlphaFold2Model, **args)
+        # protRebuildDockPrediction.setObjLabel('Rebuild\ndock prediction\nQ9BXJ8\n')
+        # self.launchProtocol(protRebuildDockPrediction)
+        # self.assertTrue(os.path.exists(
+        #     protRebuildDockPrediction.outputPdb.getFileName()))
 
     def testDDockBuildPrediction2(self):
         """ Test the protocol dock and rebuild alpahafold2 predicted model
@@ -518,7 +522,7 @@ class TestBProtProcessDockBuildPredictedAlphaFold(TestImportData):
                 }
         protDockBuildPrediction = self.newProtocol(
             PhenixProtDockAndRebuildAlphaFold2Model, **args)
-        protDockBuildPrediction.setObjLabel('Dock and rebuild\nprediction\nQ9BXJ8\n')
+        protDockBuildPrediction.setObjLabel('8-Dock and rebuild\nprediction\nQ9BXJ8\n')
         self.launchProtocol(protDockBuildPrediction)
         self.assertTrue(os.path.exists(
             protDockBuildPrediction.outputPdb.getFileName()))
