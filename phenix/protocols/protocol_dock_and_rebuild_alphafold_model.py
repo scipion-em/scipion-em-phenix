@@ -107,9 +107,11 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
             pwutils.path.createLink(predictedAtomStruct, predictedAtomStruct_localPath)
             predictedAtomStruct = predictedAtomStruct_localPath
 
-        self.prefix = os.path.abspath(self._getExtraPath(predictedAtomStruct))
+        # self.prefix = os.path.abspath(self._getExtraPath(predictedAtomStruct))
+        # args = self._writeArgsDockAlphaFold(
+        #     predictedAtomStruct, localVolName, self.prefix)
         args = self._writeArgsDockAlphaFold(
-            predictedAtomStruct, localVolName, self.prefix)
+            predictedAtomStruct, localVolName)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(DOCKANDREBUILD),
               args, cwd=cwd,
@@ -175,7 +177,7 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         return fnVol
 
     def _writeArgsDockAlphaFold(
-            self, predictedAtomStruct, vol, prefix):
+            self, predictedAtomStruct, vol):
         args = " "
         args += "model=%s " % predictedAtomStruct
         # if self.modelCopies > 1:
@@ -186,7 +188,7 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
         #     args += " asymmetric_map=False "
         args += "resolution=%f" % self.resolution
         args += " "
-        args += "output_model_prefix=%s" % prefix
+        # args += "output_model_prefix=%s" % prefix
         args += " "
         if self.numberOfThreads > 1:
             print("self.numberOfThreads: ", self.numberOfThreads)
