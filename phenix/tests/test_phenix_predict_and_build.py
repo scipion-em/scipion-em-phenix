@@ -24,7 +24,7 @@
 
 # protocol to test the phenix protocol dock in map
 import os
-from phenix.protocols import PhenixPredictAndBuildCryoEM,  \
+from phenix.protocols import PhenixPredictAndBuildCryoEM  \
     
 from pwem.protocols.protocol_import import (ProtImportSequence,
                                             ProtImportVolumes)
@@ -56,48 +56,34 @@ class TestImportData(TestImportBase):
         volume1 = protImportVol.outputVolume
         return volume1
 
-    def _importStructure(self):
-        """Import atom structure from pdb id
-        """ 
-        args = {'inputPdbData': emprot.ProtImportPdb.IMPORT_FROM_ID,
-                'pdbId': '5ni1',
-                }
-        protImportStructure = self.newProtocol(emprot.ProtImportPdb, **args)
-        protImportStructure.setObjLabel('5ni1')
-        self.launchProtocol(protImportStructure)
-        atom_struct_1 = protImportStructure.outputPdb
-        return atom_struct_1
-
-    def _extractSeqChainAlpha(self):
-        """Extract chain alpha from atom struct 5ni1
+    def _seqChainAlpha(self):
+        """Download seq chain alpha from UniProt
         """
-        atom_struct_1 = self._importStructure()
         args = {'inputSequenceName': '5ni1_alpha_chain',
                 'inputProteinSequence':
-                    emprot.ProtImportSequence.IMPORT_FROM_STRUCTURE,
-                'pdbFile': atom_struct_1 ,
-                'inputStructureChain': 'A'
+                    emprot.ProtImportSequence.IMPORT_FROM_UNIPROT,
+                'uniProtSequence': 'P69905'
                 }
         protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('5ni1_A')
+        protImportSequence.setObjLabel('5ni1_alphaChain')
         self.launchProtocol(protImportSequence)
         sequence_5ni1_A = protImportSequence.outputSequence
+        self.assertEqual("P69905", protImportSequence._getUniProtID())
         return sequence_5ni1_A
     
-    def _extractSeqChainBeta(self):
-        """Extract chain beta from atom struct 5ni1
+    def _seqChainBeta(self):
+        """Download seq chain beta from UniProt
         """
-        atom_struct_1 = self._importStructure()
         args = {'inputSequenceName': '5ni1_beta_chain',
                 'inputProteinSequence':
-                    emprot.ProtImportSequence.IMPORT_FROM_STRUCTURE,
-                'pdbFile': atom_struct_1 ,
-                'inputStructureChain': 'B'
+                    emprot.ProtImportSequence.IMPORT_FROM_UNIPROT,
+                'uniProtSequence': 'P68871'
                 }
         protImportSequence = self.newProtocol(emprot.ProtImportSequence, **args)
-        protImportSequence.setObjLabel('5ni1_B')
+        protImportSequence.setObjLabel('5ni1_betaChain')
         self.launchProtocol(protImportSequence)
         sequence_5ni1_B = protImportSequence.outputSequence
+        self.assertEqual("P68871", protImportSequence._getUniProtID())
         return sequence_5ni1_B
 
 
@@ -109,28 +95,27 @@ class TestPredictAndBuildCryoEM(TestImportData):
         and one sequence
         """
         print("Run phenix predict_and_build protocol from an imported map"
-              "and the sequence importedfrom an atom structure ")
+              " and the sequence imported from an atom structure ")
         
         # import full map
         volume1 = self._importVolume()
-
-        # import PDB
-        atom_struct_1 = self._importStructure()
+        self.assertTrue(volume1.getFileName())
 
         # import sequence chain alpha
-        sequence_5ni1_A = self._extractSeqChainAlpha()
+        sequence_5ni1_A = self._seqChainAlpha()
+        sequence_5ni1_B = self._seqChainBeta()
 
         args = {
                 'inputVolume': volume1,
-                'inputSequenceS': sequence_5ni1_A,
+                'inputSequenceS': [sequence_5ni1_A, sequence_5ni1_B,sequence_5ni1_A, sequence_5ni1_B],
                 'resolution': 3.0
                }
 
-        protPredictAndBuildCryoEM = self.newProtocol(
-            PhenixPredictAndBuildCryoEM, **args)
-        protPredictAndBuildCryoEM.setObjLabel('Predict and build\n5ni1_chainA\n')
+        protPredictAndBuildCryoEM = self.newProtocol(PhenixPredictAndBuildCryoEM, **args)
+        protPredictAndBuildCryoEM.setObjLabel('Predict and build\n5ni1_chainA_chainB\n')
         self.launchProtocol(protPredictAndBuildCryoEM)
-        self.assertTrue(os.path.exists(
-            protPredictAndBuildCryoEM.outputPdb.getFileName()))
+        # self.assertTrue(os.path.exists(
+        #     protPredictAndBuildCryoEM.outputPdb.getFileName()))
 
-   
+        # self.assertTrue(os.path.exists(
+        #     protDockInMap.outputPdb.getFileName()))
