@@ -41,3 +41,4 @@ from .test_protocol_dock_in_map import TestProtDockInMap
 from .test_protocol_search_fit import TestPhenixProtSearchFit
 from .test_phenix_alphafold import TestAProtProcessDockBuildPredictedAlphaFold, \
     TestBProtProcessDockBuildPredictedAlphaFold, TestCProtProcessDockBuildPredictedAlphaFold
+from .test_phenix_predict_and_build import TestPredictAndBuildCryoEM
