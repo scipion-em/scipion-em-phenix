@@ -30,7 +30,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20
+from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20, PHENIXVERSION21
 
 
 class TestImportBase(BaseTest):
@@ -321,6 +321,14 @@ class TestPhenixRSRefine(TestImportData):
                                       clashScore=3.87,
                                       overallScore=1.17,
                                       protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
+            self.checkRSRefineResults(ramOutliers=0.0,
+                                      ramFavored=98.11,
+                                      rotOutliers=1.70,
+                                      cbetaOutliers=0,
+                                      clashScore=1.79,
+                                      overallScore=1.11,
+                                      protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=96.70,
@@ -525,6 +533,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=5.411,
                                       overallScore=1.29,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=98.23,
+                                      rotOutliers=1.08,
+                                      cbetaOutliers=0,
+                                      clashScore=3.09,
+                                      overallScore=1.13,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
@@ -846,6 +862,14 @@ class TestPhenixRSRefine(TestImportData):
                                       cbetaOutliers=0,
                                       clashScore=4.31,
                                       overallScore=1.30,
+                                      protRSRefine=protRSRefine)
+        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
+            self.checkRSRefineResults(ramOutliers=0.00,
+                                      ramFavored=99.12,
+                                      rotOutliers=1.30,
+                                      cbetaOutliers=0,
+                                      clashScore=2.54,
+                                      overallScore=1.13,
                                       protRSRefine=protRSRefine)
         else:
             self.checkRSRefineResults(ramOutliers=0.00,
