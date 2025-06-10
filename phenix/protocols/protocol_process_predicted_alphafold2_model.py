@@ -51,7 +51,8 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
     # _version = VERSION_1_2
     PROCESSPREDICTEDFILE = '_processed.pdb'
     SEQREMAINDER = '_remainder.seq'
-    ContentOfBvalueField = ['LDDT (AlphaFold2)', 'RMSD', 'B-value']
+    # ContentOfBvalueField = ['LDDT (AlphaFold2)', 'RMSD', 'B-value']
+    ContentOfBvalueField = ['RMSD', 'B-value']
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -69,15 +70,15 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                       "An actual B-value (atomic displacement parameter)\n"
                       "In process_predicted_model, confidence values or error estimates "
                       "in A or are first converted in new pseudo B-values.")
-        form.addParam('minLDDT', IntParam, default=70,
-                      label='Minimun LDDT value',
-                      condition=('contentBvalueField==%d ' % 0),
-                      help="""Cutoff value to remove low-confidence residues. 
-                       Values of LDDT range between 0 and 100. A minimum LDDT 
-                       of 70 corresponds to a maximum RMSD of 1.5.\nModel 
-                       Confidence:\nVery high (pLDDT > 90)\n
-                       Confident (90 > pLDDT > 70)\nLow (70 > pLDDT > 50)\n
-                       Very low (pLDDT < 50): Probably unstructured in isolation""")
+        # form.addParam('minLDDT', IntParam, default=70,
+        #               label='Minimun LDDT value',
+        #               condition=('contentBvalueField==%d ' % 0),
+        #               help="""Cutoff value to remove low-confidence residues. 
+        #                Values of LDDT range between 0 and 100. A minimum LDDT 
+        #                of 70 corresponds to a maximum RMSD of 1.5.\nModel 
+        #                Confidence:\nVery high (pLDDT > 90)\n
+        #                Confident (90 > pLDDT > 70)\nLow (70 > pLDDT > 50)\n
+        #                Very low (pLDDT < 50): Probably unstructured in isolation""")
         form.addParam('maxRMSD', FloatParam, default=1.5,
                       label='Maximum RMSD value',
                       condition=('contentBvalueField==%d ' % 1),
@@ -188,10 +189,11 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
                           "(check the values of the B-factor column)")
 
         # Check  if there are at least 5 sequential residues satisfying the threshold
-        if self.contentBvalueField == 0:
-            threshold = self.minLDDT
-        elif self.contentBvalueField == 1:
-            threshold = self.maxRMSD
+        # if self.contentBvalueField == 0:
+        #     threshold = self.minLDDT
+        # elif self.contentBvalueField == 1:
+        #     threshold = self.maxRMSD
+        threshold = self.maxRMSD
         result = \
             self._minSequentialResidues(
                 listOfResiduesBFactors, self.contentBvalueField, threshold)
@@ -221,17 +223,18 @@ class PhenixProtProcessPredictedAlphaFold2Model(EMProtocol):
         args = " "
         args += "%s " % atomStruct
         args += " "
-        args += "b_value_field_is="
+        # args += "b_value_field_is="
         if self.contentBvalueField == 0:
-            args += "lddt"
-            if self.minLDDT != 70:
-                args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
-            if self.paeFile.get():
-                args += " pae_file=%s  " % self.paeFile.get()
-        elif self.contentBvalueField == 1:
-            args += "rmsd"
+            # args += "lddt"
+            # if self.minLDDT != 70:
+            #     args += " minimum_lddt=%d maximum_rmsd=None  " % self.minLDDT
+        #     if self.paeFile.get():
+        #         args += " pae_file=%s  " % self.paeFile.get()
+        # elif self.contentBvalueField == 1:
+            # args += "rmsd"
             if self.maxRMSD != 1.5:
-                args += " minimum_lddt=None maximum_rmsd=%.2f  " % self.maxRMSD
+                # args += " minimum_lddt=None maximum_rmsd=%.2f  " % self.maxRMSD
+                args += " maximum_rmsd=%.2f  " % self.maxRMSD
             if self.paeFile.get():
                 args += " pae_file=%s  " % self.paeFile.get()
         else:
