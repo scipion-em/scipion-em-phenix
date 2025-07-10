@@ -112,8 +112,8 @@ class PhenixPredictAndBuildCryoEM(EMProtocol):
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
         form.addParam('predictedModel', PointerParam, pointerClass='AtomStruct', 
-                      expertLevel=LEVEL_ADVANCED,
-                      label='Optional input: Predicted model.',
+                      expertLevel=LEVEL_ADVANCED, allowsNull=True,
+                      label='Predicted model. (optional)',
                       help="Set the atomic structure obtained in any way by yourself.\n"
                            "Supported formats are PDB or mmCIF; this last one"
                            " is especially useful for very large structures.")
@@ -139,30 +139,54 @@ class PhenixPredictAndBuildCryoEM(EMProtocol):
 
     def convertInputStep(self):
         """ Read the input volume."""
-        self.volList = []
+        self.input_half1_fn = None
+        self.input_half2_fn = None
+        self.input_vol_fn = None
+
         if self.useHalfMapsInsteadVol.get():
             if self.halfMapsAttached.get():
                 vol = self.inputVolume.get()
-                self.INPUT_HALF1, self.INPUT_HALF2 = vol.getHalfMaps().split(',')
+                self.input_half1_fn, self.input_half2_fn = vol.getHalfMaps().split(',')
+                self.input_half1_fn = os.path.abspath(self.input_half1_fn)
+                self.input_half2_fn = os.path.abspath(self.input_half2_fn)
             else:
                 half1Vol = self.inputHalf1.get()
                 half2Vol = self.inputHalf2.get()
-                self.INPUT_HALF1 = self._inputVol2Mrc(half1Vol)
-                self.INPUT_HALF2 = self._inputVol2Mrc(half2Vol)
-            self.volList.append(self.INPUT_HALF1, self.INPUT_HALF2)
+                self.input_half1_fn = os.path.abspath(self._inputVol2Mrc(half1Vol))
+                self.input_half2_fn = os.path.abspath(self._inputVol2Mrc(half2Vol))
 
         else:
             vol = self.inputVolume.get()
-            self.INPUT_VOL = self._inputVol2Mrc(vol)
-            self.volList.append(self.INPUT_VOL)
+            self.input_vol_fn = os.path.abspath(self._inputVol2Mrc(vol))
+
+    def _writeArgsPredictAndBuild(self, fastafilename):
+        prefix = self._getExtraPath().split("/")[-2]
+        self.prefix = f'PredictAndBuid_{prefix.split("_")[0]}_rebuilt'
+        print("prefix3", prefix)
+        args = " "
+        if self.input_half1_fn is not None:
+            args += "half_map=%s " % self.input_half1_fn
+            args += "half_map=%s " % self.input_half2_fn
+        else:
+            args += "full_map=%s " % self.input_vol_fn
+        args += "seq_file=%s " % os.path.abspath(fastafilename)
+        args += "crystal_info.resolution=%f " % self.resolution.get()
+        # add templates
+        args += "output_model_prefix=%s " % self.prefix
+        if self.numberOfThreads > 1:
+            print("self.numberOfThreads: ", self.numberOfThreads)
+            args += "nproc=%d " % self.numberOfThreads
+            if len(str(self.extraParams)) > 0:
+                args += " %s " % self.extraParams.get()
+        return args
 
     def runPredictAndBuildCryoEM(self):
-        args = self._writeArgsPredictAndBuild(
-            half1Vol=None, half2Vol=None, vol=None, seq_file=self.seq_file, prefix=self.prefix)
+        fastaFileName = self.createInputFastaFile()
+        args = self._writeArgsPredictAndBuild(fastafilename=fastaFileName)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(PREDICTANDBUILD),
         args, cwd=cwd,
-        listAtomStruct=[predictedAtomStruct],
+        listAtomStruct=[],
         log=self._log, sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
@@ -231,42 +255,19 @@ class PhenixPredictAndBuildCryoEM(EMProtocol):
             Ccp4Header.fixFile(volFileName, mrcFileName, origin, sampling, Ccp4Header.START) # ORIGIN
         return mrcFileName
 
-    def _writeArgsPredictAndbuild(
-        self, seqFile, prefix):
-        args = " "
-        if len(self.volList) > 1:
-            args += "half_map=%s " % self.INPUT_HALF1
-            args += " "
-            args += "half_map=%s " % self.INPUT_HALF2
-        else:
-            args += "full_map=%s " % INPUT_VOL
-        args += " "    
-        args += "seq_file=%s " % self.OUTPUT_SEQUENCE_FILE
-        args += " " 
-        args += "resolution=%f" % self.resolution
-        args += " "
-        # add templates
-        args += "output_model_prefix=%s" % prefix
-        args += " "
-        if self.numberOfThreads > 1:
-            print("self.numberOfThreads: ", self.numberOfThreads)
-            args += "nproc=%d " % self.numberOfThreads
-            if len(str(self.extraParams)) > 0:
-                args += " %s " % self.extraParams.get()
-        return args
-
-    def createInputFastaFile(self, seqs):
+    def createInputFastaFile(self):
         """ Get sequence as string and create the corresponding fasta file. """
+        inputSeqs = self.inputSequenceS
+        print("inputSeqs", inputSeqs)
+        fastaFileName = self._getExtraPath(OUTPUT_SEQUENCE_FILE)
 
-        fastaFileName = self._getExtraPath('sequence.fasta')
+        with open(fastaFileName, "w") as f:
+            for seq in inputSeqs:
+                s = seq.get()
+                f.write(f"> {s.getId()}\n")
+                f.write(f"{s.getSequence()}\n")
 
-# with open(fastaFileName, "w") as f:
-# for seq in seqs:
-# s = seq.get()
-# f.write(f"> {s.getId()}\n")
-# f.write(f"{s.getSequence()}\n")
-
-# return fastaFileName
+        return fastaFileName
 
 # def _registerAtomStruct(self, name, path):
 # if not os.path.exists(path):
