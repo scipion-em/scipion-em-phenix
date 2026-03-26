@@ -334,7 +334,157 @@ class TestPhenixRSRefine(TestImportData):
                                       clashScore=4.47,
                                       overallScore=1.89,
                                       protRSRefine=protRSRefine)
+ 
+    def testPhenixRSRefineFromVolumeAndPDB2(self):
+        """ This test checks that phenix real_space_refine protocol runs
+        with a volume provided directly as inputVol, the input PDB was fitted
+        to the volume and refined previously by coot and refmac withouth mask
+        in another project; (MolProbity has not been run as it is good to have
+        some tests without it); default refine strategy
+        """
+        print ("Run phenix real_space_refine from imported volume and pdb file "
+               "previously fitted and refined by Coot and Refmac without mask "
+               "(copy of testPhenixRSRefineFromVolumeAndPDB1 except MolProbity "
+               "has not been run as it is good to have some tests without it); "
+               "default refine strategy")
 
+        # Import Volume
+        volume_refmac3 = self._importVolRefmac3()
+
+        # import PDB
+        structure_refmac3 = self._importStructRefmac3()
+
+        # real_space_refine
+        args = {'inputVolume': volume_refmac3,
+                'resolution': 3.5,
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4,
+                # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False,
+                'doMolProbity': False
+                }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
+        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
+        protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
+                                   'refmac3.pdb\n')
+        self.launchProtocol(protRSRefine)
+
+    def testPhenixRSRefineFromVolumeAndPDB3a(self):
+        """ This test checks that phenix real_space_refine protocol runs
+        with a volume provided directly as inputVol, the input PDB was fitted
+        to the volume and refined previously by coot and refmac withouth mask
+        in another project; (MolProbity has not been run as it is good to have
+        some tests without it); default refine strategy plus default rigid bodies
+        """
+        print ("Run phenix real_space_refine from imported volume and pdb file "
+               "previously fitted and refined by Coot and Refmac without mask "
+               "(copy of testPhenixRSRefineFromVolumeAndPDB1 except MolProbity "
+               "has not been run as it is good to have some tests without it); "
+               "default refine strategy plus default rigid bodies")
+
+        # Import Volume
+        volume_refmac3 = self._importVolRefmac3()
+
+        # import PDB
+        structure_refmac3 = self._importStructRefmac3()
+
+        # real_space_refine
+        args = {'inputVolume': volume_refmac3,
+                'resolution': 3.5,
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4,
+                # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False,
+                'doMolProbity': False,
+                'rigidBody': True
+                }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
+        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
+        protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
+                                   'refmac3.pdb\n')
+        self.launchProtocol(protRSRefine)
+
+    def testPhenixRSRefineFromVolumeAndPDB3b(self):
+        """ This test checks that phenix real_space_refine protocol runs
+        with a volume provided directly as inputVol, the input PDB was fitted
+        to the volume and refined previously by coot and refmac withouth mask
+        in another project; (MolProbity has not been run as it is good to have
+        some tests without it); default refine strategy plus 1 defined rigid body
+        """
+        print ("Run phenix real_space_refine from imported volume and pdb file "
+               "previously fitted and refined by Coot and Refmac without mask "
+               "(copy of testPhenixRSRefineFromVolumeAndPDB1 except MolProbity "
+               "has not been run as it is good to have some tests without it); "
+               "default refine strategy plus 1 defined rigid body")
+
+        # Import Volume
+        volume_refmac3 = self._importVolRefmac3()
+
+        # import PDB
+        structure_refmac3 = self._importStructRefmac3()
+
+        # real_space_refine
+        args = {'inputVolume': volume_refmac3,
+                'resolution': 3.5,
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4,
+                # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False,
+                'doMolProbity': False,
+                'rigidBody': True,
+                'rigidBodySelections': """chain A and resseq 122:160"""
+                }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
+        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
+        protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
+                                   'refmac3.pdb\n')
+        self.launchProtocol(protRSRefine)
+
+    def testPhenixRSRefineFromVolumeAndPDB3c(self):
+        """ This test checks that phenix real_space_refine protocol runs
+        with a volume provided directly as inputVol, the input PDB was fitted
+        to the volume and refined previously by coot and refmac withouth mask
+        in another project; (MolProbity has not been run as it is good to have
+        some tests without it); default refine strategy plus 3 defined rigid bodies
+        """
+        print ("Run phenix real_space_refine from imported volume and pdb file "
+               "previously fitted and refined by Coot and Refmac without mask "
+               "(copy of testPhenixRSRefineFromVolumeAndPDB1 except MolProbity "
+               "has not been run as it is good to have some tests without it); "
+               "default refine strategy plus 3 defined rigid bodies")
+
+        # Import Volume
+        volume_refmac3 = self._importVolRefmac3()
+
+        # import PDB
+        structure_refmac3 = self._importStructRefmac3()
+
+        # real_space_refine
+        args = {'inputVolume': volume_refmac3,
+                'resolution': 3.5,
+                'inputStructure': structure_refmac3,
+                'numberOfThreads': 4,
+                # default parameters in Optimization strategy options
+                'occupancy': False,
+                'nqh_flips': False,
+                'doMolProbity': False,
+                'rigidBody': True,
+                'rigidBodySelections': """chain A and resseq 122:160
+                                          chain A and resseq 30:74
+                                          chain A and resseq 1:29 or chain A and resseq 75:121 or chain A and resseq 161:214"""
+                }
+        if Plugin.getPhenixVersion() == PHENIXVERSION:
+            args['doSecondary'] = False
+        protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
+        protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
+                                   'refmac3.pdb\n')
+        self.launchProtocol(protRSRefine)
     def testPhenixRSRefineFromVolumeAndPDB4(self):
         """ This test checks that phenix real_space_refine protocol runs
         with a volume provided directly as inputVol and the input PDB from

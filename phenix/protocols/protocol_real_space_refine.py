@@ -28,7 +28,7 @@
 import os
 
 from pwem.objects import AtomStruct
-from pyworkflow.protocol.params import BooleanParam,  IntParam
+from pyworkflow.protocol.params import BooleanParam, IntParam, TextParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
                               VALIDATION_CRYOEM,
@@ -98,6 +98,15 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                        help="Refinement strategy that considers groups of "
                             "atoms that move (rotate and translate) as a "
                             "single body.\n")
+        group.addParam('rigidBodySelections', TextParam, width=30,
+                       condition='rigidBody==True',
+                       expertLevel=LEVEL_ADVANCED,
+                       label='Rigid body selections',
+                       help='Write a new rigid body selection definition on each line. '
+                            'Rigid body selections can include chain and residue sequence IDs '
+                            'with any number of blocks separated by AND and OR e.g. '
+                            'group = """chain A AND resseq 25:319 OR chain A AND resid 1301 OR chain A AND resseq 1304:1307""". '
+                            'See https://phenix-online.org/documentation/reference/atom_selections.html#examples-for-selection-expressions')
         group.addParam('localGridSearch', BooleanParam,
                        label="Local grid search: ", default=True,
                        expertLevel=LEVEL_ADVANCED,
@@ -165,6 +174,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
                             "phenix.refine uses Reduce to identify Asn, Gln, and "
                             "His residues that should be flipped, and then flips "
                             "them automatically.")
+        
+        form.addParam("doMolProbity", BooleanParam, label="Whether to run MolProbity",
+                      default=True, expertLevel=LEVEL_ADVANCED,
+                      help="Set to True to run MolProbity or False to skip this step.")
 
         # form.addParallelSection(threads=1, mpi=0)
 
@@ -172,9 +185,10 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     def _insertAllSteps(self):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
         self._insertFunctionStep('runRSrefineStep', self.REALSPACEFILE)
-        self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
-        if Plugin.getPhenixVersion() != PHENIXVERSION:
-            self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
+        if self.doMolProbity.get():
+            self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
+            if Plugin.getPhenixVersion() != PHENIXVERSION:
+                self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
@@ -245,7 +259,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
               sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
-        # self._getRSRefineOutput()
+        if not self.doMolProbity.get():
+            self._getRSRefineOutput()
         pdb = AtomStruct()
         pdb.setFileName(self.outAtomStructName)
 
@@ -336,6 +351,23 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         if self.nqh_flips == True:
             args += "nqh_flips+"
         args = args[:-1]
+
+        if self.rigidBodySelections.hasValue():
+            RIGID_BODY_FILENAME = os.path.abspath(self._getExtraPath("rigid.eff"))
+            fi = open(RIGID_BODY_FILENAME, 'w')
+            fi.write("refinement.rigid_body {\n")
+
+            for rigidBody in self.rigidBodySelections.get().split('\n'):
+                rigidBody = rigidBody.strip()
+                if not rigidBody.startswith('group'):
+                    rigidBody = "group = {0}".format(rigidBody)
+                fi.write("\t" + rigidBody + "\n")
+
+            fi.write("}\n")
+            fi.close()
+
+            args += " " + RIGID_BODY_FILENAME
+            
         # args += " run=minimization_global+local_grid_search+morphing+simulated_annealing"
         if self.macroCycles != 5:
             args += " macro_cycles=%d" % self.macroCycles
