@@ -81,18 +81,15 @@
 }
 
 @Article{Terwilliger_2022,
-  title = {Improved AlphaFold modeling with implicit experimental information},
-  volume = {19},
-  ISSN = {1548-7105},
-  DOI = {http://dx.doi.org/10.1038/s41592-022-01645-6},
-  number = {11},
-  journal = {Nature Methods},
-  publisher = {Springer Science and Business Media LLC},
-  author = {Terwilliger,  Thomas C. and Poon,  Billy K. and Afonine,  Pavel V. and Schlicksup,  Christopher J. and Croll,  Tristan I. and Millán,  Claudia and Richardson,  Jane. S. and Read,  Randy J. and Adams,  Paul D.},
-  year = {2022},
-  month = oct,
-  pages = {1376–1382}
-}
+	author = {Terwilliger, Thomas C. and Poon, Billy K. and Afonine, Pavel V. and Schlicksup, Christopher J. and Croll, Tristan I. and Mill{\'a}n, Claudia and Richardson, Jane. S. and Read, Randy J. and Adams, Paul D.},
+	title = {Improving AlphaFold modeling using implicit information from experimental density maps},
+	elocation-id = {2022.01.07.475350},
+	year = {2022},
+	doi = {10.1101/2022.01.07.475350},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2022/01/07/2022.01.07.475350},
+	eprint = {https://www.biorxiv.org/content/early/2022/01/07/2022.01.07.475350.full.pdf},
+	journal = {bioRxiv}
 
 }
 """
