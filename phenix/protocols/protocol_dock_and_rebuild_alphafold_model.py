@@ -49,6 +49,62 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
      RoseTTAFold and other prediction software into a cryo EM map, using a set
      of docked domains from the predicted model as a template.
     """
+    """
+        Phenix Dock and Rebuild Predicted Model Protocol — User Manual
+
+        Overview
+
+        The PhenixProtDockAndRebuildAlphaFold2Model protocol is a Scipion
+        wrapper designed to integrate the Phenix `dock_and_rebuild`
+        workflow into cryo-EM processing pipelines. Its main objective is to
+        dock and rebuild predicted protein structures, such as AlphaFold2 or
+        RoseTTAFold models, into experimental cryo-EM density maps in order
+        to improve agreement between the predicted structure and the observed
+        experimental density.
+
+        Inputs and Workflow
+
+        The protocol requires a predicted atomic structure and an input
+        cryo-EM map. During execution, the map is prepared with the correct
+        origin coordinates and sampling rate to ensure compatibility between
+        the density map and the atomic model. The predicted structure is then
+        locally linked or copied into the working directory before launching
+        the Phenix rebuilding procedure.
+
+        Docking and Rebuilding
+
+        The protocol uses the Phenix `dock_and_rebuild` program to perform
+        docking, conformational adjustment, rebuilding, and refinement of the
+        predicted model against the experimental density map. This process is
+        biologically important because predicted structures may differ from
+        the experimental conformation due to flexibility, domain motions, or
+        ligand-induced structural changes.
+
+        The user can define the experimental map resolution, which guides the
+        rebuilding process and determines the level of structural detail used
+        during refinement. Additional Phenix parameters may also be provided
+        for advanced customization.
+
+        Computational Execution
+
+        The rebuilding job is executed externally through the Phenix software
+        suite. The protocol validates that the required Phenix executable is
+        correctly configured and supports multi-threaded execution to improve
+        computational performance.
+
+        Outputs and Biological Interpretation
+
+        After execution, the rebuilt atomic model is automatically imported
+        back into Scipion as an output structure. The resulting model
+        represents a refined version of the original predicted structure that
+        better matches the experimental cryo-EM density.
+
+        From a biological perspective, this protocol improves structural
+        interpretation by adapting predicted models to experimentally observed
+        conformations, making it particularly useful for flexible proteins,
+        conformationally variable complexes, and intermediate-resolution
+        cryo-EM datasets.
+        """
     _label = 'dock and rebuild predicted model'
     _program = ""
     # _version = VERSION_1_2

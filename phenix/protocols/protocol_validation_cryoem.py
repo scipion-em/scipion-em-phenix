@@ -34,6 +34,72 @@ class PhenixProtRunValidationCryoEM(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
 atomic structure inferred from an electron density map.
 """
+    """
+    Validation Cryo-EM (PhenixProtRunValidationCryoEM) — User Manual
+
+    Overview
+
+    The Validation Cryo-EM protocol evaluates the quality of an atomic
+    structure against a cryo-EM density map using PHENIX validation tools,
+    particularly MolProbity and validation_cryo_em. Its primary goal is to
+    measure both the stereochemical quality of the atomic model and its
+    agreement with the experimental density map, helping users identify
+    geometry inconsistencies, fitting errors, and regions with poor
+    map-to-model correlation.
+
+    In cryo-EM workflows, this protocol is commonly used after model
+    refinement to verify whether the resulting structure is biologically
+    and structurally reliable before downstream interpretation, comparison,
+    or publication.
+
+    Inputs and General Workflow
+
+    The protocol requires an atomic structure and optionally a cryo-EM
+    volume. If no volume is explicitly provided, the workflow attempts to
+    retrieve the volume associated with the input structure. The selected
+    map is internally converted into the appropriate format required for
+    PHENIX validation procedures.
+
+    During execution, the protocol first runs MolProbity validation in
+    order to evaluate stereochemical quality. This analysis detects common
+    structural problems such as steric clashes, backbone geometry
+    violations, and rotamer outliers. Afterwards, when a compatible PHENIX
+    version and an input map are available, the protocol performs Cryo-EM
+    validation analysis to estimate map-to-model agreement using real-space
+    correlation metrics.
+
+    Biological Interpretation
+
+    From a biological perspective, validation is a critical step because a
+    structurally refined model is not necessarily a biologically accurate
+    one. Poor geometry statistics may indicate unrealistic conformations,
+    while low real-space correlation values can reveal that the atomic
+    model does not properly fit the experimental density.
+
+    This protocol is especially useful for identifying problematic regions
+    before structural interpretation, comparing alternative refined models,
+    or validating structures intended for deposition or publication.
+    Careful examination of validation metrics helps ensure that biological
+    conclusions are supported by a reliable structural model.
+
+    Outputs and Results
+
+    The protocol produces validation statistics and stores the extracted
+    analysis results from PHENIX output files. These outputs provide a
+    global assessment of model quality and map consistency, allowing users
+    to evaluate whether the atomic structure satisfies both geometrical and
+    experimental constraints.
+
+    Final Perspective
+
+    For cryo-EM studies, validation is an essential quality-control step
+    that complements refinement and model building. Reliable biological
+    interpretation depends not only on achieving a visually good fit to the
+    density map, but also on maintaining correct stereochemistry and
+    structural consistency. By combining MolProbity analysis with Cryo-EM
+    map validation, this protocol provides a robust framework for assessing
+    the overall reliability of atomic models derived from cryo-EM data.
+    """
     _label = 'validation_cryoem'
     _program = ""
     #_version = VERSION_1_2

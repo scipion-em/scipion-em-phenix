@@ -46,6 +46,41 @@ samples the density around Chi1 angles of protein sidechains. Electronic
 density and appropriate rotameric angles must coincide for each residue if
 the atomic structure backbone has been perfectly fitted to the map.
 """
+    """
+        EMRinger (PhenixProtRunEMRinger)
+
+        This protocol validates the agreement between a cryo-EM density
+        map and an atomic structure using the EMRinger methodology from
+        the Phenix package. The protocol evaluates side-chain fitting by
+        analyzing electron density around Chi1 torsion angles of amino
+        acid residues. Correctly fitted side chains are expected to show
+        density peaks that coincide with preferred rotameric conformations.
+
+        The workflow requires an input cryo-EM map and an atomic model
+        in PDB or mmCIF format. During execution, the map is converted
+        into MRC format while preserving origin coordinates and sampling
+        information. The protocol then launches the EMRinger analysis
+        through Phenix tools and evaluates the consistency between the
+        experimental density and the fitted atomic structure.
+
+        Biologically, EMRinger is especially useful for validating
+        cryo-EM models at medium and high resolution, where side-chain
+        positioning becomes critical for accurate structural interpretation.
+        High EMRinger scores indicate good agreement between the map and
+        the atomic model, while poor scores may suggest incorrect backbone
+        tracing, side-chain misplacement, or insufficient local density.
+
+        After execution, the protocol extracts several validation metrics,
+        including EMRinger score, optimal threshold, rotamer ratio,
+        maximum Z-score, and model length. These values are collected
+        from Phenix-generated pickle files and stored for visualization
+        and summary reporting within the workflow environment.
+
+        In practical cryo-EM workflows, this protocol is commonly used
+        as a structural validation step after model fitting or refinement,
+        helping researchers assess the reliability of side-chain placement
+        and the overall quality of the atomic interpretation of the map.
+        """
     _label = 'emringer'
     _program = ""
     # _version = VERSION_1_2
