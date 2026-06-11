@@ -27,7 +27,6 @@
 
 import collections
 import json
-from phenix import PHENIXVERSION
 import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
@@ -64,28 +63,27 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
     MULTICPLOTTMPFILE = "Multi_criterion_plot.py"
 
     def __init__(self,  **kwargs):
+        self.class_name = self.__class__.__name__
+        # PhenixProtRunMolprobityViewer
+        # PhenixProtRunRSRefineViewer
         ProtocolViewer.__init__(self,  **kwargs)
-        if os.path.exists(self.protocol._getExtraPath(
-                self.protocol.MOLPROBITYOUTFILENAME)):
-            MOLPROBITYOUTFILENAME = self.protocol._getExtraPath(
-                self.protocol.MOLPROBITYOUTFILENAME)
-            self._parseFile(MOLPROBITYOUTFILENAME)
-        if Plugin.getPhenixVersion() == PHENIXVERSION or \
-                os.path.exists(self.protocol._getExtraPath(
-                self.protocol.MOLPROBITYPKLFILENAME)):
-            self.MOLPROBITYPKLFILENAME = self.protocol._getExtraPath(
+        MOLPROBITYOUTFILENAME = os.path.abspath(self.protocol._getExtraPath(
+            self.protocol.MOLPROBITYOUTFILENAME))
+        self._parseFile(MOLPROBITYOUTFILENAME)
+        self.MOLPROBITYPKLFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYPKLFILENAME)
-            self._writePickleData()
-            self.dictOverall = json.loads(self.dictOverall,
-                                   object_pairs_hook=collections.OrderedDict)
+        MOLPROBITYOUTFILENAME = os.path.abspath(MOLPROBITYOUTFILENAME)
+        self._writePickleData()
+        self.dictOverall = json.loads(
+            self.dictOverall,
+            object_pairs_hook=collections.OrderedDict)
 
     def _defineParams(self, form):
         form.addSection(label="Volume and models")
         form.addParam('displayMapModel', LabelParam,
                       label="Volume and models in ChimeraX",
                       help="Display of input volume(s) and atomic structure(s).")
-        if Plugin.getPhenixVersion() == PHENIXVERSION or \
-                os.path.exists(self.protocol._getExtraPath(
+        if os.path.exists(self.protocol._getExtraPath(
                 self.protocol.MOLPROBITYPKLFILENAME)):
             form.addSection(label='MolProbity results')
             group = form.addGroup('Summary MolProbity')
@@ -412,7 +410,11 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
                     group.addParam('showMesgNosuites', LabelParam,
                                     label="Backbone angles within expected ranges",
                                     help="")
-            if (self.dictOverall['_overall_rsc'] == True):
+            # PhenixProtRunMolprobityViewer
+            # PhenixProtRunRSRefineViewer
+            if (self.dictOverall['_overall_rsc'] == True and 
+                self.class_name != 'PhenixProtRunMolprobityViewer'):
+                print("self.dictOverall['_overall_rsc']", self.dictOverall['_overall_rsc'])
                 form.addSection(label='Real-space correlation')
                 group = form.addGroup('Real-space correlation to electron density')
                 group.addParam('showMultiCriterionPlot', LabelParam,
@@ -1364,11 +1366,17 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         ANALYSISTMPFILENAME = self.protocol._getExtraPath(
             self.ANALYSISTMPFILE)
         command = """import pickle
+import os
+import locale
+
+os.environ["LANG"] = "en_US.UTF-8"
+os.environ["LC_ALL"] = "en_US.UTF-8"
+
 import collections
 import json
 
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
 
 # process file %s"
@@ -1433,6 +1441,7 @@ else:
     dictOverall['_clashes_headers'] = data.clashes.gui_list_headers
 
 # correlation coefficients
+
 if data.real_space is None:
     dictOverall['_overall_rsc'] = False
     dictOverall['_fsc'] = False
@@ -1523,9 +1532,15 @@ if data.model_stats.ligands is not None:
 
     def _writeCommand(self, listName):
         self.command ="""import pickle
+
+import os
+import locale
+
+os.environ["LANG"] = "en_US.UTF-8"
+os.environ["LC_ALL"] = "en_US.UTF-8"
         
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"br") as f:
         return pickle.load(f)
 
 # process file %s"
@@ -1542,7 +1557,7 @@ if data.ramalyze is not None:
         self.command +="""
     try :
         import wxtbx.app
-    except ImportError, e :
+    except ImportError as e :
         raise Sorry("wxPython not available.")
     else :
         app = wxtbx.app.CCTBXApp(0)

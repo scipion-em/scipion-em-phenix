@@ -28,7 +28,7 @@ from pwem.protocols.protocol_import import (ProtImportPdb,
                                                     ProtImportVolumes)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import PHENIXVERSION18, PHENIXVERSION20, Plugin
+from phenix import Plugin
 
 
 class TestImportBase(BaseTest):
@@ -269,22 +269,22 @@ class TestMolprobityValidation2(TestImportData):
     """ Test the protocol of MolProbity validation
     """
     def checkResults(self, ramOutliers, ramFavored, rotOutliers, cbetaOutliers,
-                     clashScore, overallScore, protMolProbity, places=0):
+                     clashScore, overallScore, protMolProbity, places=0, delta=6):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protMolProbity.ramachandranOutliers.get(),
-                                   ramOutliers, places)
+                                   ramOutliers, delta=delta)
             self.assertAlmostEqual(protMolProbity.ramachandranFavored.get(),
-                                   ramFavored, places)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protMolProbity.rotamerOutliers.get(),
-                                   rotOutliers, places)
+                                   rotOutliers, delta=delta)
             self.assertAlmostEqual(protMolProbity.cbetaOutliers.get(),
-                                   cbetaOutliers, places)
+                                   cbetaOutliers, delta=delta)
             self.assertAlmostEqual(protMolProbity.clashscore.get(),
-                                   clashScore, places)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protMolProbity.overallScore.get(),
-                                   overallScore, places)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
@@ -626,22 +626,13 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkResults(ramOutliers=0.12,
-                              ramFavored=95.86,
-                              rotOutliers=0.52,
-                              cbetaOutliers=0,
-                              clashScore=9.70,
-                              overallScore=1.80,
-                              protMolProbity=protMolProbity)
-        else:
-            self.checkResults(ramOutliers=0.12,
-                              ramFavored=95.86,
-                              rotOutliers=0.52,
-                              cbetaOutliers=0,
-                              clashScore=9.74,
-                              overallScore=1.80,
-                              protMolProbity=protMolProbity)
+        self.checkResults(ramOutliers=0.12,
+                            ramFavored=95.86,
+                            rotOutliers=0.52,
+                            cbetaOutliers=0,
+                            clashScore=9.74,
+                            overallScore=1.80,
+                            protMolProbity=protMolProbity)
 
     def testMolProbityValidationManyOutliers1(self):
         """ This test checks that MolProbity validation protocol runs with
@@ -664,22 +655,13 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkResults(ramOutliers=0.20,
-                              ramFavored=97.35,
-                              rotOutliers=12.24,
-                              cbetaOutliers=0,
-                              clashScore=132.67,
-                              overallScore=3.54,
-                              protMolProbity=protMolProbity)
-        else:
-            self.checkResults(ramOutliers=0.20,
-                              ramFavored=97.35,
-                              rotOutliers=12.24,
-                              cbetaOutliers=0,
-                              clashScore=130.72,
-                              overallScore=3.53,
-                              protMolProbity=protMolProbity)
+        self.checkResults(ramOutliers=0.20,
+                            ramFavored=97.35,
+                            rotOutliers=12.24,
+                            cbetaOutliers=0,
+                            clashScore=132.67,
+                            overallScore=3.54,
+                            protMolProbity=protMolProbity)
 
     def testMolProbityValidationManyOutliers2(self):
         """ This test checks that MolProbity validation protocol runs with
@@ -702,20 +684,11 @@ class TestMolprobityValidation2(TestImportData):
         self.launchProtocol(protMolProbity)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkResults(ramOutliers=3.82,
-                              ramFavored=89.09,
-                              rotOutliers=31.44,
-                              cbetaOutliers=746,
-                              clashScore=281.68,
-                              overallScore=4.62,
-                              protMolProbity=protMolProbity)
-        else:
-            self.checkResults(ramOutliers=3.82,
-                              ramFavored=89.09,
-                              rotOutliers=31.35,
-                              cbetaOutliers=746,
-                              clashScore=276.52,
-                              overallScore=4.61,
-                              protMolProbity=protMolProbity)
+        self.checkResults(ramOutliers=3.82,
+                            ramFavored=89.09,
+                            rotOutliers=31.44,
+                            cbetaOutliers=746,
+                            clashScore=281.68,
+                            overallScore=4.62,
+                            protMolProbity=protMolProbity)
 

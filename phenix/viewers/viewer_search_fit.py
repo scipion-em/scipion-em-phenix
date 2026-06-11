@@ -38,7 +38,7 @@ from pwem import Domain
 from phenix.protocols.protocol_search_fit import (DATAFILE,
                                                   TABLE)
 from phenix import Plugin
-from phenix.constants import PHENIXVERSION19
+# from phenix.constants import PHENIXVERSION
 
 def errorWindow(tkParent, msg):
     try:
@@ -140,10 +140,10 @@ class PhenixProtRuSearchFitViewer(ProtocolViewer):
         rows = c.fetchall()
 
         for row in rows:
-            if Plugin.getPhenixVersion() >= PHENIXVERSION19:
-                atomStructFn = row[0][:-4] + "_real_space_refined_000.cif"
-            else:
-                atomStructFn = row[0][:-4] + "_real_space_refined.cif"
+            #if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+            atomStructFn = row[0][:-4] + "_real_space_refined_000.cif"
+            #else:
+            #    atomStructFn = row[0][:-4] + "_real_space_refined.cif"
             f.write("open %s\n" % atomStructFn)
         c.close()
         conn.close()

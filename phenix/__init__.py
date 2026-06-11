@@ -25,7 +25,7 @@
 # **************************************************************************
 
 
-
+import re
 import os
 import pwem
 import subprocess
@@ -36,20 +36,19 @@ from pwem.constants import MAXIT
 
 _logo = "phenix.png"
 _references = ['Adams_2010']
-__version__ = "3.2.2"
+__version__ = "4.0.0"
 
 
 class Plugin(pwem.Plugin):
     _homeVar = PHENIX_HOME
     _pathVars = [PHENIX_HOME]
-    _supportedVersions = PHENIXVERSION
+    _supportedVersions = [str(PHENIXVERSION210)]  # scipion versions are strings
+    _phenix_version = None
 
     @classmethod
     def _defineVariables(cls):
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            cls._defineEmVar(PHENIX_HOME, 'phenix-1.18.2')
-        else:
-            cls._defineEmVar(PHENIX_HOME, ('phenix-' + (Plugin.getPhenixVersion())))
+        cls._defineEmVar(PHENIX_HOME, ('phenix-' + (Plugin.getPhenixVersion())))
+
 
     @classmethod
     def getEnviron(cls, first=True):
@@ -69,12 +68,13 @@ class Plugin(pwem.Plugin):
         environ.update({
             'DISPLAY': display,
             'HOME': home,
-            'LIBTBX_BUILD': os.path.join(cls.getHome(), 'build'),
+            'LIBTBX_BUILD': os.path.join(cls.getHome()),
             'LIBTBX_OPATH': os.environ['PATH'],
-            'PATH': os.path.join(Plugin.getHome(), 'build', 'bin') +
+            'PATH': os.path.join(Plugin.getHome(), 'bin') +
                     ':/usr/bin:'
                     '/bin'
         }, position=pos)
+        print("getEnvirom:getEnviron", environ)
         return environ
 
     @classmethod
@@ -103,15 +103,35 @@ class Plugin(pwem.Plugin):
     @classmethod
     def getPhenixVersion(cls):
         """ Return the program binary that will be used. """
-        pid = subprocess.Popen(cls.getProgram("phenix.version"),
+        if cls._phenix_version is not None:
+            return cls._phenix_version
+        phenix_home = os.getenv(PHENIX_HOME)
+        filename = os.path.join(phenix_home, PHENIXVERSIONFILENAME)
+        with open(filename, "r") as f:
+            content = f.read()
+
+        match = re.search(r"export\s+PHENIX_VERSION=(.+)", content)
+
+        if match:
+            cls._phenix_version = match.group(1).strip()
+            print("version", cls._phenix_version)
+            return cls._phenix_version
+        return ''
+
+        env = cls.getEnviron()
+        pid = subprocess.Popen(GETVERSION,
                            shell=True,
+                           env=env,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
         stdout, stderr = pid.communicate()
+        #print("os.path.join(Plugin.getHome(), 'bin')", os.path.join(Plugin.getHome(), 'bin'))
         searchKey = "Version: "
         stdout = stdout.decode("utf-8")
         place = stdout.find(searchKey)
-        return stdout[place + len(searchKey):place + len(searchKey)+4]
+        version = stdout[place + len(searchKey):place + len(searchKey)+4]
+        #print("getPhenixVersion:version", version)
+        return version
 
     @classmethod
     def isVersionActive(cls):

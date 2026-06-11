@@ -40,9 +40,7 @@ from phenix import Plugin
 from ccp4 import Plugin as PluginCCP4
 from ccp4.convert import (runCCP4Program)
 from ccp4.constants import CCP4_BINARIES
-from phenix.constants import (REALSPACEREFINE,
-                              PHENIXVERSION19,
-                              PHENIXVERSION20)
+from phenix.constants import (REALSPACEREFINE)
 from pwem.convert.atom_struct import retry
 
 COOT = CCP4_BINARIES['COOT']
@@ -344,19 +342,19 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
                  messages=[("Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.",
                              "Sorry: Map and model are not aligned! Use skip_map_model_overlap_check=True to continue.")],
                  sdterrLog = self.getLogsLastLines)
-            
-            if Plugin.getPhenixVersion() >= PHENIXVERSION19:
-                # update data base with phenix version
-                logFileFn = atomStructFn[:-4] + "_real_space_refined_000.log"
-                # last file
-                lastLogFile = sorted(glob.glob(logFileFn))[-1]
-                phenix_id = lastLogFile[-8:-4]  # _000
-                c.execute("""UPDATE %s
-                                SET phenix_id='%s'
-                              WHERE filename='%s'""" % (TABLE, phenix_id,
+            phenix_id = ''
+            #if Plugin.getPhenixVersion() >= PHENIXVERSION19:
+            # update data base with phenix version
+            logFileFn = atomStructFn[:-4] + "_real_space_refined_000.log"
+            # last file
+            lastLogFile = sorted(glob.glob(logFileFn))[-1]
+            phenix_id = lastLogFile[-8:-4]  # _000
+            c.execute("""UPDATE %s
+                            SET phenix_id='%s'
+                            WHERE filename='%s'""" % (TABLE, phenix_id,
                                                                              atomStructFn))
-            else:
-                phenix_id = ''
+            #else:
+            #    phenix_id = ''
             conn.commit()
 
             logFileFn = atomStructFn[:-4] + "_real_space_refined%s.log" % phenix_id
@@ -414,26 +412,26 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
         return summary
 
     def _writeArgsRSR(self, atomStruct, vol):
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
-            # Necessary step to avoid the failing of phenix-real_space_refine
-            # due to the mmcif format
-            # (in this case the simplest mmcif format is the best one)
-            aSH = AtomicStructHandler()
-            if atomStruct.endswith(".pdb") or atomStruct.endswith(".ent"):
-                newAtomStructName = atomStruct.replace(".pdb", ".cif"). \
-                    replace(".ent", ".cif")
+        #if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
+        # Necessary step to avoid the failing of phenix-real_space_refine
+        # due to the mmcif format
+        # (in this case the simplest mmcif format is the best one)
+        aSH = AtomicStructHandler()
+        if atomStruct.endswith(".pdb") or atomStruct.endswith(".ent"):
+            newAtomStructName = atomStruct.replace(".pdb", ".cif"). \
+                replace(".ent", ".cif")
 
-                aSH.read(atomStruct)
-                aSH.write(newAtomStructName)
-                atomStruct = newAtomStructName
-            args = " "
-        else:
-            args = " model_file="
+            aSH.read(atomStruct)
+            aSH.write(newAtomStructName)
+            atomStruct = newAtomStructName
+        args = " "
+        #else:
+        #    args = " model_file="
         args += "%s " % atomStruct
-        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
-            args += " "
-        else:
-            args += " map_file="
+#        if Plugin.getPhenixVersion() >= PHENIXVERSION19 or PHENIXVERSION20:
+        args += " "
+#        else:
+#            args += " map_file="
         args += "%s " % vol
         args += " resolution=%f" % self.resolution
         if self.doSecondary == True:

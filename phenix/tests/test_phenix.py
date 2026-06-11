@@ -23,16 +23,16 @@
 # ***************************************************************************
 
 
-from pyworkflow.tests import *
+from pyworkflow.tests import BaseTest
 from phenix import Plugin
-from phenix.constants import PHENIXVERSION
+from phenix.constants import PHENIXVERSIONdev_6085
 
 class TestVersion(BaseTest):
 
     def testgetVersion(self):
         version = Plugin.getPhenixVersion()
-        if version == PHENIXVERSION:
-            self.assertEqual(version, PHENIXVERSION)
+        if version == PHENIXVERSIONdev_6085:
+            self.assertEqual(version, PHENIXVERSIONdev_6085)
         else:
-            print(("Your version is not " + PHENIXVERSION + " anymore"))
+            print(("Your version is not " + PHENIXVERSIONdev_6085 + " anymore"))
             print(("Your current version is " + version))

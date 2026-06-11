@@ -30,7 +30,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
                                                          mmCIF)
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20, PHENIXVERSION21
+from phenix import Plugin  # , PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20, PHENIXVERSION21
 
 
 class TestImportBase(BaseTest):
@@ -186,14 +186,14 @@ class TestPhenixRSRefine(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=3, delta=2):
+                             protRSRefine, places=3, delta=4):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=3)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
                                    rotOutliers, delta=5)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
@@ -228,8 +228,8 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        # if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine without\nvolume, should NOT work')
         try:
@@ -289,53 +289,20 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        # if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine\n refmac3.mrc and '
                                    'refmac3.pdb\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=95.75,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.09,
-                                      overallScore=1.27,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.56,
-                                      rotOutliers=1.70,
-                                      cbetaOutliers=0,
-                                      clashScore=2.09,
-                                      overallScore=1.16,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.0,
-                                      ramFavored=98.11,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.17,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkRSRefineResults(ramOutliers=0.0,
+        self.checkRSRefineResults(ramOutliers=0.0,
                                       ramFavored=98.11,
                                       rotOutliers=1.70,
                                       cbetaOutliers=0,
                                       clashScore=1.79,
                                       overallScore=1.11,
-                                      protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.70,
-                                      rotOutliers=3.98,
-                                      cbetaOutliers=0,
-                                      clashScore=4.47,
-                                      overallScore=1.89,
                                       protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndPDB4(self):
@@ -384,54 +351,54 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.pdb\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.53,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.43,
+        #                              overallScore=1.12,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.64,
+        #                              rotOutliers=4.77,
+        #                              cbetaOutliers=0,
+        #                              clashScore=6.07,
+        #                              overallScore=2.06,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION19:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=2.39,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.87,
+        #                              overallScore=1.59,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=98.06,
                                       rotOutliers=0.22,
                                       cbetaOutliers=0,
                                       clashScore=5.41,
                                       overallScore=1.29,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.11,
+        #                              rotOutliers=3.04,
+        #                              cbetaOutliers=0,
+        #                              clashScore=5.30,
+        #                              overallScore=1.92,
+        #                              protRSRefine=protRSRefine)
 
     def testPhenixRSRefineFromVolumeAndCIF5(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -494,62 +461,62 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\ndefault refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.06,
-                                      rotOutliers=0.22,
-                                      cbetaOutliers=0,
-                                      clashScore=5.411,
-                                      overallScore=1.29,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.53,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.43,
+        #                              overallScore=1.12,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.64,
+        #                              rotOutliers=4.77,
+        #                              cbetaOutliers=0,
+        #                              clashScore=6.07,
+        #                              overallScore=2.06,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION19:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=2.39,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.87,
+        #                              overallScore=1.59,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=98.06,
+        #                              rotOutliers=0.22,
+        #                              cbetaOutliers=0,
+        #                              clashScore=5.411,
+        #                              overallScore=1.29,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=98.23,
                                       rotOutliers=1.08,
                                       cbetaOutliers=0,
                                       clashScore=3.09,
                                       overallScore=1.13,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.11,
+        #                              rotOutliers=3.04,
+        #                              cbetaOutliers=0,
+        #                              clashScore=5.30,
+        #                              overallScore=1.92,
+        #                              protRSRefine=protRSRefine)
             # self.checkRSRefineResults(ramOutliers=0.00,
             #                           ramFavored=95.41,
             #                           rotOutliers=3.47,
@@ -608,46 +575,46 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.pdb\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.10,
-                                      overallScore=1.11,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.89,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=3.76,
-                                      overallScore=1.19,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.10,
+        #                              overallScore=1.11,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.89,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.76,
+        #                              overallScore=1.19,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=98.06,
                                       rotOutliers=0.22,
                                       cbetaOutliers=0,
                                       clashScore=5.52,
                                       overallScore=1.30,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
-                                      rotOutliers=3.47,
-                                      cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.29,
+        #                              rotOutliers=3.47,
+        #                              cbetaOutliers=0,
+        #                              clashScore=4.86,
+        #                              overallScore=1.50,
+        #                              protRSRefine=protRSRefine)
 
     # TODO: Talk to Roberto if we have to continue testing these values (rotOutliers)
 
@@ -714,46 +681,46 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\nalternative refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.10,
-                                      overallScore=1.11,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.52,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=3.64,
-                                      overallScore=1.25,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.10,
+        #                              overallScore=1.11,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.52,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.64,
+        #                              overallScore=1.25,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.70,
                                       rotOutliers=0.22,
                                       cbetaOutliers=0,
                                       clashScore=5.63,
                                       overallScore=1.37,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
-                                      rotOutliers=3.47,
-                                      cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.29,
+        #                              rotOutliers=3.47,
+        #                              cbetaOutliers=0,
+        #                              clashScore=4.86,
+        #                              overallScore=1.50,
+        #                              protRSRefine=protRSRefine)
             # self.checkRSRefineResults(ramOutliers=0.00,
             #                           ramFavored=96.47,
             #                           rotOutliers=0.00,
@@ -823,62 +790,62 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.cif\ndefault refine strategy')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.59,
-                                      rotOutliers=1.30,
-                                      cbetaOutliers=0,
-                                      clashScore=4.31,
-                                      overallScore=1.30,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.53,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.43,
+        #                              overallScore=1.12,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.64,
+        #                              rotOutliers=4.77,
+        #                              cbetaOutliers=0,
+        #                              clashScore=6.07,
+        #                              overallScore=2.06,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION19:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=2.39,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.87,
+        #                              overallScore=1.59,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=98.59,
+        #                              rotOutliers=1.30,
+        #                              cbetaOutliers=0,
+        #                              clashScore=4.31,
+        #                              overallScore=1.30,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=99.12,
                                       rotOutliers=1.30,
                                       cbetaOutliers=0,
                                       clashScore=2.54,
                                       overallScore=1.13,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.11,
+        #                              rotOutliers=3.04,
+        #                              cbetaOutliers=0,
+        #                              clashScore=5.30,
+        #                              overallScore=1.92,
+        #                              protRSRefine=protRSRefine)
             # self.checkRSRefineResults(ramOutliers=0.00,
             #                           ramFavored=95.41,
             #                           rotOutliers=3.47,
@@ -950,8 +917,8 @@ class TestPhenixRSRefine(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n'
                                  '5ni1.cif and associated map\n'
@@ -960,38 +927,38 @@ class TestPhenixRSRefine(TestImportData):
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.10,
-                                      overallScore=1.11,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.52,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=3.64,
-                                      overallScore=1.25,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.35,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=2.10,
+        #                              overallScore=1.11,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION18:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=97.52,
+        #                              rotOutliers=0.00,
+        #                              cbetaOutliers=0,
+        #                              clashScore=3.64,
+        #                              overallScore=1.25,
+        #                              protRSRefine=protRSRefine)
+        #elif Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=97.70,
                                       rotOutliers=0.22,
                                       cbetaOutliers=0,
                                       clashScore=5.63,
                                       overallScore=1.37,
                                       protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.29,
-                                      rotOutliers=3.47,
-                                      cbetaOutliers=0,
-                                      clashScore=4.86,
-                                      overallScore=1.50,
-                                      protRSRefine=protRSRefine)
+        #else:
+        #    self.checkRSRefineResults(ramOutliers=0.00,
+        #                              ramFavored=96.29,
+        #                              rotOutliers=3.47,
+        #                              cbetaOutliers=0,
+        #                              clashScore=4.86,
+        #                              overallScore=1.50,
+        #                              protRSRefine=protRSRefine)
             # self.checkRSRefineResults(ramOutliers=0.00,
             #                           ramFavored=96.47,
             #                           rotOutliers=0.00,

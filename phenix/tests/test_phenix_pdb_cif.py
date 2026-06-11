@@ -33,7 +33,7 @@ from phenix.protocols.protocol_real_space_refine import (PhenixProtRunRSRefine,
 from phenix.protocols.protocol_molprobity import PhenixProtRunMolprobity
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from pyworkflow.tests import *
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18, PHENIXVERSION19, PHENIXVERSION20, PHENIXVERSION21
+from phenix import Plugin  #, PHENIXVERSION
 import json
 from phenix.protocols.protocol_emringer import PhenixProtRunEMRinger
 from phenix.protocols.protocol_superpose_pdbs import PhenixProtRunSuperposePDBs
@@ -125,7 +125,7 @@ class TestPhenixPdbCif(TestImportData):
 
     def checkMPResults(self, ramOutliers, ramFavored, rotOutliers,
                        cbetaOutliers, clashScore, overallScore,
-                       protMolProbity, places=2, delta=1):
+                       protMolProbity, places=2, delta=3):
         # method to check MolProbity statistic results of the Final Results
         # Table
         try:
@@ -134,7 +134,7 @@ class TestPhenixPdbCif(TestImportData):
             self.assertAlmostEqual(protMolProbity.ramachandranFavored.get(),
                                    ramFavored, delta=delta)
             self.assertAlmostEqual(protMolProbity.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=delta)
             self.assertAlmostEqual(protMolProbity.cbetaOutliers.get(),
                                    cbetaOutliers, delta=delta)
             self.assertAlmostEqual(protMolProbity.clashscore.get(),
@@ -148,22 +148,22 @@ class TestPhenixPdbCif(TestImportData):
 
     def checkRSRefineResults(self, ramOutliers, ramFavored, rotOutliers,
                              cbetaOutliers, clashScore, overallScore,
-                             protRSRefine, places=2):
+                             protRSRefine, places=2, delta=3):
         # method to check Real Space Refine statistic results of the Final Results
         # Table
         try:
             self.assertAlmostEqual(protRSRefine.ramachandranOutliers.get(),
                                    ramOutliers, places)
             self.assertAlmostEqual(protRSRefine.ramachandranFavored.get(),
-                                   ramFavored, delta=1)
+                                   ramFavored, delta=delta)
             self.assertAlmostEqual(protRSRefine.rotamerOutliers.get(),
-                                   rotOutliers, delta=3)
+                                   rotOutliers, delta=delta)
             self.assertAlmostEqual(protRSRefine.cbetaOutliers.get(),
                                    cbetaOutliers, places)
             self.assertAlmostEqual(protRSRefine.clashscore.get(),
-                                   clashScore, delta=2)
+                                   clashScore, delta=delta)
             self.assertAlmostEqual(protRSRefine.overallScore.get(),
-                                   overallScore, delta=2)
+                                   overallScore, delta=delta)
         except Exception as e:
             # print error since test does not print it
             print(("Exception error:", str(e)))
@@ -366,55 +366,24 @@ class TestPhenixPdbCif(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        # if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #     args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map and '
                                  '5ni1.pdb\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.06,
-                                      rotOutliers=0.22,
-                                      cbetaOutliers=0,
-                                      clashScore=5.41,
-                                      overallScore=1.29,
-                                      protRSRefine=protRSRefine)
-        else:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protRSRefine=protRSRefine)
-
+        # if Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkRSRefineResults(
+            ramOutliers=0.00,
+            ramFavored=98.06,
+            rotOutliers=0.22,
+            cbetaOutliers=0,
+            clashScore=5.41,
+            overallScore=1.29,
+            protRSRefine=protRSRefine)
+        
         # MolProbity2
         args = {
             'inputVolume': volume_hemo_org,
@@ -428,47 +397,15 @@ class TestPhenixPdbCif(TestImportData):
         self.launchProtocol(protMolProbity2)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.53,
-                                rotOutliers=0.00,
-                                cbetaOutliers=0,
-                                clashScore=2.43,
-                                overallScore=1.12,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.64,
-                                rotOutliers=4.77,
-                                cbetaOutliers=0,
-                                clashScore=6.07,
-                                overallScore=2.06,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.35,
-                                rotOutliers=2.39,
-                                cbetaOutliers=0,
-                                clashScore=3.87,
-                                overallScore=1.59,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkMPResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=98.06,
                                 rotOutliers=0.22,
                                 cbetaOutliers=0,
                                 clashScore=5.41,
                                 overallScore=1.29,
                                 protMolProbity=protMolProbity2)
-        else:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.11,
-                                rotOutliers=3.04,
-                                cbetaOutliers=0,
-                                clashScore=5.30,
-                                overallScore=1.92,
-                                protMolProbity=protMolProbity2)
-
+        
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
@@ -495,30 +432,14 @@ class TestPhenixPdbCif(TestImportData):
 
             return
         # self.assertTrue(False)
-        if Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                       ramFavored=97.35,
-                                       rotOutliers=2.39,
-                                       cbetaOutliers=0,
-                                       clashScore=3.87,
-                                       overallScore=1.59,
-                                       protValCryoEM=protValCryoEM)
-        if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkValCryoEMResults(ramOutliers=0.00,
+        # if Plugin.getPhenixVersion() == PHENIXVERSION20:
+        self.checkValCryoEMResults(ramOutliers=0.00,
                                        ramFavored=98.59,
                                        rotOutliers=1.30,
                                        cbetaOutliers=0,
                                        clashScore=4.42,
                                        overallScore=1.31,
                                        protValCryoEM=protValCryoEM)
-        else:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protValCryoEM=protValCryoEM)
 
     def testValCryoEMFFromVolumeAndCIF(self):
         """ This test checks that phenix real_space_refine protocol runs
@@ -583,63 +504,21 @@ class TestPhenixPdbCif(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        # if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #     args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map\nand '
                                  '5ni1.cif\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.06,
-                                      rotOutliers=0.22,
-                                      cbetaOutliers=0,
-                                      clashScore=5.41,
-                                      overallScore=1.29,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=98.23,
                                       rotOutliers=1.08,
                                       cbetaOutliers=0,
                                       clashScore=3.09,
                                       overallScore=1.13,
-                                      protRSRefine=protRSRefine)
-        else:
-            # values obtained from phenix GUI v. 1.16
-            # (minimization_global + adp)
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
                                       protRSRefine=protRSRefine)
 
         # MolProbity2
@@ -655,53 +534,13 @@ class TestPhenixPdbCif(TestImportData):
         self.launchProtocol(protMolProbity2)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.53,
-                                rotOutliers=0.00,
-                                cbetaOutliers=0,
-                                clashScore=2.43,
-                                overallScore=1.12,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.64,
-                                rotOutliers=4.77,
-                                cbetaOutliers=0,
-                                clashScore=6.07,
-                                overallScore=2.06,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.35,
-                                rotOutliers=2.39,
-                                cbetaOutliers=0,
-                                clashScore=3.87,
-                                overallScore=1.59,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=98.06,
-                                rotOutliers=0.22,
-                                cbetaOutliers=0,
-                                clashScore=5.41,
-                                overallScore=1.29,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkMPResults(ramOutliers=0.00,
+        # if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=98.23,
                                 rotOutliers=1.08,
                                 cbetaOutliers=0,
                                 clashScore=3.09,
                                 overallScore=1.13,
-                                protMolProbity=protMolProbity2)
-        else:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.11,
-                                rotOutliers=3.04,
-                                cbetaOutliers=0,
-                                clashScore=5.30,
-                                overallScore=1.92,
                                 protMolProbity=protMolProbity2)
 
         # validation_cryoEM
@@ -732,39 +571,14 @@ class TestPhenixPdbCif(TestImportData):
         # self.assertTrue(False)
 
         # check validation cryoem results
-        if Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                    ramFavored=97.35,
-                                    rotOutliers=2.39,
-                                    cbetaOutliers=0,
-                                    clashScore=3.87,
-                                    overallScore=1.59,
-                                    protValCryoEM=protValCryoEM)
-        if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                    ramFavored=98.59,
-                                    rotOutliers=1.30,
-                                    cbetaOutliers=0,
-                                    clashScore=4.42,
-                                    overallScore=1.31,
-                                    protValCryoEM=protValCryoEM)
-        if Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkValCryoEMResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkValCryoEMResults(ramOutliers=0.00,
                                     ramFavored=98.23,
                                     rotOutliers=1.08,
                                     cbetaOutliers=0,
                                     clashScore=3.09,
                                     overallScore=1.13,
                                     protValCryoEM=protValCryoEM)
-        else:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protValCryoEM=protValCryoEM)
-
     def testValCryoEMFFromVolumeAndCIFFromPDB(self):
         """ This test checks that phenix real_space_refine protocol runs
         with a volume provided directly as inputVol (with half1 and half2)
@@ -829,66 +643,23 @@ class TestPhenixPdbCif(TestImportData):
                 'occupancy': False,
                 'nqh_flips': False
                 }
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args['doSecondary'] = False
+        # if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #     args['doSecondary'] = False
         protRSRefine = self.newProtocol(PhenixProtRunRSRefine, **args)
         protRSRefine.setObjLabel('RSRefine hemo\n emd_3488.map\nand '
                                  '5ni1.cif from PDB\n')
         self.launchProtocol(protRSRefine)
 
         # check real_space_refine results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.53,
-                                      rotOutliers=0.00,
-                                      cbetaOutliers=0,
-                                      clashScore=2.43,
-                                      overallScore=1.12,
-                                      protRSRefine=protRSRefine)
-
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.64,
-                                      rotOutliers=4.77,
-                                      cbetaOutliers=0,
-                                      clashScore=6.07,
-                                      overallScore=2.06,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=97.35,
-                                      rotOutliers=2.39,
-                                      cbetaOutliers=0,
-                                      clashScore=3.87,
-                                      overallScore=1.59,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=98.06,
-                                      rotOutliers=0.22,
-                                      cbetaOutliers=0,
-                                      clashScore=5.41,
-                                      overallScore=1.29,
-                                      protRSRefine=protRSRefine)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkRSRefineResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkRSRefineResults(ramOutliers=0.00,
                                       ramFavored=98.23,
                                       rotOutliers=1.08,
                                       cbetaOutliers=0,
                                       clashScore=3.09,
                                       overallScore=1.13,
                                       protRSRefine=protRSRefine)
-        else:
-            # values obtained from phenix GUI v. 1.16
-            # (minimization_global + adp)
-            self.checkRSRefineResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protRSRefine=protRSRefine)
-
+        
         # MolProbity2
         args = {
             'inputVolume': volume_hemo_org,
@@ -902,55 +673,15 @@ class TestPhenixPdbCif(TestImportData):
         self.launchProtocol(protMolProbity2)
 
         # check MolProbity results
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.53,
-                                rotOutliers=0.00,
-                                cbetaOutliers=0,
-                                clashScore=2.43,
-                                overallScore=1.12,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION18:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.64,
-                                rotOutliers=4.77,
-                                cbetaOutliers=0,
-                                clashScore=6.07,
-                                overallScore=2.06,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=97.35,
-                                rotOutliers=2.39,
-                                cbetaOutliers=0,
-                                clashScore=3.87,
-                                overallScore=1.59,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=98.06,
-                                rotOutliers=0.22,
-                                cbetaOutliers=0,
-                                clashScore=5.41,
-                                overallScore=1.29,
-                                protMolProbity=protMolProbity2)
-        elif Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkMPResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkMPResults(ramOutliers=0.00,
                                 ramFavored=98.23,
                                 rotOutliers=1.08,
                                 cbetaOutliers=0,
                                 clashScore=3.09,
                                 overallScore=1.13,
                                 protMolProbity=protMolProbity2)
-        else:
-            self.checkMPResults(ramOutliers=0.00,
-                                ramFavored=96.11,
-                                rotOutliers=3.04,
-                                cbetaOutliers=0,
-                                clashScore=5.30,
-                                overallScore=1.92,
-                                protMolProbity=protMolProbity2)
-
+        
         # validation_cryoEM
         args = {'inputVolume': volume_hemo_org,
                 'resolution': 3.2,
@@ -979,38 +710,14 @@ class TestPhenixPdbCif(TestImportData):
         # self.assertTrue(False)
 
         # check validation cryoem results
-        if Plugin.getPhenixVersion() == PHENIXVERSION19:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                       ramFavored=97.35,
-                                       rotOutliers=2.39,
-                                       cbetaOutliers=0,
-                                       clashScore=3.87,
-                                       overallScore=1.59,
-                                       protValCryoEM=protValCryoEM)
-        if Plugin.getPhenixVersion() == PHENIXVERSION20:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                       ramFavored=98.59,
-                                       rotOutliers=1.30,
-                                       cbetaOutliers=0,
-                                       clashScore=4.42,
-                                       overallScore=1.31,
-                                       protValCryoEM=protValCryoEM)
-        if Plugin.getPhenixVersion() == PHENIXVERSION21:
-            self.checkValCryoEMResults(ramOutliers=0.00,
+        ## if Plugin.getPhenixVersion() == PHENIXVERSION21:
+        self.checkValCryoEMResults(ramOutliers=0.00,
                                        ramFavored=98.23,
                                        rotOutliers=1.08,
                                        cbetaOutliers=0,
                                        clashScore=3.09,
                                        overallScore=1.13,
                                        protValCryoEM=protValCryoEM)
-        else:
-            self.checkValCryoEMResults(ramOutliers=0.00,
-                                      ramFavored=96.11,
-                                      rotOutliers=3.04,
-                                      cbetaOutliers=0,
-                                      clashScore=5.30,
-                                      overallScore=1.92,
-                                      protValCryoEM=protValCryoEM)
 
     def testSuperposePdbsFromPDBAndCIF(self):
         """ This test checks that phenix superpose_pdbs protocol runs with

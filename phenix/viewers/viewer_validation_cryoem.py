@@ -27,7 +27,7 @@
 from phenix.protocols.protocol_validation_cryoem import PhenixProtRunValidationCryoEM
 from .viewer_refinement_base import PhenixProtRefinementBaseViewer
 from pyworkflow.protocol.params import LabelParam, EnumParam
-from phenix import Plugin, PHENIXVERSION, PHENIXVERSION18
+from phenix import Plugin  #, PHENIXVERSION
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
 from phenix import Plugin
@@ -51,19 +51,19 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
     FSCHALFMAPFILE = "FscHalfMap.txt"
 
     def __init__(self,  **kwargs):
-         PhenixProtRefinementBaseViewer.__init__(self, **kwargs)
-         if Plugin.getPhenixVersion() != PHENIXVERSION:
+        PhenixProtRefinementBaseViewer.__init__(self, **kwargs)
+        #if Plugin.getPhenixVersion() != PHENIXVERSION:
             # VALIDATIONCRYOEMFILE = self.protocol._getExtraPath(
             #     self.protocol.VALIDATIONCRYOEMFILE)
 
-            self.VALIDATIONCRYOEMPKLFILENAME = self.protocol._getExtraPath(
+        self.VALIDATIONCRYOEMPKLFILENAME = self.protocol._getExtraPath(
                 self.protocol.VALIDATIONCRYOEMPKLFILE)
-            self._writePickleData2()
-            self.dictOverall2 = json.loads(self.dictOverall2,
+        self._writePickleData2()
+        self.dictOverall2 = json.loads(self.dictOverall2,
                                   object_pairs_hook=collections.OrderedDict)
 
     def _defineParams(self, form):
-        if Plugin.getPhenixVersion() != PHENIXVERSION:
+        # if Plugin.getPhenixVersion() != PHENIXVERSION:
             if (self.protocol.inputVolume.get() \
                 or self.protocol.inputStructure.get().getVolume()) \
                     is not None:
@@ -71,7 +71,11 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                     self.vol = self.protocol.inputVolume.get()
                 else:
                     self.vol = self.protocol.inputStructure.get().getVolume()
-            PhenixProtRefinementBaseViewer._defineParams(self, form)
+
+            form.addSection(label="Volume and models")
+            form.addParam('displayMapModel', LabelParam,
+                        label="Volume and models in ChimeraX",
+                        help="Display of input volume(s) and atomic structure(s).")
             form.addSection(label="Summary")
             group = form.addGroup('Model')
             group.addParam('showModelSummary', LabelParam,
@@ -398,11 +402,11 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                                 "(1/Angstroms) and resolution (Angstroms).")
             group.addParam('exportFiles5', LabelParam,
                            label='Save FSC plot data as text')
-        elif Plugin.getPhenixVersion() == PHENIXVERSION:
-            PhenixProtRefinementBaseViewer._defineParams(self, form)
+        # elif Plugin.getPhenixVersion() == PHENIXVERSION:
+        #     PhenixProtRefinementBaseViewer._defineParams(self, form)
 
-    if Plugin.getPhenixVersion() != PHENIXVERSION:
-        def _getVisualizeDict(self):
+    # if Plugin.getPhenixVersion() != PHENIXVERSION:
+    def _getVisualizeDict(self):
             return{
                    'displayMapModel': self._displayMapModel,
                    'showModelSummary': self._showModelSummary,
@@ -442,38 +446,38 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                    'showPlotFSC2': self._showPlotFSC2,
                    'exportFiles5': self._exportFiles5
                   }
-    if Plugin.getPhenixVersion() == PHENIXVERSION:
-        def _getVisualizeDict(self):
-            return{
-                   'displayMapModel': self._displayMapModel,
-                   'showMolProbityResults': self._visualizeMolProbityResults,
-                   'showCootOutliers': self._showCootOutliers,
-                   'showMissingAtoms': self._showMissingAtoms,
-                   'showBLrestraints': self._showBLrestraints,
-                   'showBLoutliers': self._showBLoutliers,
-                   'showBArestraints': self._showBArestraints,
-                   'showBAoutliers': self._showBAoutliers,
-                   'showDArestraints': self._showDArestraints,
-                   'showDAoutliers': self._showDAoutliers,
-                   'showCHILrestraints': self._showCHILrestraints,
-                   'showCHILoutliers': self._showCHILoutliers,
-                   'showPLANARrestraints': self._showPLANARrestraints,
-                   'showPLANARoutliers': self._showPLANARoutliers,
-                   'showPlotType': self._showPlotType,
-                   'showRamaOutliersTable': self._showRamaOutliersTable,
-                   'showRotaOutliersTable': self._showRotaOutliersTable,
-                   'showCbetaOutliersTable': self._showCbetaOutliersTable,
-                   'showBackAsnGlnHisSidechains': self._showBackAsnGlnHisSidechains,
-                   'showCisAndTwistedPeptides': self._showCisAndTwistedPeptides,
-                   'showMultiCriterionPlot': self._showMultiCriterionPlot,
-                   'showOverallRSCResults': self._showOverallRSCResults,
-                   'showClashes': self._showClashes,
-                   'showCCTable': self._showCCTable,
-                   'displayFSCplot': self._displayFSCplot,
-                   'showOccupancies' : self._showOccupancies,
-                   'showIsotropicB': self._showIsotropicB,
-                   'showSuspiciousBfactors': self. _showSuspiciousBfactors
-                   }
+    # if Plugin.getPhenixVersion() == PHENIXVERSION:
+    #     def _getVisualizeDict(self):
+    #         return{
+    #                'displayMapModel': self._displayMapModel,
+    #                'showMolProbityResults': self._visualizeMolProbityResults,
+    #                'showCootOutliers': self._showCootOutliers,
+    #                'showMissingAtoms': self._showMissingAtoms,
+    #                'showBLrestraints': self._showBLrestraints,
+    #                'showBLoutliers': self._showBLoutliers,
+    #                'showBArestraints': self._showBArestraints,
+    #                'showBAoutliers': self._showBAoutliers,
+    #                'showDArestraints': self._showDArestraints,
+    #                'showDAoutliers': self._showDAoutliers,
+    #                'showCHILrestraints': self._showCHILrestraints,
+    #                'showCHILoutliers': self._showCHILoutliers,
+    #                'showPLANARrestraints': self._showPLANARrestraints,
+    #                'showPLANARoutliers': self._showPLANARoutliers,
+    #                'showPlotType': self._showPlotType,
+    #                'showRamaOutliersTable': self._showRamaOutliersTable,
+    #                'showRotaOutliersTable': self._showRotaOutliersTable,
+    #                'showCbetaOutliersTable': self._showCbetaOutliersTable,
+    #                'showBackAsnGlnHisSidechains': self._showBackAsnGlnHisSidechains,
+    #                'showCisAndTwistedPeptides': self._showCisAndTwistedPeptides,
+    #                'showMultiCriterionPlot': self._showMultiCriterionPlot,
+    #                'showOverallRSCResults': self._showOverallRSCResults,
+    #                'showClashes': self._showClashes,
+    #                'showCCTable': self._showCCTable,
+    #                'displayFSCplot': self._displayFSCplot,
+    #                'showOccupancies' : self._showOccupancies,
+    #                'showIsotropicB': self._showIsotropicB,
+    #                'showSuspiciousBfactors': self. _showSuspiciousBfactors
+    #                }
 
     def _showModelSummary(self, e = None):
         headerList = ['Item', 'Value']
@@ -483,8 +487,8 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                        '     Angles (degrees) (# > 4sigma)', 'MolProbity score',
                        'Clash score', 'Ramachandran plot (%)', '     Outliers',
                        '     Allowed', '     Favored']
-        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
-            dataList1_2 = ['Rama-Z (Ramachandran plot Z-score, RMSD)',
+        #if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+        dataList1_2 = ['Rama-Z (Ramachandran plot Z-score, RMSD)',
                            '     whole (N = ' + str(self.dictOverall2['Rama_Z_whole_n']) + ')',
                            '     helix (N = ' + str(self.dictOverall2['Rama_Z_helix_n']) + ')',
                            '     sheet (N = ' + str(self.dictOverall2['Rama_Z_sheet_n']) + ')',
@@ -496,10 +500,10 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                        '           Nucleotide', '           Ligand', '           Water',
                        'Occupancy', '     Mean', '     occ = 1 (%)', '     0 < occ < 1 (%)',
                        '     occ > 1 (%)']
-        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
-            dataList1 = dataList1_1 + dataList1_2 + dataList1_3
-        else:
-            dataList1 = dataList1_1 + dataList1_3
+        #if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+        dataList1 = dataList1_1 + dataList1_2 + dataList1_3
+        #else:
+        #    dataList1 = dataList1_1 + dataList1_3
 
         dataList2_1 = ["", self.dictOverall2['Chains'],
                      str(self.dictOverall2["Atoms"])+ " " + "(Hydrogens: " +
@@ -516,8 +520,8 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                      "", self.dictOverall2['Rhama_Outliers'],
                      self.dictOverall2['Rhama_Allowed'],
                      self.dictOverall2['Rhama_Favored']]
-        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
-            dataList2_2 = ["", self.dictOverall2['Rama_Z_whole_value'] + " (" +
+        # if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+        dataList2_2 = ["", self.dictOverall2['Rama_Z_whole_value'] + " (" +
                          self.dictOverall2['Rama_Z_whole_std'] + ")",
                          self.dictOverall2['Rama_Z_helix_value'] + " (" +
                          self.dictOverall2['Rama_Z_helix_std'] + ")",
@@ -552,10 +556,10 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
                      self.dictOverall2['occupancy_0_occ_1'],
                      self.dictOverall2['occupancy_occ_higher_1']]
 
-        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
-            dataList2 = dataList2_1 + dataList2_2 + dataList2_3
-        else:
-            dataList2 = dataList2_1 + dataList2_3
+        #if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+        dataList2 = dataList2_1 + dataList2_2 + dataList2_3
+        #else:
+        #    dataList2 = dataList2_1 + dataList2_3
 
         dataList = []
         for a1, a2 in zip(dataList1, dataList2):
@@ -637,8 +641,14 @@ class PhenixProtRunValidationCryoEMViewer(PhenixProtRefinementBaseViewer):
         def onSelect(obj):
             dirName = obj.getPath()
             command = """import pickle
+import os
+import locale
+
+os.environ["LANG"] = "en_US.UTF-8"
+os.environ["LC_ALL"] = "en_US.UTF-8"
+
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"br") as f:
         return pickle.load(f)
 
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -737,9 +747,15 @@ data.model.geometry.clash.clashes.save_table_data("{dirName}/clashes.txt")
         Plugin.runPhenixProgram("", FILENAME)
 
     def _writeCommand2(self, listNumber):
-        self.command ="""import pickle     
+        self.command ="""import pickle
+import os
+import locale
+
+os.environ["LANG"] = "en_US.UTF-8"
+os.environ["LC_ALL"] = "en_US.UTF-8"
+
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"br") as f:
         return pickle.load(f)
         
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -757,7 +773,7 @@ if data.model.geometry.rotamer.rotalyze is not None:
             self.command +="""
     try :
         import wxtbx.app
-    except ImportError, e :
+    except ImportError as e :
         raise Sorry("wxPython not available.")
     app = wxtbx.app.CCTBXApp(0)
 """
@@ -1267,11 +1283,16 @@ if data.model_vs_data.cc is not None:
             self.VALIDATIONTMPFILE)
         command = """
 import pickle
+import os
+import locale
+
+os.environ["LANG"] = "en_US.UTF-8"
+os.environ["LC_ALL"] = "en_US.UTF-8"
 import collections
 import json
 
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"br") as f:
         return pickle.load(f)
         
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -1292,7 +1313,7 @@ dictOverall2['Water'] = data.model.composition.n_water
 
 Ligands = []
 if data.model.composition.n_other != 0:
-    for k, v  in data.model.composition.other_cnts.iteritems():
+    for k, v  in data.model.composition.other_cnts.items():
         Ligands.append(str(k) + ': ' + str(v))
         dictOverall2['Ligands'] = Ligands
 else:
@@ -1663,8 +1684,8 @@ if len(Ligand_CC) > 0:
 else:
     dictOverall2['Ligand_CC'] = "---"
 """.format(VALIDATIONCRYOEMPKLFILENAME=self.VALIDATIONCRYOEMPKLFILENAME)
-        if Plugin.getPhenixVersion() >= PHENIXVERSION18:
-            command += """
+        #if Plugin.getPhenixVersion() >= PHENIXVERSION18:
+        command += """
 # Rama-Z (Ramachandran plot Z-score, RMSD))
 if data.model.geometry.rama_z is not None:
     dictOverall2['Rama_Z_whole_n'] = "%d" % (data.model.geometry.rama_z.whole.n)

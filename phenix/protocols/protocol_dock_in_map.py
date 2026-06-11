@@ -93,7 +93,7 @@ class PhenixProtRunDockInMap(EMProtocol):
 
     def runDockInMapStep(self):
         # starting structure
-        atomStructFileName = self.inputStructure.get().getFileName()
+        atomStructFileName = os.path.abspath(self.inputStructure.get().getFileName())
         # atomStruct = os.getcwd() + "/" + atomStructFileName
         atomStruct = atomStructFileName
         # starting map (.mrc)
@@ -107,10 +107,13 @@ class PhenixProtRunDockInMap(EMProtocol):
             sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
-        self._getDockInMapOutput()
+        # no longer needed since output is now in cif
+        # self._getDockInMapOutput()
+        # 00022:   AttributeError: 'PhenixProtRunDockInMap' object has no attribute 'outAtomStructName'
+        outAtomStructName = os.getcwd() + "/" +\
+            self._getExtraPath("placed_model.cif")
         pdb = AtomStruct()
-        pdb.setFileName(relpath(self.outAtomStructName))
-
+        pdb.setFileName(relpath(outAtomStructName))
         if self.inputVolume1.get() is not None:
             pdb.setVolume(self.inputVolume1.get())
         else:
@@ -194,15 +197,15 @@ class PhenixProtRunDockInMap(EMProtocol):
         from shutil import which
         return which(name) is not None
 
-    def _getDockInMapOutput(self):
-        outAtomStructName = os.getcwd() + "/" +\
-                            self._getExtraPath("placed_model.pdb")
-        # convert cif to mmcif by using maxit program
-        # to get the right number and name of chains
-        log = self._log
-        self.outAtomStructName = outAtomStructName.replace("pdb", "cif")
-        fromPDBToCIF(outAtomStructName, self.outAtomStructName, log)
-        fromCIFTommCIF(self.outAtomStructName, self.outAtomStructName, log)
+    # def _getDockInMapOutput(self):
+    #     outAtomStructName = os.getcwd() + "/" +\
+    #                         self._getExtraPath("placed_model.pdb")
+    #     # convert cif to mmcif by using maxit program
+    #     # to get the right number and name of chains
+    #     log = self._log
+    #     self.outAtomStructName = outAtomStructName.replace("pdb", "cif")
+    #     fromPDBToCIF(outAtomStructName, self.outAtomStructName, log)
+    #     fromCIFTommCIF(self.outAtomStructName, self.outAtomStructName, log)
 
     def _writeArgsDocKInMap(self, vol, atomStruct):
         args = ""

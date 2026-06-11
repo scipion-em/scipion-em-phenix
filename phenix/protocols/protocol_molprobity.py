@@ -25,7 +25,7 @@
 # **************************************************************************
 
 import os
-from phenix.constants import MOLPROBITY, PHENIXVERSION
+from phenix.constants import MOLPROBITY
 from phenix import Plugin
 from .protocol_refinement_base import PhenixProtRunRefinementBase
 from pwem.convert.atom_struct import retry
@@ -36,10 +36,9 @@ atomic structure inferred from an electron density map.
 """
     _label = 'molprobity'
     _program = ""
-    #_version = VERSION_1_2
     MOLPROBITYFILE = 'molprobity.mrc'
-    TMPCIFFILENAME="inMolprobity.cif"
-    TMPPDBFILENAME="inMolprobity.pdb"
+    TMPCIFFILENAME = "inMolprobity.cif"
+    TMPPDBFILENAME = "inMolprobity.pdb"
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -64,11 +63,7 @@ atomic structure inferred from an electron density map.
 
     def runMolprobityStep(self):
         version = Plugin.getPhenixVersion()
-        if version == '1.13':
-            print("PHENIX version: 1.13")
-        else:
-            print(("PHENIX version: ", version))
-        # PDBx/mmCIF
+
         fileName = self.inputStructure.get().getFileName()
         # self.atomStruct = os.path.abspath(fileName)
         self.atomStruct = os.getcwd() + "/" + fileName
@@ -132,8 +127,7 @@ atomic structure inferred from an electron density map.
 
     def _writeArgsMolProbityExpand(self, atomStruct, vol=None):
         args = self._writeArgsMolProbity(atomStruct, vol)
-        if Plugin.getPhenixVersion() != PHENIXVERSION:
-            args += " pickle=True"
+        args += " pickle=True"
         args += " pdb_interpretation.clash_guard.nonbonded_distance_threshold=None"
         args += " %s " % self.extraParams.get()
         # args += " wxplots=True" # TODO: Avoid the direct opening of plots

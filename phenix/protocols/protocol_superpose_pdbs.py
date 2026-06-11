@@ -236,8 +236,8 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                     aSH.read(list_args[i])
                     aSH.write(list_args[i])
                     args = list_args[0] + " " + list_args[1]
-                    Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
-                                            args, extraEnvDict=None, cwd=cwd)
+                Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
+                                        args, extraEnvDict=None, cwd=cwd)
             except:
                 print("CIF file standarization failed.")
 

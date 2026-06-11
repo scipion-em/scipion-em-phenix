@@ -33,7 +33,7 @@ from pyworkflow.protocol.constants import LEVEL_ADVANCED
 from pyworkflow.protocol.params import (PointerParam, BooleanParam, EnumParam,
                                         StringParam, FloatParam, IntParam,
                                         MultiPointerParam)
-from phenix.constants import PREDICTANDBUILD, PHENIX_HOME
+from phenix.constants import PREDICTANDBUILD, PHENIX_HOME, VERSION
 from pwem.convert.atom_struct import fromCIFToPDB, fromPDBToCIF, \
     fromCIFTommCIF, AtomicStructHandler, retry
 from pwem.objects import Volume, Sequence, SetOfSequences
@@ -45,7 +45,7 @@ except:
 from phenix import Plugin
 
 
-# _version = VERSION_1_2
+_version = VERSION
 OUTPUT_BEST_MAP = 'predict_and_build_best_map.mrc'
 OUTPUT_BEST_PDB = 'predict_and_build_best_pdb.pdb'
 OUTPUT_BEST_SUPERPOSED_PREDICTED_MODELS = 'predict_and_build_best_superposed_predicted_models.pdb'
@@ -111,7 +111,7 @@ class PhenixPredictAndBuildCryoEM(EMProtocol):
         form.addParam('resolution', FloatParam, default=3.0,
                       label='High-resolution limit (A):',
                       help="Map resolution (Angstroms).")
-        form.addParam('predictedModel', PointerParam, pointerClass='AtomStruct', 
+        form.addParam('inputPredictedModel', PointerParam, pointerClass='AtomStruct', 
                       expertLevel=LEVEL_ADVANCED, allowsNull=True,
                       label='Predicted model. (optional)',
                       help="Set the atomic structure obtained in any way by yourself.\n"
