@@ -25,7 +25,7 @@
 # **************************************************************************
 
 import os
-from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, PHENIXVERSION
+from phenix.constants import MOLPROBITY, VALIDATION_CRYOEM, VERSION
 from phenix import Plugin
 from pwem.convert.atom_struct import retry
 from .protocol_refinement_base import PhenixProtRunRefinementBase
@@ -36,7 +36,7 @@ atomic structure inferred from an electron density map.
 """
     _label = 'validation_cryoem'
     _program = ""
-    #_version = VERSION_1_2
+    _version = VERSION
     VALIDATIONCRYOEMFILE = 'validation_cryoem.mrc'
     VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
@@ -94,7 +94,8 @@ atomic structure inferred from an electron density map.
 
         args = self._writeArgsValCryoEM(atomStruct, volume, self.vol)
 
-        if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
+        # if Plugin.getPhenixVersion() != PHENIXVERSION and self.vol is not None:
+        if self.vol is not None:
             retry(Plugin.runPhenixProgram, Plugin.getProgram(VALIDATION_CRYOEM),
                   args, cwd=cwd, listAtomStruct=[atomStruct], log=self._log, sdterrLog = self.getLogsLastLines)
 

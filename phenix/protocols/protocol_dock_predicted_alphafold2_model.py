@@ -130,9 +130,12 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         if str(processedAtomStruct) != str(processedAtomStruct_localPath):
             pwutils.path.createLink(processedAtomStruct, processedAtomStruct_localPath)
             processedAtomStruct = processedAtomStruct_localPath
-        prefix = os.path.abspath(self._getExtraPath(processedAtomStruct))
+        # prefix = os.path.abspath(self._getExtraPath(processedAtomStruct))
+        # prefix = os.path.abspath(self._getExtraPath(processedAtomStruct.split('_processed.pdb')[0]))
+        # args = self._writeArgsDockAlphaFold(
+        #     predictedAtomStruct, processedAtomStruct, vol, prefix)
         args = self._writeArgsDockAlphaFold(
-            predictedAtomStruct, processedAtomStruct, vol, prefix)
+            predictedAtomStruct, processedAtomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
         retry(Plugin.runPhenixProgram, Plugin.getProgram(DOCKPREDICTEDMODEL),
               args, cwd=cwd,
@@ -140,13 +143,14 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
               log=self._log, sdterrLog = self.getLogsLastLines)
               
     def createOutputStep(self):
-        pdb = AtomStruct()
         for fileName in os.listdir(self._getExtraPath()):
-            if (fileName.endswith(".cif.pdb") or fileName.endswith(".pdb.pdb")):
+            pdb = AtomStruct()
+            # if (fileName.endswith(".cif.pdb") or fileName.endswith(".pdb.pdb")):
+            if (fileName.endswith("docked.pdb") or fileName.endswith("rebuilt.pdb")):
                 pdb.setFileName(self._getExtraPath(fileName))
-        self._defineOutputs(outputPdb=pdb)
-        self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
-        self._defineSourceRelation(self.inputProcessedPredictedModel.get(), pdb)
+                self._defineOutputs(outputPdb=pdb)
+                self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
+                self._defineSourceRelation(self.inputProcessedPredictedModel.get(), pdb)
 
         self._store()
 
@@ -194,7 +198,8 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         return fnVol
 
     def _writeArgsDockAlphaFold(
-            self, predictedAtomStruct, processedAtomStruct, vol, prefix):
+            # self, predictedAtomStruct, processedAtomStruct, vol, prefix):
+            self, predictedAtomStruct, processedAtomStruct, vol):
         args = " "
         args += "model=%s " % predictedAtomStruct
         args += "processed_model_file=%s " % processedAtomStruct
@@ -206,7 +211,7 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
         #     args += " asymmetric_map=False "
         args += "resolution=%f" % self.resolution
         args += " "
-        args += "output_model_prefix=%s" % prefix
+        # args += "output_model_prefix=%s" % prefix
         args += " "
         if self.numberOfThreads > 1:
             print("self.numberOfThreads: ", self.numberOfThreads)

@@ -6,7 +6,7 @@ from pyworkflow.object import Float, Integer
 from pwem.protocols import EMProtocol
 from pyworkflow.protocol.params import (PointerParam, FloatParam, \
     StringParam)
-from phenix.constants import (PHENIXVERSION)
+# from phenix.constants import (PHENIXVERSION)
 from pwem.convert.headers import Ccp4Header
 from phenix import Plugin
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
@@ -107,9 +107,9 @@ atomic structure derived from a cryo-EM density map.
             errors.append("Missing variables %s and/or PHENIX_HOME" % label)
         elif not os.path.exists(program):
             errors.append("Binary '%s' does not exists.\n" % program)
-            errors.append("Check if you need to upgrade your PHENIX version"
-                          " to run %s.\nYour current PHENIX version is %s.\n"
-                          % (label, PHENIXVERSION))
+            # errors.append("Check if you need to upgrade your PHENIX version"
+            #               " to run %s.\nYour current PHENIX version is %s.\n"
+            #               % (label, PHENIXVERSION))
 
         # If there is any error at this point it is related to config variables
         if errors:
@@ -161,7 +161,7 @@ import collections
 import json
 
 def pickleData(file):
-    with open(file,"r") as f:
+    with open(file,"br") as f:
         return pickle.load(f)
 
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -189,7 +189,7 @@ dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
         Plugin.runPhenixProgram("", pythonFileName)
 
         # read file in scipion python
-        with open(self.SUMMARYFILENAME, "r") as f:
+        with open(self.SUMMARYFILENAME, "br") as f:
             dictSummary = f.read()
 
         dictSummary = json.loads(
@@ -205,12 +205,12 @@ dictSummary['MolProbity_score'] = data.model.geometry.molprobity_score
     def _writeArgsMolProbity(self, atomStruct, vol=None):
         args = ""
         args += atomStruct
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            args += " "
-            args += " map_file_name=%s" % vol
-            args += " pickle=True"
-            args += " "
-            args += " d_min=%f" % self.resolution.get()
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        args += " "
+        args += " map_file_name=%s" % vol
+        args += " pickle=True"
+        args += " "
+        args += " d_min=%f" % self.resolution.get()
         args += " "
         numberOfThreads = self.numberOfThreads.get()
         if numberOfThreads > 1:

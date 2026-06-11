@@ -25,25 +25,30 @@
 # **************************************************************************
 
 PHENIX_HOME = 'PHENIX_HOME'
-PHENIXVERSIONFILENAME = './phenix_env.sh'
-PHENIXVERSION = '1.13' # plugin version
-PHENIXVERSION18 = '1.18' # september 2020
-PHENIXVERSION19 = '1.19' # june 2021
-PHENIXVERSION20 = '1.20' # march 2022
+PHENIXVERSIONFILENAME = 'phenix_env.sh'
+PHENIXVERSION210 = 2.1
+PHENIXVERSIONdev_6085 = 'dev-6085'
+# TO BE DELETED
+# PHENIXVERSION = PHENIXVERSION210
+# PHENIXVERSION18 = PHENIXVERSION
+# PHENIXVERSION19 = PHENIXVERSION
+# PHENIXVERSION20 = PHENIXVERSION
+# PHENIXVERSION21 = PHENIXVERSION
 
-#python used to run phenix scripts
+# python used to run phenix scripts
+# it is in the bin directory
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
 
 #phenix binaries are in several directories
-PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
-PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
-PHENIX_GETVERSION_PATH = 'build/bin'
+PHENIX_SCRIPT_PATH1 = 'lib/python3.9/site-packages/mmtbx/command_line'
+PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
+PHENIX_GETVERSION_PATH = 'bin'
 
 # list of phenix scripts and corresponding binary directory
 SUPERPOSE = 'superpose_pdbs.py'
 REALSPACEREFINE = 'real_space_refine.py'
 MOLPROBITY = 'molprobity.py'
-MOLPROBITY2 = 'molprobity.py'
+MOLPROBITY2 = 'molprobity.py'  # to be deleted
 VALIDATION_CRYOEM = 'validation_cryoem.py'
 EMRINGER = 'emringer.py'
 GETVERSION = 'phenix.version'
@@ -53,6 +58,7 @@ PROCESS = 'process_predicted_model.py'
 DOCKPREDICTEDMODEL = 'dock_predicted_model.py'
 REBUILDDOCKPREDICTEDMODEL = 'rebuild_predicted_model.py'
 DOCKANDREBUILD = 'dock_and_rebuild.py'
+PREDICTANDBUILD = 'predict_and_build.py'
 mapBinarytoDirectory ={
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,
@@ -63,9 +69,12 @@ mapBinarytoDirectory ={
     GETVERSION: PHENIX_GETVERSION_PATH,
     DOCKINMAP: PHENIX_SCRIPT_PATH2,
     SYMMETRY: PHENIX_SCRIPT_PATH2,
-    PROCESS: PHENIX_SCRIPT_PATH2,
+    PROCESS: PHENIX_SCRIPT_PATH1,
     DOCKPREDICTEDMODEL: PHENIX_SCRIPT_PATH2,
     REBUILDDOCKPREDICTEDMODEL: PHENIX_SCRIPT_PATH2,
-    DOCKANDREBUILD: PHENIX_SCRIPT_PATH2
+    DOCKANDREBUILD: PHENIX_SCRIPT_PATH2,
+    PREDICTANDBUILD: PHENIX_SCRIPT_PATH2
 }
 DISPLAY='display'
+
+VERSION = "2.1"

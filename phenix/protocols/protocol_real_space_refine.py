@@ -31,10 +31,7 @@ from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
                               MOLPROBITY2,
-                              VALIDATION_CRYOEM,
-                              PHENIXVERSION,
-                              PHENIXVERSION19,
-                              PHENIXVERSION20)
+                              VALIDATION_CRYOEM)
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
 
@@ -59,8 +56,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     _program = ""
     # _version = VERSION_1_2
     REALSPACEFILE = 'real_space.mrc'
-    if Plugin.getPhenixVersion() != PHENIXVERSION:
-        VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
+    # if Plugin.getPhenixVersion() != PHENIXVERSION:
+    VALIDATIONCRYOEMPKLFILE = 'validation_cryoem.pkl'
 
     # --------------------------- DEFINE param functions -------------------
     def _defineParams(self, form):
@@ -173,8 +170,8 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         self._insertFunctionStep('convertInputStep', self.REALSPACEFILE)
         self._insertFunctionStep('runRSrefineStep', self.REALSPACEFILE)
         self._insertFunctionStep('runMolprobityStep', self.REALSPACEFILE)
-        if Plugin.getPhenixVersion() != PHENIXVERSION:
-            self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
+        #if Plugin.getPhenixVersion() != PHENIXVERSION:
+        self._insertFunctionStep('runValidationCryoEMStep', self.REALSPACEFILE)
         self._insertFunctionStep('createOutputStep')
 
     # --------------------------- STEPS functions --------------------------
@@ -245,7 +242,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
               sdterrLog = self.getLogsLastLines)
 
     def createOutputStep(self):
-        # self._getRSRefineOutput()
+        self._getRSRefineOutput()
         pdb = AtomStruct()
         pdb.setFileName(self.outAtomStructName)
 
@@ -258,14 +255,14 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         if self.inputVolume.get() is not None:
             self._defineSourceRelation(self.inputVolume.get(), pdb)
 
-        if Plugin.getPhenixVersion() == PHENIXVERSION:
-            MOLPROBITYOUTFILENAME = self._getExtraPath(
-                self.MOLPROBITYOUTFILENAME)
-            self._parseFile(MOLPROBITYOUTFILENAME)
-        else:
-            VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
-                self.VALIDATIONCRYOEMPKLFILE)
-            self._readValidationPklFile(VALIDATIONCRYOEMPKLFILENAME)
+        #if Plugin.getPhenixVersion() == PHENIXVERSION:
+        #    MOLPROBITYOUTFILENAME = self._getExtraPath(
+        #        self.MOLPROBITYOUTFILENAME)
+        #    self._parseFile(MOLPROBITYOUTFILENAME)
+        #else:
+        VALIDATIONCRYOEMPKLFILENAME = self._getExtraPath(
+             self.VALIDATIONCRYOEMPKLFILE)
+        self._readValidationPklFile(VALIDATIONCRYOEMPKLFILENAME)
         self._store()
     # --------------------------- INFO functions ---------------------------
 
@@ -305,16 +302,16 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         fromCIFTommCIF(outAtomStructName, self.outAtomStructName, log)
 
     def _writeArgsRSR(self, atomStruct, vol):
-        if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
-            args = " "
-        else:
-            args = " model_file="
-        args += "%s " % atomStruct
-        if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
-            args += " "
-        else:
-            args += " map_file="
-        args += "%s " % vol
+        #if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
+        #    args = " "
+        #else:
+        #    args = " model_file="
+        args = " %s " % atomStruct
+        #if Plugin.getPhenixVersion() == PHENIXVERSION19 or PHENIXVERSION20:
+        #    args += " "
+        #else:
+        #    args += " map_file="
+        args += " %s " % vol
         args += " resolution=%f" % self.resolution
         if self.doSecondary == True:
             args += " secondary_structure.enabled=%s" % self.doSecondary
