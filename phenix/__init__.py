@@ -74,7 +74,6 @@ class Plugin(pwem.Plugin):
                     ':/usr/bin:'
                     '/bin'
         }, position=pos)
-        print("getEnvirom:getEnviron", environ)
         return environ
 
     @classmethod
@@ -85,13 +84,6 @@ class Plugin(pwem.Plugin):
             env.update(extraEnvDict)
         program = PHENIX_PYTHON + program
         pwutils.runJob(None, program, args, env=env, cwd=cwd)
-
-    @classmethod
-    def getProgram(cls, progName):
-        """ Return the program binary that will be used. """
-        return os.path.join(Plugin.getHome(),
-                            mapBinarytoDirectory[progName],
-                            os.path.basename(progName))
 
     @classmethod
     def getProgram(cls, progName):
@@ -116,7 +108,7 @@ class Plugin(pwem.Plugin):
             cls._phenix_version = match.group(1).strip()
             print("version", cls._phenix_version)
             return cls._phenix_version
-        return ''
+        # return ''
 
         env = cls.getEnviron()
         pid = subprocess.Popen(GETVERSION,
@@ -133,9 +125,10 @@ class Plugin(pwem.Plugin):
         #print("getPhenixVersion:version", version)
         return version
 
-    @classmethod
-    def isVersionActive(cls):
-        return cls.getActiveVersion().startswith(PHENIXVERSION)
+    # # not used in phenix. Does scipion need it?
+    # @classmethod
+    # def isVersionActive(cls):
+    #     return cls.getActiveVersion().startswith(PHENIXVERSION)
 
     @classmethod
     def defineBinaries(cls, env):

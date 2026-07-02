@@ -65,14 +65,16 @@ atomic structure inferred from an electron density map.
         version = Plugin.getPhenixVersion()
 
         fileName = self.inputStructure.get().getFileName()
-        # self.atomStruct = os.path.abspath(fileName)
-        self.atomStruct = os.getcwd() + "/" + fileName
+        self.atomStruct = os.path.join(os.getcwd(), fileName)
+        # self.atomStruct = os.path.abspath(self.atomStruct)
+        # self.atomStruct = os.getcwd() + "/" + fileName
         # starting volume (.mrc)
         if (self.inputVolume.get() or self.inputStructure.get().getVolume()) \
                 is not None:
             tmpMapFile = self.MOLPROBITYFILE
             # self.vol = os.path.abspath(self._getExtraPath(tmpMapFile))
-            self.vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
+            self.vol = os.path.join(os.getcwd(), self._getExtraPath(tmpMapFile))
+            # self.vol = os.getcwd() + "/" + self._getExtraPath(tmpMapFile)
             args = self._writeArgsMolProbityExpand(self.atomStruct, self.vol)
         else:
             args = self._writeArgsMolProbityExpand(self.atomStruct, vol=None)

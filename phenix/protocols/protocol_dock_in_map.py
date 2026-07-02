@@ -94,7 +94,6 @@ class PhenixProtRunDockInMap(EMProtocol):
     def runDockInMapStep(self):
         # starting structure
         atomStructFileName = os.path.abspath(self.inputStructure.get().getFileName())
-        # atomStruct = os.getcwd() + "/" + atomStructFileName
         atomStruct = atomStructFileName
         # starting map (.mrc)
         mapFile = self.DOCKINMAPFILE

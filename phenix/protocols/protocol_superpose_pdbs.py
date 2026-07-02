@@ -195,7 +195,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args3 = []
                         list_args0 = args2.split()
                         for i in range(0, 2):
-                            list_args3[i].append(fromCIFTommCIF(
+                            list_args3.append(fromCIFTommCIF(
                                 list_args0[i], list_args0[i]), log)
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
@@ -224,7 +224,7 @@ class PhenixProtRunSuperposePDBs(EMProtocol):
                         list_args0 = args2.split()
                         for i in range(0, 2):
                             list_args3.append(fromCIFTommCIF(
-                                list_args0[i], list_args0[i]), log)
+                                list_args0[i], list_args0[i], log))
                         args3 = list_args3[0] + " " + list_args3[1]
                         Plugin.runPhenixProgram(Plugin.getProgram(SUPERPOSE),
                                                 args3, extraEnvDict=None, cwd=cwd)

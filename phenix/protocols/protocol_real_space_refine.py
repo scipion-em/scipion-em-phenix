@@ -30,7 +30,7 @@ import os
 from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam
 from phenix.constants import (REALSPACEREFINE,
-                              MOLPROBITY2,
+                              MOLPROBITY,
                               VALIDATION_CRYOEM)
 
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
@@ -190,7 +190,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
 
         self.refinedFile = False
         for item in os.listdir(self._getExtraPath()):
-            p = re.compile('\d+')
+            p = re.compile(r'\d+')
             if p.search(item) is not None and item.endswith(".cif"):
                 self.refinedFile = True
                 break
@@ -219,7 +219,7 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
         vol = os.path.abspath(self._getExtraPath(tmpMapFile))
         args = self._writeArgsMolProbity(atomStruct, vol)
         cwd = os.getcwd() + "/" + self._getExtraPath()
-        retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY2),
+        retry(Plugin.runPhenixProgram, Plugin.getProgram(MOLPROBITY),
               args, cwd=cwd,
               listAtomStruct=[atomStruct], log=self._log,
               sdterrLog = self.getLogsLastLines)
