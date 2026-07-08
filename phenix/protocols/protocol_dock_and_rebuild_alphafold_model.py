@@ -107,7 +107,7 @@ class PhenixProtDockAndRebuildAlphaFold2Model(EMProtocol):
             pwutils.path.createLink(predictedAtomStruct, predictedAtomStruct_localPath)
             predictedAtomStruct = predictedAtomStruct_localPath
 
-        # self.prefix = os.path.abspath(self._getExtraPath(predictedAtomStruct))
+        self.prefix = os.path.abspath(self._getExtraPath(predictedAtomStruct))
         # args = self._writeArgsDockAlphaFold(
         #     predictedAtomStruct, localVolName, self.prefix)
         args = self._writeArgsDockAlphaFold(
