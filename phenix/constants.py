@@ -46,6 +46,7 @@ PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
 PHENIX_GETVERSION_PATH = 'bin'
 
 # list of phenix scripts and corresponding binary directory
+AQUAREF = "qr.aquaref"
 SUPERPOSE = 'superpose_pdbs.py'
 REALSPACEREFINE = 'real_space_refine.py'
 MOLPROBITY = 'molprobity.py'
@@ -61,6 +62,7 @@ REBUILDDOCKPREDICTEDMODEL = 'rebuild_predicted_model.py'
 DOCKANDREBUILD = 'dock_and_rebuild.py'
 PREDICTANDBUILD = 'predict_and_build.py'
 mapBinarytoDirectory ={
+    AQUAREF: "bin",
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,
     MOLPROBITY : PHENIX_SCRIPT_PATH1,

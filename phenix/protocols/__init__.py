@@ -37,4 +37,5 @@ from .protocol_search_fit import PhenixProtSearchFit
 # from .protocol_rebuild_docked_predicted_alphafold2_model import PhenixProtRebuildDockPredictedAlphaFold2Model
 # from .protocol_dock_and_rebuild_alphafold_model import PhenixProtDockAndRebuildAlphaFold2Model
 from .protocol_predict_and_build_cryoEM import PhenixPredictAndBuildCryoEM
+from .protocol_aquaref_rsr import PhenixProtAQuaRefRSR
 
