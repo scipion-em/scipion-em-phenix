@@ -23,7 +23,7 @@
 # *
 # **************************************************************************
 
-import os
+import os, subprocess
 
 from pwem.objects import AtomStruct
 from pyworkflow.protocol.params import BooleanParam,  IntParam, EnumParam, StringParam, FloatParam, PointerParam
@@ -180,6 +180,24 @@ class PhenixProtAQuaRefRSR(PhenixProtRunRefinementBase):
     # --------------------------- INFO functions ---------------------------
     def _validate(self):
         errors = []
+
+        phenix_python = os.path.join(Plugin.getHome(), "bin", "phenix.python")
+
+        modules = ["torch", "numba", "torch_cluster"]
+
+        for module in modules:
+            result = subprocess.run(
+                [phenix_python, "-c", f"import {module}"],
+                capture_output=True,
+                text=True
+            )
+
+            if result.returncode != 0:
+                errors.append(
+                    f"AQuaRef requires the Python module '{module}', "
+                    f"but it is not installed in the Phenix environment."
+                )
+
         return errors
 
     def _citations(self):
