@@ -1420,8 +1420,8 @@ else:
     dictOverall['_rna_group'] = True
     dictOverall['_n_bonds_rna_outliers'] = data.rna.bonds.n_outliers
     dictOverall['_n_angles_rna_outliers'] = data.rna.angles.n_outliers
-    dictOverall['_n_puckers_rna_outliers'] = data.puckers.angles.n_outliers
-    dictOverall['_n_suites_rna_outliers'] = data.suites.angles.n_outliers
+    dictOverall['_n_puckers_rna_outliers'] = data.rna.puckers.n_outliers
+    dictOverall['_n_suites_rna_outliers'] = data.rna.suites.n_outliers
 
 # Clashes
 if data.clashes is None:
