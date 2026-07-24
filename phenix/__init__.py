@@ -70,7 +70,7 @@ class Plugin(pwem.Plugin):
             'HOME': home,
             'LIBTBX_BUILD': os.path.join(cls.getHome()),
             'LIBTBX_OPATH': os.environ['PATH'],
-            'PATH': os.path.join(Plugin.getHome(), 'bin') +
+            'PATH': os.path.join(Plugin.getHome(), 'build/bin') +
                     ':/usr/bin:'
                     '/bin'
         }, position=pos)
