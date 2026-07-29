@@ -1404,9 +1404,14 @@ else:
     dictOverall['_cbeta_headers'] = data.cbetadev.gui_list_headers
 
     # Backwards Asn/Gln/His sidechains
-    dictOverall['_n_nqh_flips_outliers'] = data.nqh_flips.n_outliers
-    dictOverall['_nqh_flips_outliers'] = data.nqh_flips.as_gui_table_data()
-    dictOverall['_nqh_flips_headers'] = data.nqh_flips.gui_list_headers
+    if data.nqh_flips is None:
+        dictOverall['_n_nqh_flips_outliers'] = 0
+        dictOverall['_nqh_flips_outliers'] = []
+        dictOverall['_nqh_flips_headers'] = []
+    else:
+        dictOverall['_n_nqh_flips_outliers'] = data.nqh_flips.n_outliers
+        dictOverall['_nqh_flips_outliers'] = data.nqh_flips.as_gui_table_data()
+        dictOverall['_nqh_flips_headers'] = data.nqh_flips.gui_list_headers
 
     # Cis and Twisted peptides
     dictOverall['_n_omega_outliers'] = data.omegalyze.n_outliers
