@@ -43,25 +43,24 @@ PHENIX_PYTHON = 'phenix.python '  # keep the ending space
 #phenix binaries are in several directories
 # PHENIX_SCRIPT_PATH1 = 'lib/python3.9/site-packages/mmtbx/command_line'
 # PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
-PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
-PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
+PHENIX_SCRIPT_PATH1 = 'bin'
+PHENIX_SCRIPT_PATH2 = 'bin'
 PHENIX_GETVERSION_PATH = 'bin'
 
 # list of phenix scripts and corresponding binary directory
-SUPERPOSE = 'superpose_pdbs.py'
-REALSPACEREFINE = 'real_space_refine.py'
-MOLPROBITY = 'molprobity.py'
-# MOLPROBITY2 = 'molprobity.py'  # to be deleted
-VALIDATION_CRYOEM = 'validation_cryoem.py'
-EMRINGER = 'emringer.py'
-GETVERSION = 'phenix.version'
-DOCKINMAP = 'dock_in_map.py'
-SYMMETRY = 'map_symmetry.py'
-PROCESS = 'process_predicted_model.py'
-DOCKPREDICTEDMODEL = 'dock_predicted_model.py'
-REBUILDDOCKPREDICTEDMODEL = 'rebuild_predicted_model.py'
-DOCKANDREBUILD = 'dock_and_rebuild.py'
-PREDICTANDBUILD = 'predict_and_build.py'
+SUPERPOSE = "superpose_pdbs"
+REALSPACEREFINE = "real_space_refine"
+MOLPROBITY = "molprobity"
+VALIDATION_CRYOEM = "validation_cryoem"
+EMRINGER = "emringer"
+GETVERSION = "phenix.version"      # este probablemente no cambia
+DOCKINMAP = "dock_in_map"
+SYMMETRY = "map_symmetry"
+PROCESS = "process_predicted_model"
+DOCKPREDICTEDMODEL = "dock_predicted_model"
+REBUILDDOCKPREDICTEDMODEL = "rebuild_predicted_model"
+DOCKANDREBUILD = "dock_and_rebuild"
+PREDICTANDBUILD = "predict_and_build"
 mapBinarytoDirectory ={
     REALSPACEREFINE : PHENIX_SCRIPT_PATH2,
     SUPERPOSE : PHENIX_SCRIPT_PATH2,

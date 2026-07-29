@@ -70,27 +70,36 @@ class Plugin(pwem.Plugin):
             'HOME': home,
             'LIBTBX_BUILD': os.path.join(cls.getHome()),
             'LIBTBX_OPATH': os.environ['PATH'],
-            'PATH': os.path.join(Plugin.getHome(), 'build/bin') +
-                    ':/usr/bin:'
-                    '/bin'
+            'PATH': (
+                os.path.join(cls.getHome(), 'phenix_bin') + ":" +
+                os.path.join(cls.getHome(), 'bin') + ":" +
+                os.environ.get("PATH", "")
+            )
         }, position=pos)
         return environ
 
     @classmethod
     def runPhenixProgram(cls, program, args=None, extraEnvDict=None, cwd=None):
-        """ Internal shortcut function to launch a Phenix program. """
         env = cls.getEnviron()
         if extraEnvDict is not None:
             env.update(extraEnvDict)
-        program = PHENIX_PYTHON + program
-        pwutils.runJob(None, program, args, env=env, cwd=cwd)
+
+        if program:
+            # Execute a Phenix wrapper
+            pwutils.runJob(None, program, args, env=env, cwd=cwd)
+        else:
+            # Execute a Python script using Phenix's Python
+            python = os.path.join(cls.getHome(), "bin", "phenix.python")
+            pwutils.runJob(None, python, args, env=env, cwd=cwd)
 
     @classmethod
     def getProgram(cls, progName):
         """ Return the program binary that will be used. """
-        return os.path.join(Plugin.getHome(),
-                            mapBinarytoDirectory[progName],
-                            os.path.basename(progName))
+        return os.path.join(
+            cls.getHome(),
+            mapBinarytoDirectory[progName],
+            f"phenix.{os.path.basename(progName)}"
+        )
 
     @classmethod
     def getPhenixVersion(cls):
