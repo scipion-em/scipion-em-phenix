@@ -161,7 +161,7 @@ import collections
 import json
 
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
 
 # process file {VALIDATIONCRYOEMPKLFILENAME}"

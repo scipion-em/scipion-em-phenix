@@ -172,7 +172,7 @@ from mmtbx.ringer.em_scoring import parse_pickle
 from mmtbx.ringer.em_rolling import easy_pickle, RingerDict
 
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
 
 # process file %s"

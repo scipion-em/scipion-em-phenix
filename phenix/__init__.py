@@ -82,7 +82,9 @@ class Plugin(pwem.Plugin):
         env = cls.getEnviron()
         if extraEnvDict is not None:
             env.update(extraEnvDict)
-        program = PHENIX_PYTHON + program
+        phenix_home = os.getenv(PHENIX_HOME)
+
+        program = os.path.join(phenix_home, 'bin', PHENIX_PYTHON) + program
         pwutils.runJob(None, program, args, env=env, cwd=cwd)
 
     @classmethod

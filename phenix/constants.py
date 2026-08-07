@@ -41,10 +41,10 @@ PHENIXVERSIONdev_6085 = 'dev-6085'
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
 
 #phenix binaries are in several directories
-# PHENIX_SCRIPT_PATH1 = 'lib/python3.9/site-packages/mmtbx/command_line'
-# PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
-PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
-PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
+PHENIX_SCRIPT_PATH1 = 'lib/python3.9/site-packages/mmtbx/command_line'
+PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
+# PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
+# PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
 PHENIX_GETVERSION_PATH = 'bin'
 
 # list of phenix scripts and corresponding binary directory

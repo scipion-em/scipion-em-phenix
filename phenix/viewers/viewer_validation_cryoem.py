@@ -648,7 +648,7 @@ os.environ["LANG"] = "en_US.UTF-8"
 os.environ["LC_ALL"] = "en_US.UTF-8"
 
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
 
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -755,7 +755,7 @@ os.environ["LANG"] = "en_US.UTF-8"
 os.environ["LC_ALL"] = "en_US.UTF-8"
 
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
         
 # process file {VALIDATIONCRYOEMPKLFILENAME}"
@@ -1292,7 +1292,7 @@ import collections
 import json
 
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
         
 # process file {VALIDATIONCRYOEMPKLFILENAME}"

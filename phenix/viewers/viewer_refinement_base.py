@@ -676,11 +676,12 @@ class PhenixProtRefinementBaseViewer(ProtocolViewer):
         self._showResults(headerList, dictX, val, mesg, title)
 
     def _showCootOutliers(self, e=None):
+        print("Launching Coot to visualize outliers and clashes")
         MOLPROBITYCOOTFILENAME = self.protocol._getExtraPath(
             self.protocol.MOLPROBITYCOOTFILENAME)
         args = ""
         args += " --python " + MOLPROBITYCOOTFILENAME
-
+        print("Launching Coot to visualize outliers and clashes with the following command: coot " + args)
         # pdb file
         if self.protocol.hasAttribute('outputPdb'):
             pdb = self.protocol.outputPdb
@@ -1541,7 +1542,7 @@ os.environ["LANG"] = "en_US.UTF-8"
 os.environ["LC_ALL"] = "en_US.UTF-8"
         
 def pickleData(file):
-    with open(file,"br") as f:
+    with open(file,"rb") as f:
         return pickle.load(f)
 
 # process file %s"

@@ -150,7 +150,7 @@ class PhenixProtRunDockInMap(EMProtocol):
         # Check that the input volume exist
         if self._getInputVolume() is None:
             errors.append("Error: You should provide a map.\n")
-        if self.inputStructure is None:
+        if self.inputStructure.get() is None:
             errors.append("Error: You should provide an atomic structure to fit.\n")
 
         return errors
