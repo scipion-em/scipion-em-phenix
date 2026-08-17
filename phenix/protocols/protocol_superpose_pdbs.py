@@ -43,6 +43,70 @@ from phenix import Plugin
 
 class PhenixProtRunSuperposePDBs(EMProtocol):
     """Superpose two PDBs so that they optimally match """
+
+    """
+        Superpose PDBs (PhenixProtRunSuperposePDBs) — User Manual
+
+        Overview
+
+        The Superpose PDBs protocol aligns two atomic structures in order to obtain the
+        best possible structural correspondence between them. The protocol uses the
+        Phenix superposition tools to calculate the optimal rigid-body transformation
+        between a fixed reference structure and a moving structure.
+
+        In cryo-EM and structural biology workflows, structural superposition is commonly
+        used to compare conformational states, evaluate structural similarity, validate
+        refinement results, or analyze differences between experimentally determined and
+        predicted models. By placing both structures into the same coordinate frame, the
+        protocol enables direct geometric and biological interpretation.
+
+        Inputs and Workflow
+
+        The protocol requires two atomic structures as input. The fixed structure defines
+        the reference coordinate system, while the moving structure is transformed to
+        match the reference as accurately as possible.
+
+        During execution, the protocol launches the Phenix superposition program and
+        computes the optimal alignment between both structures. The resulting fitted model
+        is stored as a new atomic structure while preserving the associated experimental
+        volume when available.
+
+        The protocol also includes automatic compatibility handling for PDB and mmCIF
+        formats. When format inconsistencies or parsing problems occur, several conversion
+        and standardization procedures are applied automatically to ensure successful
+        execution across different Phenix versions and structural file formats.
+
+        RMSD Evaluation
+
+        Structural similarity is evaluated using the Root Mean Square Deviation (RMSD)
+        between corresponding atoms before and after alignment. The initial RMSD reflects
+        the structural discrepancy prior to fitting, whereas the final RMSD represents
+        the quality of the optimized superposition.
+
+        Lower final RMSD values generally indicate stronger structural similarity and
+        better alignment quality. However, biologically meaningful differences such as
+        flexible domains, conformational rearrangements, or partial structural coverage
+        may still produce elevated RMSD values even when the alignment is correct.
+
+        Outputs and Interpretation
+
+        The protocol produces a fitted atomic structure corresponding to the aligned
+        moving model. This output can be used for downstream visualization, comparative
+        analysis, refinement validation, or structural interpretation.
+
+        In biological applications, structural superposition helps identify conserved
+        regions, characterize conformational variability, and compare structures obtained
+        from different experimental conditions, refinement procedures, or prediction
+        methods.
+
+        Final Perspective
+
+        The Superpose PDBs protocol provides a robust and automated strategy for aligning
+        atomic structures within cryo-EM and structural biology workflows. By combining
+        structural fitting, RMSD evaluation, and automatic format compatibility handling,
+        the protocol facilitates reliable comparison and interpretation of macromolecular
+        models.
+        """
     _label = 'superpose pdbs'
     _program = ""
     # _version = VERSION_1_2

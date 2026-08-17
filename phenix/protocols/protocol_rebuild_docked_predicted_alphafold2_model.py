@@ -49,6 +49,45 @@ class PhenixProtRebuildDockPredictedAlphaFold2Model(EMProtocol):
      RoseTTAFold and other prediction software into a cryo EM map, using a set
      of docked domains from the predicted model as a template.
     """
+    """
+    This protocol is designed to rebuild and refine predicted protein structures,
+    such as AlphaFold2 or RoseTTAFold models, into cryo-EM density maps using
+    Phenix tools. Its main objective is to improve the agreement between a
+    predicted atomic model and an experimental density map by using a previously
+    docked version of the model as a structural reference.
+
+    The workflow requires three main inputs: the original predicted structure,
+    a docked and processed version of the same model, and the cryo-EM map.
+    The docked structure provides the spatial orientation that guides the
+    rebuilding process, while the experimental density map constrains the
+    refinement toward biologically meaningful conformations.
+
+    During execution, the protocol creates local links for the input files,
+    prepares the execution environment, and generates the command-line arguments
+    required by the Phenix rebuild_predicted_model program. Users can define the
+    map resolution, configure the number of CPU threads, and include additional
+    advanced Phenix parameters to customize the rebuilding procedure.
+
+    The protocol then launches the rebuilding and morphing process, combining the
+    predicted structure, the docked template, and the cryo-EM density map to
+    produce a refined atomic model with improved fitting to the experimental data.
+    After completion, the protocol identifies the generated output structure,
+    stores it as the final result, and establishes relationships with the input
+    models to preserve workflow traceability inside Scipion.
+
+    Validation steps are included to verify that the required Phenix executable
+    is correctly installed and accessible. If the program is not properly
+    configured, the protocol reports installation and environment errors related
+    to the local Phenix and Scipion configuration.
+
+    From a biological perspective, this protocol is particularly useful when
+    predicted structures provide a correct global fold but require adaptation to
+    experimental cryo-EM conformations. By integrating computational predictions
+    with experimental density information, the workflow generates models that are
+    more accurate, experimentally supported, and suitable for downstream
+    structural interpretation and analysis.
+    """
+
     _label = 'rebuild predicted model'
     _program = ""
     # _version = VERSION_1_2

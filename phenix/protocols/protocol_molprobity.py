@@ -34,6 +34,57 @@ class PhenixProtRunMolprobity(PhenixProtRunRefinementBase):
     """MolProbity is a Phenix application to validate the geometry of an
 atomic structure inferred from an electron density map.
 """
+    """
+        MolProbity (PhenixProtRunMolprobity) — User Manual
+
+            Overview
+
+            The MolProbity protocol validates the stereochemical quality and
+            structural consistency of an atomic model obtained from cryo-EM data.
+            Using the Phenix implementation of MolProbity, the protocol evaluates
+            whether the fitted structure is geometrically reliable and biologically
+            plausible.
+
+            Inputs and Workflow
+
+            The protocol requires an atomic structure in PDBx/mmCIF format and can
+            optionally use a cryo-EM density map. If a map is provided, the
+            protocol also evaluates the agreement between the model and the
+            experimental density through real-space correlation analysis.
+
+            During execution, the input map is converted into MRC format when
+            needed, and the Phenix MolProbity validation program is launched
+            automatically. The workflow includes stereochemical validation,
+            geometry analysis, and optional density-based validation depending on
+            the installed Phenix version.
+
+            Validation and Biological Interpretation
+
+            MolProbity helps detect structural problems such as steric clashes,
+            unrealistic bond geometries, backbone outliers, and incorrect side
+            chain conformations. These metrics are essential for assessing model
+            quality before publication, deposition, or downstream biological
+            analysis.
+
+            When density information is available, the protocol also evaluates how
+            well the model fits the experimental map. Poor correlation values may
+            indicate domain misplacement, incorrect residue assignment, or local
+            overfitting.
+
+            Outputs
+
+            The protocol produces validation statistics and structural quality
+            metrics that help determine the reliability of the atomic model.
+            Results can be used to identify problematic regions requiring further
+            refinement or rebuilding.
+
+            Final Perspective
+
+            MolProbity is an essential validation step in cryo-EM workflows because
+            accurate biological interpretation depends not only on map fitting, but
+            also on maintaining chemically and stereochemically correct atomic
+            models.
+        """
     _label = 'molprobity'
     _program = ""
     MOLPROBITYFILE = 'molprobity.mrc'

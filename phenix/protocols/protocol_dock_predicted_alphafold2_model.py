@@ -50,6 +50,44 @@ class PhenixProtDockPredictedAlphaFold2Model(EMProtocol):
      connectivity of the model as a restraint in the docking process so that
      the docked domains normally are in a reasonable arrangement. It can take
      map symmetry into account."""
+
+    """
+        Dock Predicted Model (PhenixProtDockPredictedAlphaFold2Model)
+
+        This protocol docks predicted protein structures generated with
+        AlphaFold2, RoseTTAFold, or similar prediction software into
+        cryo-EM density maps using Phenix tools. The protocol combines
+        the original predicted model with a previously processed model
+        in order to improve docking stability while preserving domain
+        connectivity and biologically meaningful arrangements.
+
+        The workflow requires three main inputs: a predicted atomic
+        structure, a processed predicted model, and a cryo-EM density
+        map. During execution, the map is converted into MRC format
+        while maintaining origin coordinates and sampling information.
+        The protocol then prepares local copies of the models and
+        launches the Phenix docking procedure using the selected
+        resolution, number of threads, and optional advanced parameters.
+
+        Biologically, this protocol is especially useful for fitting
+        multi-domain or flexible predicted structures into experimental
+        cryo-EM maps. By using connectivity restraints between domains,
+        the docking process maintains more realistic structural
+        arrangements compared to independent rigid-body fitting methods.
+
+        After execution, the protocol automatically detects the docked
+        output model and defines it as the final protocol result.
+        Validation routines verify that the required Phenix programs
+        and environment variables are correctly configured before
+        execution. Additional utility functions manage CIF/PDB format
+        conversions and structural compatibility during superposition
+        and docking operations.
+
+        In practical cryo-EM workflows, this protocol is commonly used
+        as an intermediate step between AI-based structure prediction
+        and atomic refinement, enabling biologically meaningful fitting
+        of predicted models into experimental density maps.
+        """
     _label = 'dock predicted model'
     _program = ""
     # _version = VERSION_1_2

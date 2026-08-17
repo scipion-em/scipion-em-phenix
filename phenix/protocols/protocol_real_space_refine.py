@@ -52,6 +52,49 @@ class PhenixProtRunRSRefine(PhenixProtRunRefinementBase):
     as well as possible having appropriate geometry. The model should not show
     validation outliers, such as Ramachandran plot or rotamer outliers.
     """
+
+    """
+        Real Space Refine (PhenixProtRunRSRefine) — User Manual
+
+            Overview
+
+            The Real Space Refine protocol refines an atomic structure
+            against an experimental density map using Phenix real-space
+            refinement tools. Its main objective is to improve the fit
+            between the model and the map while preserving correct
+            stereochemistry and biologically meaningful geometry.
+
+            Inputs and General Workflow
+
+            The protocol requires an input atomic structure and a
+            corresponding density map that are already approximately
+            aligned. During execution, the map is converted into a
+            compatible format and the structure is refined iteratively
+            against the density.
+
+            Refinement and Optimization
+
+            Several refinement strategies can be combined, including
+            global minimization, local grid search, rigid-body refinement,
+            morphing, simulated annealing, and secondary structure
+            restraints. The number of macro cycles controls the refinement
+            iterations and can be increased for difficult cases.
+
+            Validation and Outputs
+
+            After refinement, the protocol performs validation using
+            MolProbity and cryo-EM validation tools to evaluate geometry,
+            clashes, and map-to-model agreement. The final output is a
+            refined atomic structure with improved stereochemical quality
+            and better consistency with the experimental density.
+
+            Final Perspective
+
+            Real-space refinement is an essential step in cryo-EM model
+            optimization because it improves both structural accuracy and
+            biological interpretability before downstream analysis or
+            deposition.
+        """
     _label = 'real space refine'
     _program = ""
     # _version = VERSION_1_2

@@ -43,6 +43,75 @@ from phenix import Plugin
 
 class PhenixProtRunDockInMap(EMProtocol):
     """Docking of a PDB (one or several copies) into a map """
+
+    """
+        Phenix Dock in Map Protocol — User Manual
+
+        Overview
+
+        The PhenixProtRunDockInMap protocol is a Scipion wrapper designed to
+        integrate the Phenix `dock_in_map` workflow into cryo-EM processing
+        pipelines. Its primary objective is to dock an atomic structure into
+        an experimental cryo-electron microscopy density map in order to
+        determine the most suitable spatial placement of the model within the
+        reconstructed volume.
+
+        In cryo-EM structural biology, docking is a fundamental step for
+        interpreting density maps and connecting experimental reconstructions
+        with atomic-level structural information. The protocol is especially
+        useful when fitting previously determined structures, homology
+        models, or predicted protein conformations into cryo-EM maps for
+        structural analysis and refinement.
+
+        Inputs and Workflow
+
+        The protocol requires an input cryo-EM density map together with an
+        atomic structure provided in PDB or mmCIF format. Users may also
+        define the number of copies of the atomic structure expected inside
+        the density map, which is particularly important when studying
+        oligomeric or symmetric biological assemblies.
+
+        During execution, the protocol first converts and prepares the input
+        map in MRC format while preserving the correct origin coordinates and
+        sampling rate. Accurate coordinate handling is essential because map
+        and model consistency directly affects docking precision and
+        biological interpretation.
+
+        After preparation, the protocol launches the Phenix `dock_in_map`
+        program, which searches for the optimal placement of the atomic model
+        inside the experimental density. Multi-threaded execution is
+        supported in order to improve computational performance for large
+        structures or high-resolution maps.
+
+        Docking and Structural Interpretation
+
+        The docking process attempts to maximize agreement between the atomic
+        structure and the cryo-EM density map. Biologically, this allows the
+        identification of the most probable structural arrangement observed
+        experimentally. When multiple copies of a structure are present, the
+        protocol can search for repeated placements inside the map.
+
+        The map resolution parameter guides the fitting process and defines
+        the expected level of structural detail. Appropriate resolution
+        selection is important because excessively optimistic values may lead
+        to unstable fitting, while overly conservative values may reduce
+        docking accuracy.
+
+        Outputs and Biological Interpretation
+
+        After execution, the protocol generates a fitted atomic structure
+        corresponding to the docked model. The resulting structure is
+        converted into mmCIF format and automatically imported back into the
+        Scipion project as an output atomic model associated with the input
+        cryo-EM map.
+
+        From a biological perspective, the docked model provides a structural
+        interpretation of the experimental density and serves as a starting
+        point for subsequent refinement, rebuilding, validation, or
+        functional analysis. This protocol is particularly valuable for
+        studying macromolecular assemblies, fitting predicted models into
+        cryo-EM maps, and analyzing oligomeric protein complexes.
+        """
     _label = 'dock in map'
     _program = ""
     # _version = VERSION_1_2

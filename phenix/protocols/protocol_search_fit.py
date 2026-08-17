@@ -56,6 +56,57 @@ class PhenixProtSearchFit(PhenixProtRunRefinementBase):
     that better fits in the density. Only works if the
     atomic structure has a single chain
     """
+    """
+        Search Fit (PhenixProtSearchFit) — User Manual
+
+        Overview
+
+        The Search Fit protocol identifies the amino acid subsequence that best fits a cryo-EM density map
+        using an alanine-only template structure and a target protein sequence. The protocol combines sequence
+        mutation, real-space refinement, and model-to-map scoring to determine which sequence fragment most
+        accurately matches the experimental density.
+
+        In practical cryo-EM workflows, this protocol is useful when an approximate backbone trace exists
+        but residue identities remain uncertain. By systematically mutating the alanine chain into different
+        sequence fragments and refining each candidate against the density map, the protocol evaluates which
+        region of the sequence provides the best structural agreement.
+
+        Inputs and Workflow
+
+        The protocol requires an input density map, an alanine-template atomic structure, and a target amino
+        acid sequence. The user also defines the residue interval to explore within the sequence. The protocol
+        assumes that the input structure contains a single chain.
+
+        During execution, the protocol generates multiple mutated models by replacing the alanine residues
+        with sequence fragments extracted from the target sequence. Each generated model is then refined
+        independently using Phenix real-space refinement. Refinement jobs are distributed in parallel and
+        evaluated according to their model-to-map correlation score.
+
+        Refinement and Optimization
+
+        The protocol supports several refinement strategies including global minimization, rigid-body fitting,
+        local grid search, morphing, simulated annealing, ADP refinement, occupancy refinement, and automatic
+        NQH flips. These options allow adaptation to different map qualities and structural uncertainties.
+
+        For most routine applications, global minimization with default refinement settings is generally
+        sufficient. More advanced optimization methods improve fitting accuracy in difficult cases but may
+        substantially increase computational cost.
+
+        Outputs and Interpretation
+
+        After refinement, the protocol ranks the generated models according to their model-to-map fit score.
+        The best-scoring refined structures are exported as outputs for downstream validation and analysis.
+
+        Biologically, higher-scoring models indicate sequence fragments that are more consistent with the
+        experimental density. However, ambiguous density regions, low local resolution, or structural
+        flexibility may reduce confidence in residue assignment.
+
+        Final Perspective
+
+        The Search Fit protocol provides an automated strategy for matching protein sequences to cryo-EM
+        density maps using iterative mutation and refinement. It is especially valuable in early model-building
+        stages where residue identities are uncertain but backbone geometry is already available.
+        """
     _label = 'search fit'
     _program = ""
     FITTEDFILE = 'fitted.mrc'
