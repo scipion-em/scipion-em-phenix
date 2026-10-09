@@ -217,6 +217,22 @@ for residue in ringer_results:
 dataDict['_residues_format'] = formatResidue
 dataDict['_residues_dict'] = dictResidue
 """ % mainDataFile
+        # phenix.emringer draws the rolling-window plots with rolling_window_threshold=0
+        # (its default), so "Fraction above Threshold" is always ~1 and the rotameric fraction
+        # includes residues without density. Redraw them at the optimal threshold.
+        command += """# redraw rolling-window plots at the optimal threshold
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+    from mmtbx.ringer import em_rolling
+    em_rolling.main(ringer_results=ringer_results, dir_name='%s',
+                    threshold=dataDict['Optimal Threshold'], graph=False,
+                    save=True, out=sys.stdout)
+    dataDict['_rollingThreshold'] = dataDict['Optimal Threshold']
+except Exception as e:
+    print('Could not redraw rolling-window plots at the optimal threshold: %%s' %% e)
+    dataDict['_rollingThreshold'] = 0
+""" % plots
         command += """with open('%s',"w") as f:
     f.write(json.dumps(dataDict))
 """ % (EMRINGERTRANSFERFILENAME)
