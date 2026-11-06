@@ -24,6 +24,8 @@
 # *
 # **************************************************************************
 
+import os
+
 PHENIX_HOME = 'PHENIX_HOME'
 PHENIXVERSIONFILENAME = 'phenix_env.sh'
 PHENIXVERSION = '2.1'
@@ -40,11 +42,30 @@ PHENIXVERSIONdev_6085 = 'dev-6085'
 # it is in the bin directory
 PHENIX_PYTHON = 'phenix.python '  # keep the ending space
 
-#phenix binaries are in several directories
-PHENIX_SCRIPT_PATH1 = 'lib/python3.9/site-packages/mmtbx/command_line'
-PHENIX_SCRIPT_PATH2 = 'lib/python3.9/site-packages/phenix/command_line'
-# PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
-# PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
+# phenix binaries are in several directories.
+# Their location depends on the phenix version / installation layout, so these
+# paths are configurable: set PHENIX_SCRIPT_PATH1 / PHENIX_SCRIPT_PATH2 in the
+# [PLUGINS] section of scipion.conf to override the defaults below.
+#
+# NOTE: the paths differ between phenix major versions:
+#   - phenix-1 (e.g. 1.21.2-5419, prebuilt "modules" layout):
+#         PHENIX_SCRIPT_PATH1 = 'modules/cctbx_project/mmtbx/command_line'
+#         PHENIX_SCRIPT_PATH2 = 'modules/phenix/phenix/command_line'
+#   - phenix-2 (e.g. 2.2.1-6174, conda/python 3.11 site-packages layout):
+#         PHENIX_SCRIPT_PATH1 = 'lib/python3.11/site-packages/mmtbx/command_line'
+#         PHENIX_SCRIPT_PATH2 = 'lib/python3.11/site-packages/phenix/command_line'
+#
+# The defaults below correspond to the phenix-2 layout (current supported
+# version). Users installing phenix-1 have to override them in scipion.conf.
+#
+# If the variables are not set, the values from scipion.conf (read by the
+# scipion launcher into the environment) are used; otherwise these defaults
+# apply.
+#
+#   PATH1 -> mmtbx scripts (molprobity, emringer, process_predicted_model, ...)
+#   PATH2 -> phenix scripts (real_space_refine, superpose_pdbs, validation_cryoem, ...)
+PHENIX_SCRIPT_PATH1 = os.environ.get('PHENIX_SCRIPT_PATH1', 'lib/python3.11/site-packages/mmtbx/command_line')
+PHENIX_SCRIPT_PATH2 = os.environ.get('PHENIX_SCRIPT_PATH2', 'lib/python3.11/site-packages/phenix/command_line')
 PHENIX_GETVERSION_PATH = 'bin'
 
 # list of phenix scripts and corresponding binary directory

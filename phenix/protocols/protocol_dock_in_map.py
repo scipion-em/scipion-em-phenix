@@ -109,8 +109,17 @@ class PhenixProtRunDockInMap(EMProtocol):
         # no longer needed since output is now in cif
         # self._getDockInMapOutput()
         # 00022:   AttributeError: 'PhenixProtRunDockInMap' object has no attribute 'outAtomStructName'
-        outAtomStructName = os.getcwd() + "/" +\
-            self._getExtraPath("placed_model.cif")
+        # Newer Phenix (2.x) writes the docked model as placed_model.cif,
+        # while Phenix 1.x (e.g. 1.21.2) writes placed_model.pdb. Pick the
+        # one that was actually produced so the output resolves correctly.
+        cifName = self._getExtraPath("placed_model.cif")
+        pdbName = self._getExtraPath("placed_model.pdb")
+        if os.path.exists(os.getcwd() + "/" + cifName):
+            outAtomStructName = cifName
+        elif os.path.exists(os.getcwd() + "/" + pdbName):
+            outAtomStructName = pdbName
+        else:
+            outAtomStructName = cifName  # keep previous behaviour
         pdb = AtomStruct()
         pdb.setFileName(relpath(outAtomStructName))
         if self.inputVolume1.get() is not None:

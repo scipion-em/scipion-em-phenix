@@ -198,8 +198,15 @@ class PhenixPredictAndBuildCryoEM(EMProtocol):
                 len(fileName.split(".")) > len(nameProcessed.split("."))):
                 print("fileName: ", fileName)
                 pdb.setFileName(self._getExtraPath(fileName))
-            self._defineOutputs(outputPdb=pdb)
-            self._defineSourceRelation(self.inputPredictedModel.get(), pdb)
+        self._defineOutputs(outputPdb=pdb)
+        # inputPredictedModel is optional (allowsNull=True): it is only set
+        # when the user provides their own model. When the protocol is fed
+        # sequences (the usual case) it is None and no source relation is
+        # created. Defining one with None raised
+        # AttributeError: 'NoneType' object has no attribute 'isPointer'.
+        predictedModel = self.inputPredictedModel.get()
+        if predictedModel is not None:
+            self._defineSourceRelation(predictedModel, pdb)
 
         self._store()
 
